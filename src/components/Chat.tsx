@@ -16,13 +16,13 @@ export default function Page() {
     chatDataAtom.set(JSON.parse(localStorage.getItem("messages") || "[]") as ChatMessage[]);
     chatConfigAtom.set({
       visible: false,
-      openAIKey: localStorage.getItem("openAIKey") || import.meta.env.OPENAI_API_KEY || undefined,
+      openAIKey: localStorage.getItem("openAIKey") || import.meta.env.OPENAI_API_KEY,
 
-      openAIServer: localStorage.getItem("openAIServer") || import.meta.env.OPENAI_API_SERVER || undefined,
+      openAIServer: localStorage.getItem("openAIServer") || import.meta.env.OPENAI_API_SERVER,
       systemMessage: localStorage.getItem("systemMessage") || undefined,
 
-      unisoundAppKey: localStorage.getItem("unisoundAppKey") || import.meta.env.UNISOUND_AI_KEY || undefined,
-      unisoundSecret: localStorage.getItem("unisoundSecret") || import.meta.env.UNISOUND_AI_SECRET || undefined,
+      unisoundAppKey: localStorage.getItem("unisoundAppKey") || import.meta.env.UNISOUND_AI_KEY ,
+      unisoundSecret: localStorage.getItem("unisoundSecret") || import.meta.env.UNISOUND_AI_SECRET,
     });
   }, [chatConfigAtom]);
 
