@@ -1,4 +1,8 @@
 ---
+import "antd/dist/reset.css";
+import "uno.css";
+import "github-markdown-css";
+
 export interface Props {
 	title: string;
 }
@@ -20,16 +24,36 @@ const { title } = Astro.props;
 	</body>
 </html>
 <style is:global>
-	:root {
-		--accent: 124, 58, 237;
-		--accent-gradient: linear-gradient(45deg, rgb(var(--accent)), #da62c4 30%, white 60%);
-	}
 	html {
 		font-family: system-ui, sans-serif;
-		background-color: #F6F6F6;
 	}
 	code {
 		font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
 			Bitstream Vera Sans Mono, Courier New, monospace;
 	}
+
+	.markdown-body {
+  	background-color: transparent !important;
+	}
+
+	.action-btn {
+		border-radius: 20px;
+		padding: 6px 12px;
+		color: #000;
+		border: 1px solid #666;
+	}
+
+	.action-primary {
+ 		background-color: #4096FF;
+		color: white;
+		border: 1px solid #4096FF;
+
+	}
+
+	.action-btn-red {
+		color: red;
+		border: 1px solid red;
+		background-color: transparent;
+	}
+
 </style>
