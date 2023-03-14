@@ -274,7 +274,7 @@ export default function Page() {
       </div>
       <div className="absolute bottom-0 w-full">
         {chatConfig.visible && <SettingPanel />}
-        <div className="shadow-lg m-4 flex items-center space-x-3 bg-sky-50 rounded-lg p-2">
+        <div className="shadow-lg m-4 flex flex-col  bg-sky-50 rounded-lg p-2 sm:flex-row">
           <Input.TextArea
             className="flex-1 border-none"
             bordered={false}
@@ -286,7 +286,7 @@ export default function Page() {
             onKeyDown={(e) => !isComposing && e.key === "Enter" && handleChatGPTClick()}
             autoSize={{ minRows: 1, maxRows: 6 }}
           />
-          <div className="h-full flex flex-w items-center space-x-2">
+          <div className="h-full flex flex-w items-center space-x-2 justify-end sm:justify-start">
             <button
               title="发送"
               onClick={() => handleChatGPTClick()}
