@@ -7,6 +7,7 @@ export const post: APIRoute = async (context) => {
   const body = await context.request.json();
   const server = body.openAIServer || "https://api.openai.com/v1/chat/completions";
   const openAIKey = body.openAIKey || apiKey;
+  const model = body.openAIModel;
   const messages = body.messages;
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
@@ -22,7 +23,7 @@ export const post: APIRoute = async (context) => {
     },
     method: "POST",
     body: JSON.stringify({
-      model: "gpt-3.5-turbo",
+      model: model || "gpt-3.5-turbo",
       messages,
       stream: true,
       temperature: 0.6,

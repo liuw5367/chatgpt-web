@@ -30,16 +30,21 @@ export default function SettingPanel() {
     placeholder: string;
   };
 
-  const list:ListItemType[] = [
+  const list: ListItemType[] = [
+    {
+      label: "OPENAI_SERVER",
+      value: "openAIServer",
+      placeholder: "https://api.openai.com/v1/chat/completions",
+    },
     {
       label: "OPENAI_KEY",
       value: "openAIKey",
       placeholder: "请输入 OPENAI_KEY",
     },
     {
-      label: "OPENAI_SERVER",
-      value: "openAIServer",
-      placeholder: "https://api.openai.com/v1/chat/completions",
+      label: "OPENAI_MODEL",
+      value: "openAIModel",
+      placeholder: "gpt-3.5-turbo",
     },
     {
       label: "Unisound_APPKEY",
@@ -63,7 +68,7 @@ export default function SettingPanel() {
         <div className="flex space-x-2 items-end">
           <Input.TextArea
             className="flex-1"
-            placeholder="role: system"
+            placeholder="systemMessage. 例如：你是一个翻译工具，请将给出的内容翻译成中文，此外不要输出其他多余的内容"
             value={systemMessage}
             onChange={(e) => setSystemMessage(e.target.value)}
             autoSize={{ minRows: 3, maxRows: 6 }}

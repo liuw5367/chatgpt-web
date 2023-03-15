@@ -172,6 +172,7 @@ export default function Page() {
           messages: requestMessages,
           openAIKey: chatConfig.openAIKey,
           openAIServer: chatConfig.openAIServer,
+          openAIModel: chatConfig.openAIModel,
         }),
         signal: abortController.signal,
       });

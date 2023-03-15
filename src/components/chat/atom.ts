@@ -19,6 +19,7 @@ export const chatConfigAtom = atom({
   openAIKey: (local.getItem("openAIKey") || import.meta.env.OPENAI_API_KEY) as string | undefined,
 
   openAIServer: (local.getItem("openAIServer") || import.meta.env.OPENAI_API_SERVER) as string | undefined,
+  openAIModel: (local.getItem("openAIModel") || import.meta.env.OPENAI_API_MODEL) as string | undefined,
   systemMessage: local.getItem("systemMessage") as string | undefined,
 
   unisoundAppKey: (local.getItem("unisoundAppKey") || import.meta.env.UNISOUND_AI_KEY) as string | undefined,

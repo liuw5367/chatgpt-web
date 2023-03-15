@@ -1,17 +1,10 @@
-import "dayjs/locale/zh-cn";
-import zhCN from "antd/locale/zh_CN";
-import dayjs from "dayjs";
-import { ConfigProvider, message, notification } from "antd";
 import Chat from "./chat/index";
 import { useEffect } from "react";
 import { chatConfigAtom, chatDataAtom } from "./chat/atom";
 import type { ChatMessage } from "./chat/type";
+import { ConfigProvider } from "antd";
 
-dayjs.locale("zh-cn");
-notification.config({ duration: 2 });
-message.config({ duration: 2 });
-
-export default function Page() {
+export default function App() {
   useEffect(() => {
     chatDataAtom.set(JSON.parse(localStorage.getItem("messages") || "[]") as ChatMessage[]);
     chatConfigAtom.set({
@@ -19,16 +12,16 @@ export default function Page() {
       openAIKey: localStorage.getItem("openAIKey") || import.meta.env.OPENAI_API_KEY,
 
       openAIServer: localStorage.getItem("openAIServer") || import.meta.env.OPENAI_API_SERVER,
+      openAIModel: localStorage.getItem("openAIModel") || import.meta.env.OPENAI_API_MODEL,
       systemMessage: localStorage.getItem("systemMessage") || undefined,
 
-      unisoundAppKey: localStorage.getItem("unisoundAppKey") || import.meta.env.UNISOUND_AI_KEY ,
+      unisoundAppKey: localStorage.getItem("unisoundAppKey") || import.meta.env.UNISOUND_AI_KEY,
       unisoundSecret: localStorage.getItem("unisoundSecret") || import.meta.env.UNISOUND_AI_SECRET,
     });
   }, [chatConfigAtom]);
 
   return (
     <ConfigProvider
-      locale={zhCN}
       theme={{
         token: {
           colorPrimary: "#1777FF",
