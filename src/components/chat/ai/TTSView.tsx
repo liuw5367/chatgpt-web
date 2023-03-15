@@ -1,5 +1,4 @@
 import { useMemoizedFn } from "ahooks";
-import { message } from "antd";
 import axios from "axios";
 import { useStore } from "@nanostores/react";
 import { sha256 } from "js-sha256";
@@ -69,7 +68,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     try {
       new window.AudioContext();
     } catch (e) {
-      message.error("您当前的浏览器不支持 Web Audio API");
+      alert("您当前的浏览器不支持 Web Audio API");
       return;
     }
     onStatusChange?.(TTSStatusEnum.PLAYING);
@@ -108,7 +107,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
         const result = JSON.parse(res.data);
         socket.close();
         if (result.code !== 0) {
-          message.error("合成遇到点问题，请稍后再试~");
+          alert("合成遇到点问题，请稍后再试~");
           onStatusChange?.(TTSStatusEnum.NORMAL);
           player && player.destroy();
         }
@@ -165,7 +164,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
           startTime = Date.now();
           getResult(taskId);
         } else {
-          message.warning("TTS错误，请重试");
+          alert("TTS错误，请重试");
           onStatusChange?.(TTSStatusEnum.NORMAL);
         }
       })

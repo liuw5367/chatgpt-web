@@ -1,8 +1,7 @@
 import { useMemoizedFn } from "ahooks";
-import { message } from "antd";
 import { useStore } from "@nanostores/react";
 import { sha256 } from "js-sha256";
-import React, { useEffect, useImperativeHandle, useState } from "react";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import { chatConfigAtom } from "../atom";
 import { APP_CONFIG, ASR_CONFIG } from "../Config";
@@ -45,6 +44,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   const recording = status === ASRStatusEnum.RECORDING;
 
   const chatConfig = useStore(chatConfigAtom);
+  const errorCountRef = useRef(0);
 
   useImperativeHandle(
     ref,
@@ -105,7 +105,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
         recorder.start();
       },
       () => {
-        message.warning("录音启动失败！");
+        alert("录音启动失败！");
         socketRef.current?.close();
         onStatusChange?.(ASRStatusEnum.NORMAL);
       }
@@ -139,6 +139,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     };
 
     socket.onmessage = (evt: MessageEvent) => {
+      errorCountRef.current = 0;
       const res = JSON.parse(evt.data);
       if (res.code === 0 && res.text) {
         sid = res.sid;
@@ -170,7 +171,8 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
       console.log("asr ws error", sid, new Date().toUTCString());
       console.log(e);
       socketRef.current = null;
-      createSocket();
+      errorCountRef.current = errorCountRef.current + 1;
+      setTimeout(() => createSocket(), errorCountRef.current * 200);
     };
 
     socket.onclose = (e: CloseEvent) => {
@@ -178,7 +180,8 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
       console.log(e);
       socketRef.current = null;
       if (e.code !== 1000) {
-        createSocket();
+        errorCountRef.current = errorCountRef.current + 1;
+        setTimeout(() => createSocket(), errorCountRef.current * 200);
       }
     };
   }

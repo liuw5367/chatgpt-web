@@ -11,29 +11,22 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { useDebounceEffect } from "ahooks";
-import { Input, message } from "antd";
 import { useStore } from "@nanostores/react";
 import React, { useState } from "react";
 
-import { getCurrentTime, removeLn, scrollToElement, uuid } from "./utils";
-
+import { getCurrentTime, scrollToElement, uuid } from "./utils";
 import VoiceView, { VoiceRef } from "./ai";
 import { ASRStatusEnum } from "./ai/ASRView";
 import { TTSStatusEnum } from "./ai/TTSView";
 import { chatConfigAtom, chatDataAtom } from "./atom";
 import SettingPanel from "./SettingPanel";
 import type { ChatMessage, Command } from "./type";
-import classNames from "classnames";
-
-import MarkdownIt from "markdown-it";
-// @ts-ignore
-import mdKatex from "markdown-it-katex";
-import mdHighlight from "markdown-it-highlightjs";
+import { Button, IconButton, Textarea, useToast } from "@chakra-ui/react";
+import { MessageItem } from "./MessageItem";
 
 export default function Page() {
   const [conversationId, setConversationId] = useState<string>();
   const [parentMessageId, setParentMessageId] = useState<string>();
-  const [isComposing, setComposing] = useState(false);
   const [inputContent, setInputContent] = useState("");
   const [currentAssistantMessage, setCurrentAssistantMessage] = useState("");
   const [contextEnable, setContextEnable] = useState(false);
@@ -47,6 +40,8 @@ export default function Page() {
   const [chatAbortController, setAbortController] = useState<AbortController>();
 
   const chatConfig = useStore(chatConfigAtom);
+
+  const toast = useToast({ position: "top" });
 
   useDebounceEffect(() => {
     localStorage.setItem("messages", JSON.stringify(dataSource));
@@ -77,11 +72,11 @@ export default function Page() {
 
   function handleTTSClick() {
     if (!chatConfig.unisoundAppKey) {
-      message.error("请在设置中输入 unisound APPKEY");
+      toast({ status: "error", title: "请在设置中输入 unisound APPKEY" });
       return;
     }
     if (!chatConfig.unisoundSecret) {
-      message.error("请在设置中输入 unisound SECRET");
+      toast({ status: "error", title: "请在设置中输入 unisound SECRET" });
       return;
     }
 
@@ -99,11 +94,11 @@ export default function Page() {
 
   function handleASRClick() {
     if (!chatConfig.unisoundAppKey) {
-      message.error("请在设置中输入 unisound APPKEY");
+      toast({ status: "error", title: "请在设置中输入 unisound APPKEY" });
       return;
     }
     if (!chatConfig.unisoundSecret) {
-      message.error("请在设置中输入 unisound SECRET");
+      toast({ status: "error", title: "请在设置中输入 unisound SECRET" });
       return;
     }
     stopTTS();
@@ -121,7 +116,7 @@ export default function Page() {
 
   async function handleChatGPTClick(content = inputContent) {
     if (!chatConfig.openAIKey) {
-      message.error("请在设置中输入 OPENAI_KEY");
+      toast({ status: "error", title: "请在设置中输入 OPENAI_KEY" });
       return;
     }
 
@@ -178,7 +173,7 @@ export default function Page() {
       });
 
       if (!response.ok || !response.body) {
-        message.warning("请求错误");
+        toast({ status: "warning", title: "请求异常" });
         setChatLoading(false);
         return;
       }
@@ -239,99 +234,69 @@ export default function Page() {
     setParentMessageId(undefined);
   }
 
-  function renderItem(item: ChatMessage) {
-    const isUser = item.role === "user";
-    let content = item.content;
-    if (!isUser) {
-      content = MarkdownIt().use(mdKatex).use(mdHighlight).render(item.content);
-    }
-
-    return (
-      <div
-        key={item.id} //
-        id={item.id}
-        className={`mb-3 flex flex-col ${isUser ? "items-end" : ""}`}
-      >
-        {item.time && <div className={`mb-1 px-2 text-xs text-gray-500`}>{item.time}</div>}
-        <div className={` shadow rounded-lg p-3 ${isUser ? "bg-light-blue-100" : "bg-green-50"}`}>
-          <div className="markdown-body" dangerouslySetInnerHTML={{ __html: content }} />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full h-full flex flex-col bg-cover bg-no-repeat">
-      <div className={`flex-1 overflow-auto p-4 pb-0 flex-1`}>
-        {dataSource.map((item) => renderItem(item))}
-        {currentAssistantMessage &&
-          renderItem({
-            id: "-1",
-            role: "assistant",
-            content: currentAssistantMessage,
-          })}
-        <div className="h-[200px]" />
+    <div className="w-full h-full flex flex-col bg-cover bg-no-repeat relative">
+      <div className={`flex-1 p-4 pb-0 overflow-auto`}>
+        {dataSource.map((item) => (
+          <MessageItem key={item.id} item={item} />
+        ))}
+        {currentAssistantMessage && (
+          <MessageItem
+            key={"-1"}
+            item={{
+              id: "-1",
+              role: "assistant",
+              content: currentAssistantMessage,
+            }}
+          />
+        )}
         <div id="chat-bottom" />
       </div>
-      <div className="absolute bottom-0 w-full">
-        {chatConfig.visible && <SettingPanel />}
-        <div className="shadow-lg m-4 flex flex-col  bg-sky-50 rounded-lg p-2 sm:flex-row">
-          <Input.TextArea
-            className="flex-1 border-none"
-            bordered={false}
-            value={inputContent}
-            onChange={(e) => setInputContent(removeLn(e.target.value))}
-            placeholder="请输入内容"
-            onCompositionStart={() => setComposing(true)}
-            onCompositionEnd={() => setComposing(false)}
-            onKeyDown={(e) => !isComposing && e.key === "Enter" && handleChatGPTClick()}
-            autoSize={{ minRows: 1, maxRows: 6 }}
+
+      <div className="p-6 border-t flex flex-col justify-end space-y-3">
+        <Textarea
+          rows={3}
+          className="resize-none"
+          placeholder="请输入内容"
+          value={inputContent}
+          onChange={(e) => setInputContent(e.target.value)}
+          onKeyDown={(e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+              handleChatGPTClick();
+            }
+          }}
+        />
+        <div className="flex flex-row items-center space-x-3">
+          <Button
+            onClick={() => handleChatGPTClick()}
+            colorScheme={chatLoading ? "red" : "blue"}
+            variant={chatLoading ? "outline" : "solid"}
+            leftIcon={chatLoading ? <LoadingOutlined /> : undefined}
+          >
+            {chatLoading ? "取消" : "发送"}
+          </Button>
+          <IconButton
+            aria-label="ASR" //
+            onClick={handleASRClick}
+            variant={asrState === ASRStatusEnum.RECORDING ? "outline" : "solid"}
+            icon={asrState === ASRStatusEnum.RECORDING ? <AudioMutedOutlined /> : <AudioOutlined />}
           />
-          <div className="h-full flex flex-w items-center space-x-2 justify-end sm:justify-start">
-            <button
-              title="发送"
-              onClick={() => handleChatGPTClick()}
-              className={classNames({
-                ["action-btn"]: true,
-                ["action-primary"]: true,
-                ["action-btn-red"]: chatLoading,
-              })}
-            >
-              {chatLoading ? <LoadingOutlined /> : <SendOutlined />}
-            </button>
-            <button
-              title="ASR"
-              onClick={handleASRClick}
-              className={classNames({
-                ["action-btn"]: true,
-                ["action-btn-red"]: asrState === ASRStatusEnum.RECORDING,
-              })}
-            >
-              {asrState === ASRStatusEnum.NORMAL && <AudioOutlined />}
-              {asrState === ASRStatusEnum.RECORDING && <AudioMutedOutlined />}
-            </button>
-            <button
-              title="TTS"
-              onClick={handleTTSClick}
-              className={classNames({
-                ["action-btn"]: true,
-                ["action-btn-red"]: ttsState === TTSStatusEnum.PLAYING,
-              })}
-            >
-              {ttsState === TTSStatusEnum.NORMAL && <PlayCircleOutlined />}
-              {ttsState === TTSStatusEnum.GENERATING && <LoadingOutlined />}
-              {ttsState === TTSStatusEnum.PLAYING && <PauseCircleOutlined />}
-            </button>
-            <button
-              title="清屏"
-              onClick={handleClearClick}
-              className={classNames({
-                ["action-btn"]: true,
-              })}
-            >
-              <ClearOutlined />
-            </button>
-            {/* <Button title="新对话" className="px-3" onClick={handleNewChatClick}>
+          <IconButton
+            aria-label="TTS" //
+            onClick={handleTTSClick}
+            variant={ttsState === TTSStatusEnum.PLAYING ? "outline" : "solid"}
+            icon={
+              ttsState === TTSStatusEnum.GENERATING ? (
+                <LoadingOutlined />
+              ) : ttsState === TTSStatusEnum.PLAYING ? (
+                <PauseCircleOutlined />
+              ) : (
+                <PlayCircleOutlined />
+              )
+            }
+          />
+          <IconButton aria-label="清屏" onClick={handleClearClick} icon={<ClearOutlined />} />
+          {/* <Button title="新对话" className="px-3" onClick={handleNewChatClick}>
               <ReloadOutlined />
             </Button>
             <Button
@@ -344,24 +309,30 @@ export default function Page() {
             >
               <RetweetOutlined />
             </Button> */}
-            <SettingOutlined
-              className="p-1"
-              onClick={() => {
-                const draft = chatConfigAtom.get();
-                chatConfigAtom.set({ ...draft, visible: !draft.visible });
-              }}
-            />
-          </div>
-          <VoiceView
-            ref={(ref) => (voiceRef.current = ref)}
-            chatLoading={chatLoading}
-            onAsrResultChange={handleAsrResult}
-            onAsrStatusChange={setAsrState}
-            onTtsStatusChange={setTtsState}
-            onCommandChange={handleCommandChange}
+
+          <IconButton
+            aria-label="设置"
+            icon={<SettingOutlined />}
+            onClick={() => {
+              const draft = chatConfigAtom.get();
+              chatConfigAtom.set({ ...draft, visible: !draft.visible });
+            }}
           />
         </div>
+        <VoiceView
+          ref={(ref) => (voiceRef.current = ref)}
+          chatLoading={chatLoading}
+          onAsrResultChange={handleAsrResult}
+          onAsrStatusChange={setAsrState}
+          onTtsStatusChange={setTtsState}
+          onCommandChange={handleCommandChange}
+        />
       </div>
+      {chatConfig.visible && (
+        <div className="absolute bottom-6 w-full z-50">
+          <SettingPanel />
+        </div>
+      )}
     </div>
   );
 }

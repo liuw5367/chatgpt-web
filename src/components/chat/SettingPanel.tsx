@@ -1,22 +1,34 @@
-import { CloseOutlined, SaveOutlined } from "@ant-design/icons";
-import { Input, message } from "antd";
+import { SaveOutlined } from "@ant-design/icons";
 import { useStore } from "@nanostores/react";
 import { useState } from "react";
 
 import { chatConfigAtom } from "./atom";
+import {
+  CloseButton,
+  IconButton,
+  Input,
+  InputGroup,
+  InputLeftAddon,
+  Textarea,
+  useColorMode,
+  useToast,
+} from "@chakra-ui/react";
 
 export default function SettingPanel() {
+  const toast = useToast({ position: "top" });
   const chatConfig = useStore(chatConfigAtom);
 
   const [config, setConfig] = useState({ ...chatConfig });
   const [systemMessage, setSystemMessage] = useState(chatConfig.systemMessage);
+
+  const { colorMode } = useColorMode();
 
   function handleSystemRoleSave() {
     const draft = chatConfigAtom.get();
     draft.systemMessage = systemMessage ? systemMessage : undefined;
     localStorage.setItem("systemMessage", draft.systemMessage || "");
     chatConfigAtom.set(draft);
-    message.success("");
+    toast({ status: "success", title: "Success" });
   }
 
   function handleCloseClick() {
@@ -59,41 +71,44 @@ export default function SettingPanel() {
   ];
 
   return (
-    <div className="mx-4 rounded-lg shadow-2xl px-3 pt-3 pb-4 bg-rose-50">
+    <div
+      className={`mx-6 rounded-lg shadow-2xl px-3 pt-3 pb-4 border
+        ${colorMode === "light" ? "bg-white" : "bg-[#021627]"}
+      `}
+    >
       <div className="flex justify-end">
-        <CloseOutlined onClick={handleCloseClick} />
+        <CloseButton size="md" onClick={handleCloseClick} />
       </div>
       <div className="space-y-4">
         <div>AI 背景设定：</div>
         <div className="flex space-x-2 items-end">
-          <Input.TextArea
+          <Textarea
             className="flex-1"
             placeholder="systemMessage. 例如：你是一个翻译工具，请将给出的内容翻译成中文，此外不要输出其他多余的内容"
             value={systemMessage}
             onChange={(e) => setSystemMessage(e.target.value)}
-            autoSize={{ minRows: 3, maxRows: 6 }}
-            allowClear
+            rows={4}
+            size="sm"
           />
-          <SaveOutlined className="p-2 rounded bg-blue-100 hover:bg-blue-200" onClick={handleSystemRoleSave} />
+          <IconButton aria-label="Save" size="sm" icon={<SaveOutlined />} onClick={handleSystemRoleSave} />
         </div>
         {list.map((item) => {
           return (
             <div key={item.value} className="flex space-x-2">
-              <Input
-                addonBefore={item.label}
-                placeholder={item.placeholder}
-                // @ts-expect-error
-                value={config[item.value] || ""}
-                onChange={(e) =>
-                  setConfig((draft) => ({
-                    ...draft,
-                    [item.value]: e.target.value,
-                  }))
-                }
-                allowClear
-              />
-              <SaveOutlined
-                className="p-2 rounded bg-blue-100 hover:bg-blue-200" //
+              <InputGroup size="sm">
+                <InputLeftAddon children={item.label} />
+                <Input
+                  type="tel"
+                  placeholder={item.placeholder}
+                  // @ts-expect-error
+                  value={config[item.value] || ""}
+                  onChange={(e) => setConfig((draft) => ({ ...draft, [item.value]: e.target.value }))}
+                />
+              </InputGroup>
+              <IconButton
+                aria-label="Save"
+                size="sm"
+                icon={<SaveOutlined />}
                 onClick={() => {
                   const draft = chatConfigAtom.get();
                   const value = config[item.value];
@@ -102,7 +117,7 @@ export default function SettingPanel() {
                   // @ts-expect-error
                   localStorage.setItem(item.value, value || "");
                   chatConfigAtom.set(draft);
-                  message.success("");
+                  toast({ status: "success", title: "Success" });
                 }}
               />
             </div>
