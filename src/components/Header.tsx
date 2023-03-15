@@ -8,7 +8,7 @@ export function Header() {
     <div className="h-16 flex flex-row items-center justify-between px-4 border-b">
       <div className="flex items-center space-x-1 font-medium">
         <IconRobot size="2rem" stroke={1.5} className="fill-teal-600" />
-        <div>ChatGPT</div>
+        <div className="tracking-wider font-bold">ChatGPT</div>
       </div>
       <IconButton
         aria-label="ColorMode"

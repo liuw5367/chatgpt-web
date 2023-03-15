@@ -7,7 +7,7 @@ import { Header } from "./Header";
 import { extendTheme, type ThemeConfig } from "@chakra-ui/react";
 
 import "uno.css";
-import "github-markdown-css";
+import "./app.css";
 
 export default function App() {
   const config: ThemeConfig = {
