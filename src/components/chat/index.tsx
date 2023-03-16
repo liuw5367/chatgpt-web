@@ -253,9 +253,9 @@ export default function Page() {
         <div id="chat-bottom" />
       </div>
 
-      <div className="p-6 border-t flex flex-col justify-end space-y-3">
+      <div className="px-6 py-4 border-t flex flex-col justify-end space-y-3">
         <Textarea
-          rows={3}
+          rows={2}
           className="resize-none"
           placeholder="请输入内容"
           value={inputContent}

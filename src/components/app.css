@@ -1,3 +1,11 @@
+ol {
+  list-style: decimal !important;
+}
+
+ul {
+  list-style: disc !important;
+}
+
 :root[data-theme="light"] .markdown-body * {
   color-scheme: light;
   --color-prettylights-syntax-comment: #6e7781 !important;

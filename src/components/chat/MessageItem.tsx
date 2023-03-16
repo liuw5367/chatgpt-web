@@ -13,10 +13,6 @@ export function MessageItem(props: Props) {
   const { colorMode } = useColorMode();
 
   const isUser = item.role === "user";
-  let content = item.content;
-  if (!isUser) {
-    content = renderMarkdown(item.content);
-  }
 
   return (
     <div
@@ -34,9 +30,13 @@ export function MessageItem(props: Props) {
         <div
           className={`flex-1 overflow-hidden rounded-lg py-2 px-3
               ${colorMode === "light" ? "bg-[#EDF2F7]" : "bg-[#021627]"}
-              ${isUser && "whitespace-pre"}`}
+              ${isUser && "whitespace-pre-wrap"}`}
         >
-          <div className="markdown-body" dangerouslySetInnerHTML={{ __html: content }} />
+          {isUser ? (
+            <>{item.content}</>
+          ) : (
+            <div className="markdown-body" dangerouslySetInnerHTML={{ __html: renderMarkdown(item.content) }} />
+          )}
         </div>
       </div>
     </div>
