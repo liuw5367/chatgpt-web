@@ -7,6 +7,8 @@ export interface ChatMessage extends ChatCompletionResponseMessage {
 
   time?: string;
   name?: string;
+
+  markdown?: string;
 }
 
 export type Command = "stopAI" | "stopTTS";

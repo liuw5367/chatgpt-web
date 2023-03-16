@@ -13,6 +13,9 @@ export function MessageItem(props: Props) {
   const { colorMode } = useColorMode();
 
   const isUser = item.role === "user";
+  if (!isUser && !item.markdown) {
+    item.markdown = renderMarkdown(item.content);
+  }
 
   return (
     <div
@@ -35,7 +38,7 @@ export function MessageItem(props: Props) {
           {isUser ? (
             <>{item.content}</>
           ) : (
-            <div className="markdown-body" dangerouslySetInnerHTML={{ __html: renderMarkdown(item.content) }} />
+            <div className="markdown-body" dangerouslySetInnerHTML={{ __html: item.markdown || "" }} />
           )}
         </div>
       </div>

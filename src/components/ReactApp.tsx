@@ -4,19 +4,12 @@ import { chatConfigAtom, chatDataAtom } from "./chat/atom";
 import type { ChatMessage } from "./chat/type";
 import { ChakraProvider } from "@chakra-ui/react";
 import { Header } from "./Header";
-import { extendTheme, type ThemeConfig } from "@chakra-ui/react";
+import { extendTheme } from "@chakra-ui/react";
 
 import "uno.css";
 import "./app.css";
 
 export default function App() {
-  const config: ThemeConfig = {
-    initialColorMode: "light",
-    useSystemColorMode: true,
-  };
-
-  const theme = extendTheme({ config });
-
   useEffect(() => {
     chatDataAtom.set(JSON.parse(localStorage.getItem("messages") || "[]") as ChatMessage[]);
     chatConfigAtom.set({
@@ -30,7 +23,9 @@ export default function App() {
       unisoundAppKey: localStorage.getItem("unisoundAppKey") || import.meta.env.UNISOUND_AI_KEY,
       unisoundSecret: localStorage.getItem("unisoundSecret") || import.meta.env.UNISOUND_AI_SECRET,
     });
-  }, [chatConfigAtom]);
+  }, []);
+
+  const theme = extendTheme({ initialColorMode: "light", useSystemColorMode: true });
 
   return (
     <ChakraProvider theme={theme}>
