@@ -1,4 +1,3 @@
-import { SaveOutlined } from "@ant-design/icons";
 import { useStore } from "@nanostores/react";
 import { useState } from "react";
 
@@ -13,6 +12,7 @@ import {
   useColorMode,
   useToast,
 } from "@chakra-ui/react";
+import { IconArchive } from "@tabler/icons-react";
 
 export default function SettingPanel() {
   const toast = useToast({ position: "top" });
@@ -90,7 +90,7 @@ export default function SettingPanel() {
             rows={4}
             size="sm"
           />
-          <IconButton aria-label="Save" size="sm" icon={<SaveOutlined />} onClick={handleSystemRoleSave} />
+          <IconButton aria-label="Save" size="sm" icon={<IconArchive size="1rem" />} onClick={handleSystemRoleSave} />
         </div>
         {list.map((item) => {
           return (
@@ -108,7 +108,7 @@ export default function SettingPanel() {
               <IconButton
                 aria-label="Save"
                 size="sm"
-                icon={<SaveOutlined />}
+                icon={<IconArchive size="1rem" />}
                 onClick={() => {
                   const draft = chatConfigAtom.get();
                   const value = config[item.value];

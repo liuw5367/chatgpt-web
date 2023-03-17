@@ -10,7 +10,6 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.0.1",
     "@astrojs/react": "^2.1.0",
     "@astrojs/vercel": "^3.2.0",
     "@chakra-ui/react": "^2.5.1",

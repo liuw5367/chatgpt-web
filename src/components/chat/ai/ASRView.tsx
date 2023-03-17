@@ -45,6 +45,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
 
   const chatConfig = useStore(chatConfigAtom);
   const errorCountRef = useRef(0);
+  const retryRef = useRef<any>();
 
   useImperativeHandle(
     ref,
@@ -65,7 +66,6 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   });
 
   const clear = useMemoizedFn(() => {
-    console.log("clear", "1111");
     clearResult();
     startRecording();
   });
@@ -84,7 +84,6 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   });
 
   function startRecording() {
-    doStopRecording();
     clearResult();
     onStatusChange?.(ASRStatusEnum.RECORDING);
     doStartRecording();
@@ -97,6 +96,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   }
 
   function doStartRecording() {
+    doStopRecording();
     const recorder = new Recorder(onAudioProcess);
     recorderRef.current = recorder;
     recorder.ready().then(
@@ -124,6 +124,8 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     const socket = new WebSocket(`${path}?appkey=${appKey}&time=${time}&sign=${sign}`);
     socketRef.current = socket;
     socket.onopen = () => {
+      console.log("!!! socket open !!!");
+      errorCountRef.current = 0;
       socket.send(
         JSON.stringify({
           type: "start",
@@ -139,7 +141,6 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     };
 
     socket.onmessage = (evt: MessageEvent) => {
-      errorCountRef.current = 0;
       const res = JSON.parse(evt.data);
       if (res.code === 0 && res.text) {
         sid = res.sid;
@@ -162,33 +163,44 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
         // onResultChange?.(text, res.type === "variable");
         setSimpleResult({ content: text, changing: res.type === "variable" });
       } else {
-        console.log("asr record end !", new Date().toUTCString(), res);
-        createSocket();
+        console.log("asr record end !", [new Date().toLocaleTimeString()], res);
+        doStartRecording();
       }
     };
 
     socket.onerror = function (e: Event) {
-      console.log("asr ws error", sid, new Date().toUTCString());
+      console.log("asr ws error", sid, [new Date().toLocaleTimeString()]);
       console.log(e);
       socketRef.current = null;
-      errorCountRef.current = errorCountRef.current + 1;
-      setTimeout(() => createSocket(), errorCountRef.current * 200);
+      retry();
     };
 
     socket.onclose = (e: CloseEvent) => {
-      console.log("asr ws close", sid, new Date().toUTCString());
+      console.log("asr ws close", sid, [new Date().toLocaleTimeString()]);
       console.log(e);
       socketRef.current = null;
       if (e.code !== 1000) {
-        errorCountRef.current = errorCountRef.current + 1;
-        setTimeout(() => createSocket(), errorCountRef.current * 200);
+        retry();
       }
     };
   }
 
+  function retry() {
+    errorCountRef.current = errorCountRef.current + 1;
+    clearRetryTimeout();
+    retryRef.current = setTimeout(doStartRecording, errorCountRef.current * 200);
+  }
+
+  function clearRetryTimeout() {
+    if (retryRef.current) {
+      clearTimeout(retryRef.current);
+      retryRef.current = undefined;
+    }
+  }
+
   function onAudioProcess(buffer: any) {
     const socket = socketRef.current;
-    // console.log('onAudioProcess():', socket?.readyState, new Date().toUTCString());
+    // console.log('onAudioProcess():', socket?.readyState, new Date());
 
     if (socket && socket.readyState === 1) {
       socket.send(buffer);
@@ -196,6 +208,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   }
 
   function doStopRecording() {
+    retryRef.current && clearTimeout(retryRef.current);
     recorderRef.current?.stop();
     const socket = socketRef.current;
     if (socket && socket.readyState === 1) {

@@ -36,7 +36,7 @@ Recorder.prototype.ready = function () {
   // 音频采集
   this.recorder.onaudioprocess = (e) => {
     const data = e.inputBuffer.getChannelData(0);
-    // this.input(data);
+    this.input(data);
     if (this.onaudioprocess) {
       this.onaudioprocess(this.encodePCMFragment(data));
       // this.onaudioprocess(data);
@@ -46,7 +46,7 @@ Recorder.prototype.ready = function () {
     }
   };
   if (!navigator.mediaDevices) {
-    return Promise.reject(new Error('无法发现指定的硬件设备。'));
+    return Promise.reject(new Error("无法发现指定的硬件设备。"));
   }
   return navigator.mediaDevices
     .getUserMedia({
@@ -60,30 +60,30 @@ Recorder.prototype.ready = function () {
       },
       (error) => {
         switch (error.code || error.name) {
-          case 'PERMISSION_DENIED':
-          case 'PermissionDeniedError':
-            Recorder.throwError('用户拒绝提供信息。');
+          case "PERMISSION_DENIED":
+          case "PermissionDeniedError":
+            Recorder.throwError("用户拒绝提供信息。");
             break;
-          case 'NOT_SUPPORTED_ERROR':
-          case 'NotSupportedError':
-            Recorder.throwError('浏览器不支持硬件设备。');
+          case "NOT_SUPPORTED_ERROR":
+          case "NotSupportedError":
+            Recorder.throwError("浏览器不支持硬件设备。");
             break;
-          case 'MANDATORY_UNSATISFIED_ERROR':
-          case 'MandatoryUnsatisfiedError':
-            Recorder.throwError('无法发现指定的硬件设备。');
+          case "MANDATORY_UNSATISFIED_ERROR":
+          case "MandatoryUnsatisfiedError":
+            Recorder.throwError("无法发现指定的硬件设备。");
             break;
-          case 'NotAllowedError':
-            Recorder.throwError('请在浏览器设置中开启麦克风权限!');
+          case "NotAllowedError":
+            Recorder.throwError("请在浏览器设置中开启麦克风权限!");
             break;
           case 8:
-          case 'NotFoundError':
-            Recorder.throwError('无法发现指定的硬件设备。');
+          case "NotFoundError":
+            Recorder.throwError("无法发现指定的硬件设备。");
             break;
           default:
-            Recorder.throwError('无法打开麦克风。异常信息:' + (error.code || error.name));
+            Recorder.throwError("无法打开麦克风。异常信息:" + (error.code || error.name));
             break;
         }
-      },
+      }
     );
 };
 // 异常处理
@@ -106,9 +106,14 @@ Recorder.prototype.start = function () {
     this.outputSampleRate = this.config.sampleRate; // 输出采样率
     this.oututSampleBits = this.config.sampleBits; // 输出采样数位 8, 16
   } catch (error) {
-    Recorder.throwError('无法打开麦克风。异常信息:' + (error.code || error.name));
+    Recorder.throwError("无法打开麦克风。异常信息:" + (error.code || error.name));
   }
 };
+
+Recorder.prototype.destroy = function () {
+  this.context.close().then(function () {});
+};
+
 // 停止录音
 Recorder.prototype.stop = function () {
   this.recorder.disconnect();
@@ -136,19 +141,19 @@ Recorder.prototype.getWAV = function (isRecord) {
 };
 // 获取不压缩的WAV格式的编码
 Recorder.prototype.getWAVBlob = function () {
-  return new Blob([this.getWAV(true)], { type: 'audio/wav' });
+  return new Blob([this.getWAV(true)], { type: "audio/wav" });
 };
 
 Recorder.prototype.SRC = function (input, inputFs, outputFs) {
   // 输入为空检验
   if (input == null) {
-    throw Error('Error:\t输入音频为空数组');
+    throw Error("Error:\t输入音频为空数组");
     // return null;
   }
 
   // 采样率合法检验
   if (inputFs <= 1 || outputFs <= 1) {
-    throw Error('Error:\t输入或输出音频采样率不合法');
+    throw Error("Error:\t输入或输出音频采样率不合法");
     // return null;
   }
 
@@ -306,16 +311,16 @@ Recorder.prototype.encodeWAV = function (isReplay) {
   var offset = 0;
 
   // 资源交换文件标识符
-  writeString(data, offset, 'RIFF');
+  writeString(data, offset, "RIFF");
   offset += 4;
   // 下个地址开始到文件尾总字节数,即文件大小-8
   data.setUint32(offset, 36 + bytes.byteLength, true);
   offset += 4;
   // WAV文件标志
-  writeString(data, offset, 'WAVE');
+  writeString(data, offset, "WAVE");
   offset += 4;
   // 波形格式标志
-  writeString(data, offset, 'fmt ');
+  writeString(data, offset, "fmt ");
   offset += 4;
   // 过滤字节,一般为 0x10 = 16
   data.setUint32(offset, 16, true);
@@ -339,7 +344,7 @@ Recorder.prototype.encodeWAV = function (isReplay) {
   data.setUint16(offset, sampleBits, true);
   offset += 2;
   // 数据标识符
-  writeString(data, offset, 'data');
+  writeString(data, offset, "data");
   offset += 4;
   // 采样数据总数,即数据总大小-44
   data.setUint32(offset, bytes.byteLength, true);

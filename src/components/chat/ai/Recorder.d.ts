@@ -6,4 +6,6 @@ export default class Recorder {
   start: () => void;
 
   stop: () => void;
+
+  destroy: () => void;
 }

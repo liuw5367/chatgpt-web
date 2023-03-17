@@ -1,7 +1,6 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@ant-design/icons': ^5.0.1
   '@astrojs/react': ^2.1.0
   '@astrojs/vercel': ^3.2.0
   '@chakra-ui/react': ^2.5.1
@@ -40,7 +39,6 @@ specifiers:
   uuid: ^9.0.0
 
 dependencies:
-  '@ant-design/icons': 5.0.1_biqbaboplfbrettd7655fr4n2y
   '@astrojs/react': 2.1.0_3xleytyzprlgycb2ded54tx72i
   '@astrojs/vercel': 3.2.0_astro@2.1.2+react@18.2.0
   '@chakra-ui/react': 2.5.1_5bqxzwxvttuicmmg7h6hrcnoxa
@@ -88,32 +86,6 @@ packages:
     dependencies:
       '@jridgewell/gen-mapping': 0.1.1
       '@jridgewell/trace-mapping': 0.3.17
-
-  /@ant-design/colors/7.0.0:
-    resolution: {integrity: sha512-iVm/9PfGCbC0dSMBrz7oiEXZaaGH7ceU40OJEfKmyuzR9R5CRimJYPlRiFtMQGQcbNMea/ePcoIebi4ASGYXtg==}
-    dependencies:
-      '@ctrl/tinycolor': 3.6.0
-    dev: false
-
-  /@ant-design/icons-svg/4.2.1:
-    resolution: {integrity: sha512-EB0iwlKDGpG93hW8f85CTJTs4SvMX7tt5ceupvhALp1IF44SeUFOMhKUOYqpsoYWQKAOuTRDMqn75rEaKDp0Xw==}
-    dev: false
-
-  /@ant-design/icons/5.0.1_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-ZyF4ksXCcdtwA/1PLlnFLcF/q8/MhwxXhKHh4oCHDA4Ip+ZzAHoICtyp4wZWfiCVDP0yuz3HsjyvuldHFb3wjA==}
-    engines: {node: '>=8'}
-    peerDependencies:
-      react: '>=16.0.0'
-      react-dom: '>=16.0.0'
-    dependencies:
-      '@ant-design/colors': 7.0.0
-      '@ant-design/icons-svg': 4.2.1
-      '@babel/runtime': 7.21.0
-      classnames: 2.3.2
-      rc-util: 5.28.0_biqbaboplfbrettd7655fr4n2y
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-    dev: false
 
   /@antfu/install-pkg/0.1.1:
     resolution: {integrity: sha512-LyB/8+bSfa0DFGC06zpCEfs89/XoWZwws5ygEa5D+Xsm3OfI+aXQ86VgVG7Acyef+rSZ5HE7J8rrxzrQeM3PjQ==}
@@ -1543,11 +1515,6 @@ packages:
     dependencies:
       '@chakra-ui/system': 2.5.1_xqp3pgpqjlfxxa3zxu4zoc4fba
       react: 18.2.0
-    dev: false
-
-  /@ctrl/tinycolor/3.6.0:
-    resolution: {integrity: sha512-/Z3l6pXthq0JvMYdUFyX9j0MaCltlIn6mfh9jLyQwg5aPKxkyNa0PTHtU1AlFXLNk55ZuAeJRcpvq+tmLfKmaQ==}
-    engines: {node: '>=10'}
     dev: false
 
   /@emmetio/abbreviation/2.2.3:
@@ -4703,18 +4670,6 @@ packages:
     resolution: {integrity: sha1-uRUlKD4jFcdVPS76GNg+dkMv7WU=, tarball: queue/download/queue-6.0.2.tgz}
     dependencies:
       inherits: 2.0.4
-    dev: false
-
-  /rc-util/5.28.0_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-KYDjhGodswVj29v0TRciKTqRPgumIFvFDndbCD227pitQ+0Cei196rxk+OXb/blu6V8zdTRK5RjCJn+WmHLvBA==}
-    peerDependencies:
-      react: '>=16.9.0'
-      react-dom: '>=16.9.0'
-    dependencies:
-      '@babel/runtime': 7.21.0
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-      react-is: 16.13.1
     dev: false
 
   /react-clientside-effect/1.2.6_react@18.2.0:

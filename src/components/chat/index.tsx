@@ -1,18 +1,6 @@
-import {
-  AudioMutedOutlined,
-  AudioOutlined,
-  ClearOutlined,
-  LoadingOutlined,
-  PauseCircleOutlined,
-  PlayCircleOutlined,
-  ReloadOutlined,
-  RetweetOutlined,
-  SendOutlined,
-  SettingOutlined,
-} from "@ant-design/icons";
 import { useDebounceEffect } from "ahooks";
 import { useStore } from "@nanostores/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { getCurrentTime, scrollToElement, uuid } from "./utils";
 import VoiceView, { VoiceRef } from "./ai";
@@ -21,8 +9,16 @@ import { TTSStatusEnum } from "./ai/TTSView";
 import { chatConfigAtom, chatDataAtom } from "./atom";
 import SettingPanel from "./SettingPanel";
 import type { ChatMessage, Command } from "./type";
-import { Button, IconButton, Textarea, useToast } from "@chakra-ui/react";
+import { Button, IconButton, Spinner, Textarea, useToast } from "@chakra-ui/react";
 import { MessageItem } from "./MessageItem";
+import {
+  IconMicrophone,
+  IconMicrophoneOff,
+  IconPlayerPause,
+  IconPlayerPlay,
+  IconReload,
+  IconSettings,
+} from "@tabler/icons-react";
 
 export default function Page() {
   const [conversationId, setConversationId] = useState<string>();
@@ -124,7 +120,10 @@ export default function Page() {
       stopAI();
       return;
     }
-    if (!content) return;
+    if (!content || content.trim().length === 0) {
+      toast({ status: "info", title: "请输入内容" });
+      return;
+    }
     stopTTS();
 
     const question: ChatMessage = {
@@ -234,11 +233,20 @@ export default function Page() {
     setParentMessageId(undefined);
   }
 
+  function handleMessageDelete(item: ChatMessage) {
+    chatDataAtom.set(chatDataAtom.get().filter((v) => v.id !== item.id));
+  }
+
   return (
     <div className="w-full h-full flex flex-col bg-cover bg-no-repeat relative">
       <div className={`flex-1 p-4 pb-0 overflow-auto`}>
         {dataSource.map((item) => (
-          <MessageItem key={item.id} item={item} />
+          <MessageItem
+            key={item.id}
+            item={item}
+            onDelete={handleMessageDelete}
+            onPlay={(item) => playTTS(item.content)}
+          />
         ))}
         {currentAssistantMessage && (
           <MessageItem
@@ -257,7 +265,6 @@ export default function Page() {
         <Textarea
           rows={2}
           className="resize-none"
-          placeholder="请输入内容"
           value={inputContent}
           onChange={(e) => setInputContent(e.target.value)}
           onKeyDown={(e) => {
@@ -271,31 +278,33 @@ export default function Page() {
             onClick={() => handleChatGPTClick()}
             colorScheme={chatLoading ? "red" : "blue"}
             variant={chatLoading ? "outline" : "solid"}
-            leftIcon={chatLoading ? <LoadingOutlined /> : undefined}
+            leftIcon={chatLoading ? <Spinner size="sm" /> : undefined}
           >
             {chatLoading ? "取消" : "发送"}
           </Button>
           <IconButton
             aria-label="ASR" //
             onClick={handleASRClick}
+            colorScheme={asrState === ASRStatusEnum.RECORDING ? "red" : "gray"}
             variant={asrState === ASRStatusEnum.RECORDING ? "outline" : "solid"}
-            icon={asrState === ASRStatusEnum.RECORDING ? <AudioMutedOutlined /> : <AudioOutlined />}
+            icon={
+              asrState === ASRStatusEnum.RECORDING ? (
+                <IconMicrophoneOff stroke={1.5} />
+              ) : (
+                <IconMicrophone stroke={1.5} />
+              )
+            }
           />
           <IconButton
             aria-label="TTS" //
             onClick={handleTTSClick}
+            colorScheme={ttsState === TTSStatusEnum.PLAYING ? "red" : "gray"}
             variant={ttsState === TTSStatusEnum.PLAYING ? "outline" : "solid"}
             icon={
-              ttsState === TTSStatusEnum.GENERATING ? (
-                <LoadingOutlined />
-              ) : ttsState === TTSStatusEnum.PLAYING ? (
-                <PauseCircleOutlined />
-              ) : (
-                <PlayCircleOutlined />
-              )
+              ttsState !== TTSStatusEnum.NORMAL ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />
             }
           />
-          <IconButton aria-label="清屏" onClick={handleClearClick} icon={<ClearOutlined />} />
+          <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconReload stroke={1.5} />} />
           {/* <Button title="新对话" className="px-3" onClick={handleNewChatClick}>
               <ReloadOutlined />
             </Button>
@@ -311,8 +320,8 @@ export default function Page() {
             </Button> */}
 
           <IconButton
-            aria-label="设置"
-            icon={<SettingOutlined />}
+            aria-label="Setting"
+            icon={<IconSettings stroke={1.5} />}
             onClick={() => {
               const draft = chatConfigAtom.get();
               chatConfigAtom.set({ ...draft, visible: !draft.visible });
