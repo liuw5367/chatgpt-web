@@ -1,5 +1,13 @@
 import { Avatar, Button, IconButton, useClipboard, useColorMode } from "@chakra-ui/react";
-import { IconClipboard, IconClipboardCheck, IconPlayerPlay, IconRobot, IconTrash, IconUser } from "@tabler/icons-react";
+import {
+  IconClipboard,
+  IconClipboardCheck,
+  IconPlayerPlay,
+  IconReload,
+  IconRobot,
+  IconTrash,
+  IconUser,
+} from "@tabler/icons-react";
 import { renderMarkdown } from "./markdown";
 import type { ChatMessage } from "./type";
 
@@ -7,10 +15,11 @@ interface Props {
   item: ChatMessage;
   onDelete?: (v: ChatMessage) => void;
   onPlay?: (v: ChatMessage) => void;
+  onRetry?: (v: ChatMessage) => void;
 }
 
 export function MessageItem(props: Props) {
-  const { item, onDelete, onPlay } = props;
+  const { item, onDelete, onPlay, onRetry } = props;
 
   const { colorMode } = useColorMode();
   const { setValue: setClipboard, onCopy, hasCopied } = useClipboard(item.content);
@@ -76,6 +85,16 @@ export function MessageItem(props: Props) {
               size="xs"
               onClick={() => onDelete?.(item)}
             />
+            {(item.role === "user" || (item.role === "assistant" && item.question)) && (
+              <IconButton
+                aria-label="Retry"
+                variant="ghost"
+                icon={<IconReload size="0.90rem" className="opacity-64" />}
+                size="xs"
+                onClick={() => onRetry?.(item)}
+              />
+            )}
+
             {item.token != null && (
               <Button size="xs" aria-label="Token" title="Token">
                 {item.token}

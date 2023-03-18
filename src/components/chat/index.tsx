@@ -121,6 +121,14 @@ export default function Page() {
       stopAI();
       return;
     }
+    await sendMessage(inputValue);
+  }
+
+  async function sendMessage(inputValue = inputContent) {
+    if (chatLoading) {
+      toast({ status: "warning", title: "Generating..." });
+      return;
+    }
     const content = removeLn(inputValue);
     if (!content) {
       toast({ status: "info", title: "Please enter content" });
@@ -189,14 +197,14 @@ export default function Page() {
         done = readerDone;
         onProgress(decoder.decode(value));
       }
-      addResultItem(assistantMessage);
+      addResultItem(content, assistantMessage);
     } catch (e) {
       console.log(e);
-      addResultItem(assistantMessage);
+      addResultItem(content, assistantMessage);
     }
   }
 
-  function addResultItem(assistantMessage: string) {
+  function addResultItem(content: string, assistantMessage: string) {
     // AI 完整的返回值
     console.log([assistantMessage]);
     if (!assistantMessage) return;
@@ -208,6 +216,7 @@ export default function Page() {
         role: "assistant",
         content: assistantMessage,
         token: estimateTokens(assistantMessage),
+        question: content,
       },
     ]);
     // playTTS(assistantMessage);
@@ -237,6 +246,11 @@ export default function Page() {
     setParentMessageId(undefined);
   }
 
+  function handleRegenerate(item: ChatMessage) {
+    const content = item.role === "user" ? item.content : item.question;
+    sendMessage(content);
+  }
+
   function handleMessageDelete(item: ChatMessage) {
     chatDataAtom.set(chatDataAtom.get().filter((v) => v.id !== item.id));
   }
@@ -250,6 +264,7 @@ export default function Page() {
             item={item}
             onDelete={handleMessageDelete}
             onPlay={(item) => playTTS(item.content)}
+            onRetry={handleRegenerate}
           />
         ))}
         {currentAssistantMessage && (

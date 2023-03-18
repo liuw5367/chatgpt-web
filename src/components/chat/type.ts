@@ -4,6 +4,7 @@ export interface ChatMessage extends ChatCompletionResponseMessage {
   id: string;
   time?: string;
   token?: number;
+  question?: string;
 
   conversationId?: string;
   parentMessageId?: string;
