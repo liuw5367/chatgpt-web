@@ -55,6 +55,7 @@ export function MessageItem(props: Props) {
         </div>
         <div className={`absolute bottom-0 mt-1 flex ${isUser ? "justify-end right-12" : "left-10"}`}>
           <div className="-mb-8 flex items-center space-x-1">
+            <div className="i-tabler-copy hidden" />
             <IconButton
               aria-label="Copy"
               variant="ghost"
@@ -94,7 +95,6 @@ export function MessageItem(props: Props) {
                 onClick={() => onRetry?.(item)}
               />
             )}
-
             {item.token != null && (
               <Button size="xs" aria-label="Token" title="Token">
                 {item.token}

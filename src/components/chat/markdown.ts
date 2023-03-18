@@ -1,12 +1,29 @@
 import MarkdownIt from "markdown-it";
 // @ts-ignore
 import mdKatex from "markdown-it-katex";
-import mdHighlight from "markdown-it-highlightjs";
 import hljs from "highlight.js";
-
+// @ts-expect-error
+import mdCopy from "markdown-it-code-copy";
 import "highlight.js/styles/github-dark.css";
 import "github-markdown-css";
 
 export function renderMarkdown(content: string) {
-  return MarkdownIt().use(mdKatex).use(mdHighlight, { hljs }).render(content);
+  const markdown = MarkdownIt({
+    linkify: true,
+    highlight: (str: string, lang: string, attrs: string): string => {
+      let content = str;
+      if (lang && hljs.getLanguage(lang)) {
+        try {
+          content = hljs.highlight(str, { language: lang, ignoreIllegals: true }).value;
+        } catch (e) {
+          console.log(e);
+          return str;
+        }
+      } else {
+        content = markdown.utils.escapeHtml(str);
+      }
+      return `<pre class="hljs" style="overflow: auto"><code>${content}</code></pre>`;
+    },
+  });
+  return markdown.use(mdKatex).use(mdCopy, { iconClass: "i-tabler-copy", iconStyle: "color: grey;" }).render(content);
 }

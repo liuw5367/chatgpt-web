@@ -15,7 +15,6 @@ export enum ASRStatusEnum {
 export interface ASRRef {
   start: () => void;
   stop: () => void;
-  clear: () => void;
 }
 
 interface Props {
@@ -33,7 +32,7 @@ interface AsrResult {
 }
 
 const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
-  const { status, onStatusChange, onResultChange } = props;
+  const { onStatusChange, onResultChange } = props;
 
   const [currentLang, setCurrentLang] = useState(0);
 
@@ -41,7 +40,6 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   const [asrResult, setAsrResult] = useState<AsrResult>({ fixed: [], changing: "" });
   const recorderRef = React.useRef<Recorder | null>();
   const socketRef = React.useRef<WebSocket | null>();
-  const recording = status === ASRStatusEnum.RECORDING;
 
   const chatConfig = useStore(chatConfigAtom);
   const errorCountRef = useRef(0);
@@ -50,7 +48,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   useImperativeHandle(
     ref,
     () => {
-      return { start, stop, clear };
+      return { start, stop };
     },
     []
   );
@@ -65,22 +63,13 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     stopRecording();
   });
 
-  const clear = useMemoizedFn(() => {
-    clearResult();
+  const start = useMemoizedFn(() => {
     startRecording();
   });
 
   const clearResult = useMemoizedFn(() => {
     setAsrResult({ fixed: [], changing: "" });
     setSimpleResult({ content: "", changing: false });
-  });
-
-  const start = useMemoizedFn(() => {
-    if (recording) {
-      stopRecording();
-    } else {
-      startRecording();
-    }
   });
 
   function startRecording() {
@@ -101,8 +90,9 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     recorderRef.current = recorder;
     recorder.ready().then(
       () => {
-        createSocket();
+        console.log("recorder ready ...");
         recorder.start();
+        createSocket();
       },
       () => {
         alert("录音启动失败！");
@@ -150,7 +140,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
             const result = { fixed: [...draft.fixed, text], changing: "" };
             const value = result.fixed.join("") + result.changing;
             onResultChange?.(value, !!result.changing);
-            return result;
+            return { fixed: [], changing: "" };
           });
         } else {
           setAsrResult((draft) => {
