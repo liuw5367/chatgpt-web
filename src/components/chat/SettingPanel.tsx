@@ -33,6 +33,7 @@ export default function SettingPanel() {
         }
       }
     });
+    setConfig(result);
     chatConfigAtom.set(result);
     toast({ status: "success", title: "Success" });
   }
@@ -82,7 +83,8 @@ export default function SettingPanel() {
 
   return (
     <Drawer
-      isOpen={true}
+      isOpen={!!chatConfigAtom.get().visible}
+      size="sm"
       placement="right"
       onClose={() => chatConfigAtom.set({ ...chatConfigAtom.get(), visible: false })}
     >
@@ -92,33 +94,31 @@ export default function SettingPanel() {
         <DrawerHeader>Setting</DrawerHeader>
 
         <DrawerBody>
-          <div className="space-y-4">
+          <div className="flex flex-col space-y-4">
             {list.map((item) => {
               return (
-                <div key={item.value} className="flex items-end space-x-2">
-                  <div className="flex flex-col flex-1">
-                    <div className="mb-1 ml-1 text-sm flex">{item.label}:</div>
-                    {item.type === "textarea" ? (
-                      <Textarea
-                        size="sm"
-                        className="flex-1"
-                        rows={4}
-                        placeholder={item.placeholder}
-                        // @ts-expect-error
-                        value={config[item.value] || ""}
-                        onChange={(e) => setConfig((draft) => ({ ...draft, [item.value]: e.target.value }))}
-                      />
-                    ) : (
-                      <Input
-                        size="sm"
-                        className="flex-1"
-                        placeholder={item.placeholder}
-                        // @ts-expect-error
-                        value={config[item.value] || ""}
-                        onChange={(e) => setConfig((draft) => ({ ...draft, [item.value]: e.target.value }))}
-                      />
-                    )}
-                  </div>
+                <div key={item.value}>
+                  <div className="mb-1 ml-1 text-sm flex">{item.label}:</div>
+                  {item.type === "textarea" ? (
+                    <Textarea
+                      size="sm"
+                      className="flex-1"
+                      rows={4}
+                      placeholder={item.placeholder}
+                      // @ts-expect-error
+                      value={config[item.value] || ""}
+                      onChange={(e) => setConfig((draft) => ({ ...draft, [item.value]: e.target.value }))}
+                    />
+                  ) : (
+                    <Input
+                      size="sm"
+                      className="flex-1"
+                      placeholder={item.placeholder}
+                      // @ts-expect-error
+                      value={config[item.value] || ""}
+                      onChange={(e) => setConfig((draft) => ({ ...draft, [item.value]: e.target.value }))}
+                    />
+                  )}
                 </div>
               );
             })}

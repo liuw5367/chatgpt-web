@@ -356,7 +356,7 @@ export default function Page() {
           onCommandChange={handleCommandChange}
         />
       </div>
-      {chatConfig.visible && <SettingPanel />}
+      <SettingPanel />
     </div>
   );
 }
