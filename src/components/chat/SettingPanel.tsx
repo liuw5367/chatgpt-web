@@ -51,7 +51,7 @@ export default function SettingPanel() {
     {
       label: "OPENAI_KEY",
       value: "openAIKey",
-      placeholder: "请输入 OPENAI_KEY",
+      placeholder: "Please enter OPENAI_KEY",
     },
     {
       label: "OPENAI_MODEL",
@@ -61,12 +61,12 @@ export default function SettingPanel() {
     {
       label: "Unisound_APPKEY",
       value: "unisoundAppKey",
-      placeholder: "请输入 ai.unisound.com 的 APPKEY",
+      placeholder: "Please enter ai.unisound.com APPKEY",
     },
     {
       label: "Unisound_SECRET",
       value: "unisoundSecret",
-      placeholder: "请输入 ai.unisound.com 的 SECRET",
+      placeholder: "Please enter ai.unisound.com SECRET",
     },
   ];
 

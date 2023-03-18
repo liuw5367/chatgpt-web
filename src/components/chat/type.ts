@@ -2,11 +2,11 @@ import type { ChatCompletionResponseMessage } from "openai";
 
 export interface ChatMessage extends ChatCompletionResponseMessage {
   id: string;
+  time?: string;
+  token?: number;
+
   conversationId?: string;
   parentMessageId?: string;
-
-  time?: string;
-  name?: string;
 
   markdown?: string;
 }

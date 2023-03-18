@@ -25,8 +25,8 @@ export function getCurrentTime() {
 }
 
 export function removeLn(content?: string): string {
-  if (!content) return "";
-  let result = content;
+  let result = content?.trim();
+  if (!result) return "";
   while (result.startsWith("\n") || result.endsWith("\n")) {
     if (result.startsWith("\n")) {
       result = result.substring(2);

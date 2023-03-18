@@ -1,4 +1,4 @@
-import { Avatar, IconButton, useClipboard, useColorMode } from "@chakra-ui/react";
+import { Avatar, Button, IconButton, useClipboard, useColorMode } from "@chakra-ui/react";
 import { IconClipboard, IconClipboardCheck, IconPlayerPlay, IconRobot, IconTrash, IconUser } from "@tabler/icons-react";
 import { renderMarkdown } from "./markdown";
 import type { ChatMessage } from "./type";
@@ -76,6 +76,11 @@ export function MessageItem(props: Props) {
               size="xs"
               onClick={() => onDelete?.(item)}
             />
+            {item.token != null && (
+              <Button size="xs" aria-label="Token" title="Token">
+                {item.token}
+              </Button>
+            )}
           </div>
         </div>
       </div>

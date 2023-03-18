@@ -2,7 +2,7 @@ import { useDebounceEffect } from "ahooks";
 import { useStore } from "@nanostores/react";
 import React, { useEffect, useState } from "react";
 
-import { getCurrentTime, scrollToElement, uuid } from "./utils";
+import { getCurrentTime, removeLn, scrollToElement, uuid } from "./utils";
 import VoiceView, { VoiceRef } from "./ai";
 import { ASRStatusEnum } from "./ai/ASRView";
 import { TTSStatusEnum } from "./ai/TTSView";
@@ -19,6 +19,7 @@ import {
   IconReload,
   IconSettings,
 } from "@tabler/icons-react";
+import { estimateTokens } from "./token";
 
 export default function Page() {
   const [conversationId, setConversationId] = useState<string>();
@@ -68,11 +69,11 @@ export default function Page() {
 
   function handleTTSClick() {
     if (!chatConfig.unisoundAppKey) {
-      toast({ status: "error", title: "请在设置中输入 unisound APPKEY" });
+      toast({ status: "error", title: "Please enter  unisound APPKEY" });
       return;
     }
     if (!chatConfig.unisoundSecret) {
-      toast({ status: "error", title: "请在设置中输入 unisound SECRET" });
+      toast({ status: "error", title: "Please enter  unisound SECRET" });
       return;
     }
 
@@ -90,11 +91,11 @@ export default function Page() {
 
   function handleASRClick() {
     if (!chatConfig.unisoundAppKey) {
-      toast({ status: "error", title: "请在设置中输入 unisound APPKEY" });
+      toast({ status: "error", title: "Please enter unisound APPKEY" });
       return;
     }
     if (!chatConfig.unisoundSecret) {
-      toast({ status: "error", title: "请在设置中输入 unisound SECRET" });
+      toast({ status: "error", title: "Please enter unisound SECRET" });
       return;
     }
     stopTTS();
@@ -110,9 +111,9 @@ export default function Page() {
     }
   }
 
-  async function handleChatGPTClick(content = inputContent) {
+  async function handleChatGPTClick(inputValue = inputContent) {
     if (!chatConfig.openAIKey) {
-      toast({ status: "error", title: "请在设置中输入 OPENAI_KEY" });
+      toast({ status: "error", title: "Please enter OPENAI_KEY" });
       return;
     }
 
@@ -120,8 +121,9 @@ export default function Page() {
       stopAI();
       return;
     }
-    if (!content || content.trim().length === 0) {
-      toast({ status: "info", title: "请输入内容" });
+    const content = removeLn(inputValue);
+    if (!content) {
+      toast({ status: "info", title: "Please enter content" });
       return;
     }
     stopTTS();
@@ -131,6 +133,7 @@ export default function Page() {
       role: "user",
       content,
       time: getCurrentTime(),
+      token: estimateTokens(content),
     };
     const messages = [...dataSource, question];
     chatDataAtom.set(messages);
@@ -172,7 +175,7 @@ export default function Page() {
       });
 
       if (!response.ok || !response.body) {
-        toast({ status: "warning", title: "请求异常" });
+        toast({ status: "warning", title: "Request Error" });
         setChatLoading(false);
         return;
       }
@@ -204,6 +207,7 @@ export default function Page() {
         id: uuid(),
         role: "assistant",
         content: assistantMessage,
+        token: estimateTokens(assistantMessage),
       },
     ]);
     // playTTS(assistantMessage);
@@ -280,7 +284,7 @@ export default function Page() {
             variant={chatLoading ? "outline" : "solid"}
             leftIcon={chatLoading ? <Spinner size="sm" /> : undefined}
           >
-            {chatLoading ? "取消" : "发送"}
+            {chatLoading ? "Cancel" : "Send"}
           </Button>
           <IconButton
             aria-label="ASR" //
