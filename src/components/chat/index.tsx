@@ -356,11 +356,7 @@ export default function Page() {
           onCommandChange={handleCommandChange}
         />
       </div>
-      {chatConfig.visible && (
-        <div className="absolute bottom-6 w-full z-50">
-          <SettingPanel />
-        </div>
-      )}
+      {chatConfig.visible && <SettingPanel />}
     </div>
   );
 }
