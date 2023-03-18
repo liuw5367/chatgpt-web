@@ -10,11 +10,11 @@ import "github-markdown-css";
 export function renderMarkdown(content: string) {
   const markdown = MarkdownIt({
     linkify: true,
-    highlight: (str: string, lang: string, attrs: string): string => {
+    highlight: (str: string, lang: string): string => {
       let content = str;
       if (lang && hljs.getLanguage(lang)) {
         try {
-          content = hljs.highlight(str, { language: lang, ignoreIllegals: true }).value;
+          content = hljs.highlight(lang, str).value;
         } catch (e) {
           console.log(e);
           return str;

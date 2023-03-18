@@ -1,13 +1,11 @@
 import type { APIRoute } from "astro";
 import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
 
-const apiKey = import.meta.env.OPENAI_API_KEY;
-
 export const post: APIRoute = async (context) => {
   const body = await context.request.json();
-  const server = body.openAIServer || "https://api.openai.com/v1/chat/completions";
-  const openAIKey = body.openAIKey || apiKey;
-  const model = body.openAIModel;
+  const host = body.host || "https://api.openai.com";
+  const apiKey = body.apiKey || import.meta.env.OPENAI_API_KEY;
+  const model = body.model;
   const messages = body.messages;
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
@@ -16,10 +14,10 @@ export const post: APIRoute = async (context) => {
     return new Response("No input text");
   }
 
-  const completion = await fetch(server, {
+  const completion = await fetch(host + "/v1/chat/completions", {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${openAIKey}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     method: "POST",
     body: JSON.stringify({

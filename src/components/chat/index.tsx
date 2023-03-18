@@ -173,13 +173,13 @@ export default function Page() {
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
+        signal: abortController.signal,
         body: JSON.stringify({
           messages: requestMessages,
-          openAIKey: chatConfig.openAIKey,
-          openAIServer: chatConfig.openAIServer,
-          openAIModel: chatConfig.openAIModel,
+          apiKey: chatConfig.openAIKey,
+          host: chatConfig.openAIHost,
+          model: chatConfig.openAIModel,
         }),
-        signal: abortController.signal,
       });
 
       if (!response.ok || !response.body) {

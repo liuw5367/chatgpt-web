@@ -18,7 +18,7 @@ export interface ChatConfigType {
   visible?: boolean;
   openAIKey?: string;
 
-  openAIServer?: string;
+  openAIHost?: string;
   openAIModel?: string;
   systemMessage?: string;
 

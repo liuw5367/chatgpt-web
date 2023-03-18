@@ -16,7 +16,7 @@ export default function App() {
       visible: false,
       openAIKey: localStorage.getItem("openAIKey") || import.meta.env.OPENAI_API_KEY,
 
-      openAIServer: localStorage.getItem("openAIServer") || import.meta.env.OPENAI_API_SERVER,
+      openAIHost: localStorage.getItem("openAIHost") || import.meta.env.OPENAI_API_SERVER,
       openAIModel: localStorage.getItem("openAIModel") || import.meta.env.OPENAI_API_MODEL,
       systemMessage: localStorage.getItem("systemMessage") || undefined,
 

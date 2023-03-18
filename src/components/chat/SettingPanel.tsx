@@ -44,9 +44,9 @@ export default function SettingPanel() {
 
   const list: ListItemType[] = [
     {
-      label: "OPENAI_SERVER",
-      value: "openAIServer",
-      placeholder: "https://api.openai.com/v1/chat/completions",
+      label: "OPENAI_HOST",
+      value: "openAIHost",
+      placeholder: "https://api.openai.com",
     },
     {
       label: "OPENAI_KEY",
