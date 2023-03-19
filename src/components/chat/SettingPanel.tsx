@@ -1,5 +1,5 @@
 import { useStore } from "@nanostores/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { chatConfigAtom } from "./atom";
 import {
   Input,
@@ -21,11 +21,17 @@ export default function SettingPanel() {
 
   const [config, setConfig] = useState({ ...chatConfig });
 
+  useEffect(() => {
+    if (chatConfig.visible) {
+      setConfig({ ...chatConfig });
+    }
+  }, [chatConfig.visible])
+
   function handleSaveClick() {
     const draft = chatConfigAtom.get();
     const result = { ...draft, ...config, visible: false };
     Object.entries(result).forEach(([key, value]) => {
-      if (typeof value === "string") {
+      if (typeof value !== "boolean") {
         if (value == null || value.trim() === "") {
           localStorage.removeItem(key);
         } else {
@@ -33,7 +39,6 @@ export default function SettingPanel() {
         }
       }
     });
-    setConfig(result);
     chatConfigAtom.set(result);
     toast({ status: "success", title: "Success" });
   }
@@ -49,7 +54,7 @@ export default function SettingPanel() {
   const list: ListItemType[] = [
     {
       type: "textarea",
-      label: "systemMessage",
+      label: "System Prompt",
       value: "systemMessage",
       placeholder:
         "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.\nKnowledge cutoff: 2021-09-01",
@@ -83,7 +88,7 @@ export default function SettingPanel() {
 
   return (
     <Drawer
-      isOpen={!!chatConfigAtom.get().visible}
+      isOpen={!!chatConfig.visible}
       size="sm"
       placement="right"
       onClose={() => chatConfigAtom.set({ ...chatConfigAtom.get(), visible: false })}
@@ -91,7 +96,7 @@ export default function SettingPanel() {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>Setting</DrawerHeader>
+        <DrawerHeader>Settings</DrawerHeader>
 
         <DrawerBody>
           <div className="flex flex-col space-y-4">
