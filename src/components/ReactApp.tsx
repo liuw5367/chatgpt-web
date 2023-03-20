@@ -8,6 +8,7 @@ import { extendTheme } from "@chakra-ui/react";
 
 import "uno.css";
 import "./app.css";
+import "./markdown.css";
 
 export default function App() {
   useEffect(() => {

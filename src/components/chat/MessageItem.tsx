@@ -1,4 +1,4 @@
-import { Avatar, Button, IconButton, useClipboard, useColorMode } from "@chakra-ui/react";
+import { Avatar, Badge, Button, IconButton, useClipboard, useColorMode } from "@chakra-ui/react";
 import {
   IconClipboard,
   IconClipboardCheck,
@@ -30,9 +30,24 @@ export function MessageItem(props: Props) {
     item.markdown = renderMarkdown(item.content);
   }
 
+  const prompt = (
+    <Badge
+      colorScheme="green"
+      title={item.prompt}
+      className={`cursor-pointer ${!isUser && "ml-2"}`}
+      onClick={() => {
+        setClipboard(item.prompt);
+        onCopy();
+      }}
+    >
+      Prompt
+    </Badge>
+  );
+
   const actions = (
     <div className={`absolute bottom-0 mt-1 flex ${isUser ? "justify-end right-10" : "left-7"}`}>
       <div className="-mb-8 flex items-center space-x-1">
+        {!isUser && item.prompt && prompt}
         <IconButton
           aria-label="Copy"
           variant="ghost"
@@ -93,7 +108,12 @@ export function MessageItem(props: Props) {
       id={item.id}
       className={`mb-10 flex flex-col ${isUser && "items-end"} space-y-1`}
     >
-      {item.time && <div className={`text-xs text-gray-500`}>{item.time}</div>}
+      {(item.time || item.prompt) && (
+        <div className={`flex items-center space-x-2 text-xs text-gray-500`}>
+          {isUser && item.prompt && prompt}
+          {item.time && <span>{item.time}</span>}
+        </div>
+      )}
       <div className={`flex flex-row space-x-2 relative ${isUser && "flex-row-reverse"}`}>
         <Avatar
           size="sm"

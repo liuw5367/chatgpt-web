@@ -19,6 +19,7 @@ import {
   IconClearAll,
   IconSettings,
   IconBrandTelegram,
+  IconLoader3,
 } from "@tabler/icons-react";
 import { estimateTokens } from "./token";
 import { SystemPrompt } from "./SystemPrompt";
@@ -146,12 +147,14 @@ export default function Page() {
     }
     stopTTS();
 
+    const systemMessage = chatConfig.systemMessage;
     const question: ChatMessage = {
       id: uuid(),
       role: "user",
       content,
       time: getCurrentTime(),
       token: estimateTokens(content),
+      prompt: systemMessage,
     };
     const messages = [...dataSource, question];
     chatDataAtom.set(messages);
@@ -173,10 +176,10 @@ export default function Page() {
       scrollToBottom();
     }
     const requestMessages = (contextEnable ? messages : [question]).map(({ role, content }) => ({ role, content }));
-    if (chatConfig.systemMessage) {
+    if (systemMessage) {
       requestMessages.unshift({
         role: "system",
-        content: chatConfig.systemMessage,
+        content: systemMessage,
       });
     }
 
@@ -207,14 +210,14 @@ export default function Page() {
         done = readerDone;
         onProgress(decoder.decode(value));
       }
-      addResultItem(content, assistantMessage);
+      addResultItem(content, assistantMessage, systemMessage);
     } catch (e) {
       console.log(e);
-      addResultItem(content, assistantMessage);
+      addResultItem(content, assistantMessage, systemMessage);
     }
   }
 
-  function addResultItem(content: string, assistantMessage: string) {
+  function addResultItem(content: string, assistantMessage: string, prompt: string = "") {
     // AI 完整的返回值
     console.log([assistantMessage]);
     if (!assistantMessage) return;
@@ -227,6 +230,7 @@ export default function Page() {
         content: assistantMessage,
         token: estimateTokens(assistantMessage),
         question: content,
+        prompt,
       },
     ]);
     // playTTS(assistantMessage);
@@ -257,9 +261,14 @@ export default function Page() {
     setParentMessageId(undefined);
   }
 
+  function updateSystemPrompt(prompt: string = "") {
+    chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: prompt });
+  }
+
   function handleRegenerate(item: ChatMessage) {
     const content = item.role === "user" ? item.content : item.question;
     sendMessage(content);
+    updateSystemPrompt(item.prompt);
   }
 
   function handleMessageDelete(item: ChatMessage) {
@@ -273,7 +282,11 @@ export default function Page() {
         colorScheme={chatLoading ? "red" : "blue"}
         variant={chatLoading ? "outline" : "solid"}
       >
-        {chatLoading ? <Spinner size="sm" /> : <IconBrandTelegram stroke={1.5} />}
+        {chatLoading ? ( //
+          <IconLoader3 stroke={1.5} className="rotate-img" />
+        ) : (
+          <IconBrandTelegram stroke={1.5} />
+        )}
       </Button>
       <IconButton
         aria-label="ASR" //
@@ -326,8 +339,11 @@ export default function Page() {
             item={item}
             onDelete={handleMessageDelete}
             onPlay={(item) => playTTS(item.content)}
-            onRetry={(item) => setInputContent(item.content)}
             onRegenerate={handleRegenerate}
+            onRetry={(item) => {
+              setInputContent(item.content);
+              updateSystemPrompt(item.prompt);
+            }}
           />
         ))}
         {currentAssistantMessage && (

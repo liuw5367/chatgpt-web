@@ -1,7 +1,8 @@
-import { Select, Textarea } from "@chakra-ui/react";
+import { Button, Select, Textarea } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
 import { chatConfigAtom } from "./atom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { estimateTokens } from "./token";
 
 import promptsZh from "./prompts/zh.json";
 import promptsEn from "./prompts/en.json";
@@ -26,6 +27,13 @@ export function SystemPrompt() {
   const [template, setTemplate] = useState("中文");
   const [options, setOptions] = useState(promptsZh);
   const [desc, setDesc] = useState("");
+  const [token, setToken] = useState(0);
+
+  useEffect(() => {
+    if (chatConfig.systemMessage) {
+      setToken(estimateTokens(chatConfig.systemMessage));
+    }
+  }, [chatConfig.systemMessage]);
 
   function update(content?: string) {
     chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: content?.trim() });
@@ -80,6 +88,10 @@ export function SystemPrompt() {
         value={chatConfig.systemMessage}
         onChange={(e) => update(e.target.value)}
       />
+
+      <Button size="xs" aria-label="Token" title="Token">
+        {token}
+      </Button>
     </div>
   );
 }
