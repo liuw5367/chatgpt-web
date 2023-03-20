@@ -15,11 +15,12 @@ interface Props {
   item: ChatMessage;
   onDelete?: (v: ChatMessage) => void;
   onPlay?: (v: ChatMessage) => void;
+  onRegenerate?: (v: ChatMessage) => void;
   onRetry?: (v: ChatMessage) => void;
 }
 
 export function MessageItem(props: Props) {
-  const { item, onDelete, onPlay, onRetry } = props;
+  const { item, onDelete, onPlay, onRetry, onRegenerate } = props;
 
   const { colorMode } = useColorMode();
   const { setValue: setClipboard, onCopy, hasCopied } = useClipboard(item.content);
@@ -28,6 +29,63 @@ export function MessageItem(props: Props) {
   if (!isUser && !item.markdown) {
     item.markdown = renderMarkdown(item.content);
   }
+
+  const actions = (
+    <div className={`absolute bottom-0 mt-1 flex ${isUser ? "justify-end right-10" : "left-7"}`}>
+      <div className="-mb-8 flex items-center space-x-1">
+        <IconButton
+          aria-label="Copy"
+          variant="ghost"
+          icon={
+            hasCopied ? (
+              <IconClipboardCheck size="1rem" className="opacity-64" />
+            ) : (
+              <IconClipboard size="1rem" className="opacity-64" />
+            )
+          }
+          size="xs"
+          onClick={() => {
+            setClipboard(item.content);
+            onCopy();
+          }}
+        />
+        <IconButton
+          aria-label="TTS"
+          variant="ghost"
+          icon={<IconPlayerPlay size="1rem" className="opacity-64" />}
+          size="xs"
+          onClick={() => onPlay?.(item)}
+        />
+        <IconButton
+          aria-label="Delete"
+          variant="ghost"
+          icon={<IconTrash size="0.90rem" className="opacity-64" />}
+          size="xs"
+          onClick={() => onDelete?.(item)}
+        />
+        {(item.role === "user" || (item.role === "assistant" && item.question)) && (
+          <IconButton
+            aria-label="Retry"
+            variant="ghost"
+            icon={<IconReload size="0.90rem" className="opacity-64" />}
+            size="xs"
+            onClick={() => {
+              if (item.role === "user") {
+                onRetry?.(item);
+              } else {
+                onRegenerate?.(item);
+              }
+            }}
+          />
+        )}
+        {item.token != null && (
+          <Button size="xs" aria-label="Token" title="Token">
+            {item.token}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div
@@ -53,55 +111,7 @@ export function MessageItem(props: Props) {
             <div className="markdown-body" dangerouslySetInnerHTML={{ __html: item.markdown || "" }} />
           )}
         </div>
-        <div className={`absolute bottom-0 mt-1 flex ${isUser ? "justify-end right-12" : "left-10"}`}>
-          <div className="-mb-8 flex items-center space-x-1">
-            <div className="i-tabler-copy hidden" />
-            <IconButton
-              aria-label="Copy"
-              variant="ghost"
-              icon={
-                hasCopied ? (
-                  <IconClipboardCheck size="1rem" className="opacity-64" />
-                ) : (
-                  <IconClipboard size="1rem" className="opacity-64" />
-                )
-              }
-              size="xs"
-              onClick={() => {
-                setClipboard(item.content);
-                onCopy();
-              }}
-            />
-            <IconButton
-              aria-label="TTS"
-              variant="ghost"
-              icon={<IconPlayerPlay size="1rem" className="opacity-64" />}
-              size="xs"
-              onClick={() => onPlay?.(item)}
-            />
-            <IconButton
-              aria-label="Delete"
-              variant="ghost"
-              icon={<IconTrash size="0.90rem" className="opacity-64" />}
-              size="xs"
-              onClick={() => onDelete?.(item)}
-            />
-            {(item.role === "user" || (item.role === "assistant" && item.question)) && (
-              <IconButton
-                aria-label="Retry"
-                variant="ghost"
-                icon={<IconReload size="0.90rem" className="opacity-64" />}
-                size="xs"
-                onClick={() => onRetry?.(item)}
-              />
-            )}
-            {item.token != null && (
-              <Button size="xs" aria-label="Token" title="Token">
-                {item.token}
-              </Button>
-            )}
-          </div>
-        </div>
+        {item.id !== "-1" && actions}
       </div>
     </div>
   );

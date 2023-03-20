@@ -29,12 +29,19 @@ export default function App() {
 
   return (
     <ChakraProvider theme={theme}>
-      <div className={`v-screen h-screen`}>
+      {loadIcons()}
+      <div className={`v-screen h-screen flex flex-col overflow-auto relative`}>
         <Header />
-        <div style={{ height: "calc(100% - 4rem)" }}>
-          <Chat />
-        </div>
+        <Chat />
       </div>
     </ChakraProvider>
+  );
+}
+
+function loadIcons() {
+  return (
+    <>
+      <div className="i-tabler-copy hidden" />
+    </>
   );
 }

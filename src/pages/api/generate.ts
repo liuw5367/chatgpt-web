@@ -11,22 +11,27 @@ export const post: APIRoute = async (context) => {
   const decoder = new TextDecoder();
 
   if (!messages) {
-    return new Response("No input text");
+    return new Response("No Input Text");
   }
 
-  const completion = await fetch(host + "/v1/chat/completions", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    method: "POST",
-    body: JSON.stringify({
-      model: model || "gpt-3.5-turbo",
-      messages,
-      stream: true,
-      temperature: 0.6,
-    }),
-  });
+  let completion: Response;
+  try {
+    completion = await fetch(host + "/v1/chat/completions", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      method: "POST",
+      body: JSON.stringify({
+        model: model || "gpt-3.5-turbo",
+        messages,
+        stream: true,
+        temperature: 0.6,
+      }),
+    });
+  } catch (e) {
+    return new Response("AI Http Request Error");
+  }
 
   const stream = new ReadableStream({
     async start(controller) {

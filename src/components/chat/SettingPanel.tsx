@@ -25,7 +25,7 @@ export default function SettingPanel() {
     if (chatConfig.visible) {
       setConfig({ ...chatConfig });
     }
-  }, [chatConfig.visible])
+  }, [chatConfig.visible]);
 
   function handleSaveClick() {
     const draft = chatConfigAtom.get();
@@ -52,13 +52,6 @@ export default function SettingPanel() {
   };
 
   const list: ListItemType[] = [
-    {
-      type: "textarea",
-      label: "System Prompt",
-      value: "systemMessage",
-      placeholder:
-        "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.\nKnowledge cutoff: 2021-09-01",
-    },
     {
       label: "OPENAI_HOST",
       value: "openAIHost",
@@ -103,7 +96,7 @@ export default function SettingPanel() {
             {list.map((item) => {
               return (
                 <div key={item.value}>
-                  <div className="mb-1 ml-1 text-sm flex">{item.label}:</div>
+                  <div className="mb-1 text-sm flex">{item.label}:</div>
                   {item.type === "textarea" ? (
                     <Textarea
                       size="sm"

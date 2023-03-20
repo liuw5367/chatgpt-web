@@ -9,17 +9,19 @@ import { TTSStatusEnum } from "./ai/TTSView";
 import { chatConfigAtom, chatDataAtom } from "./atom";
 import SettingPanel from "./SettingPanel";
 import type { ChatMessage, Command } from "./type";
-import { Button, IconButton, Spinner, Textarea, useToast } from "@chakra-ui/react";
+import { Button, IconButton, Textarea, useToast, Spinner } from "@chakra-ui/react";
 import { MessageItem } from "./MessageItem";
 import {
   IconMicrophone,
   IconMicrophoneOff,
   IconPlayerPause,
   IconPlayerPlay,
-  IconReload,
+  IconClearAll,
   IconSettings,
+  IconBrandTelegram,
 } from "@tabler/icons-react";
 import { estimateTokens } from "./token";
+import { SystemPrompt } from "./SystemPrompt";
 
 export default function Page() {
   const [conversationId, setConversationId] = useState<string>();
@@ -39,6 +41,10 @@ export default function Page() {
   const chatConfig = useStore(chatConfigAtom);
 
   const toast = useToast({ position: "top" });
+
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
 
   useDebounceEffect(() => {
     localStorage.setItem("messages", JSON.stringify(dataSource));
@@ -99,7 +105,11 @@ export default function Page() {
       return;
     }
     stopTTS();
-    voiceRef.current?.asr();
+    if (asrState === ASRStatusEnum.RECORDING) {
+      voiceRef.current?.stopAsr();
+    } else {
+      voiceRef.current?.asr();
+    }
   }
 
   function handleCommandChange(command: Command) {
@@ -225,8 +235,9 @@ export default function Page() {
     setChatLoading(false);
   }
 
-  function scrollToBottom(id?: string) {
-    scrollToElement(id || "chat-bottom");
+  function scrollToBottom(options: ScrollIntoViewOptions = {}) {
+    // scrollToElement("chat-bottom");
+    scrollToElement("page-bottom", { behavior: "auto", block: "end", ...options });
   }
 
   function handleClearClick() {
@@ -255,16 +266,68 @@ export default function Page() {
     chatDataAtom.set(chatDataAtom.get().filter((v) => v.id !== item.id));
   }
 
+  const actions = (
+    <>
+      <Button
+        onClick={() => handleChatGPTClick()}
+        colorScheme={chatLoading ? "red" : "blue"}
+        variant={chatLoading ? "outline" : "solid"}
+      >
+        {chatLoading ? <Spinner size="sm" /> : <IconBrandTelegram stroke={1.5} />}
+      </Button>
+      <IconButton
+        aria-label="ASR" //
+        onClick={handleASRClick}
+        colorScheme={asrState === ASRStatusEnum.RECORDING ? "red" : "gray"}
+        variant={asrState === ASRStatusEnum.RECORDING ? "outline" : "solid"}
+        icon={
+          asrState === ASRStatusEnum.RECORDING ? <IconMicrophoneOff stroke={1.5} /> : <IconMicrophone stroke={1.5} />
+        }
+      />
+      <IconButton
+        aria-label="TTS" //
+        onClick={handleTTSClick}
+        colorScheme={ttsState === TTSStatusEnum.PLAYING ? "red" : "gray"}
+        variant={ttsState === TTSStatusEnum.PLAYING ? "outline" : "solid"}
+        icon={ttsState !== TTSStatusEnum.NORMAL ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />}
+      />
+      <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
+      {/* <Button title="新对话" className="px-3" onClick={handleNewChatClick}>
+              <ReloadOutlined />
+            </Button>
+            <Button
+              title="上下文开关"
+              className="px-3"
+              type={contextEnable ? 'primary' : 'default'}
+              danger={contextEnable}
+              ghost={contextEnable}
+              onClick={() => setContextEnable(!contextEnable)}
+            >
+              <RetweetOutlined />
+            </Button> */}
+
+      <IconButton
+        aria-label="Setting"
+        icon={<IconSettings stroke={1.5} />}
+        onClick={() => {
+          const draft = chatConfigAtom.get();
+          chatConfigAtom.set({ ...draft, visible: !draft.visible });
+        }}
+      />
+    </>
+  );
+
   return (
-    <div className="w-full h-full flex flex-col bg-cover bg-no-repeat relative">
-      <div className={`flex-1 p-4 pb-0 overflow-auto`}>
+    <div className="w-full flex-1 flex flex-col bg-cover bg-no-repeat relative">
+      <div className={`p-4 pb-0`} style={{ minHeight: "calc(100vh - 207px)" }}>
         {dataSource.map((item) => (
           <MessageItem
             key={item.id}
             item={item}
             onDelete={handleMessageDelete}
             onPlay={(item) => playTTS(item.content)}
-            onRetry={handleRegenerate}
+            onRetry={(item) => setInputContent(item.content)}
+            onRegenerate={handleRegenerate}
           />
         ))}
         {currentAssistantMessage && (
@@ -283,8 +346,9 @@ export default function Page() {
       <div className="px-6 py-4 border-t flex flex-col justify-end space-y-3">
         <Textarea
           rows={2}
-          className="resize-none"
+          className="resize-none placeholder:text-[14px]"
           value={inputContent}
+          placeholder="Shortcuts: Ctrl + Enter / Command + Enter"
           onChange={(e) => setInputContent(e.target.value)}
           onKeyDown={(e) => {
             if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
@@ -292,61 +356,12 @@ export default function Page() {
             }
           }}
         />
-        <div className="flex flex-row items-center space-x-3">
-          <Button
-            onClick={() => handleChatGPTClick()}
-            colorScheme={chatLoading ? "red" : "blue"}
-            variant={chatLoading ? "outline" : "solid"}
-            leftIcon={chatLoading ? <Spinner size="sm" /> : undefined}
-          >
-            {chatLoading ? "Cancel" : "Send"}
-          </Button>
-          <IconButton
-            aria-label="ASR" //
-            onClick={handleASRClick}
-            colorScheme={asrState === ASRStatusEnum.RECORDING ? "red" : "gray"}
-            variant={asrState === ASRStatusEnum.RECORDING ? "outline" : "solid"}
-            icon={
-              asrState === ASRStatusEnum.RECORDING ? (
-                <IconMicrophoneOff stroke={1.5} />
-              ) : (
-                <IconMicrophone stroke={1.5} />
-              )
-            }
-          />
-          <IconButton
-            aria-label="TTS" //
-            onClick={handleTTSClick}
-            colorScheme={ttsState === TTSStatusEnum.PLAYING ? "red" : "gray"}
-            variant={ttsState === TTSStatusEnum.PLAYING ? "outline" : "solid"}
-            icon={
-              ttsState !== TTSStatusEnum.NORMAL ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />
-            }
-          />
-          <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconReload stroke={1.5} />} />
-          {/* <Button title="新对话" className="px-3" onClick={handleNewChatClick}>
-              <ReloadOutlined />
-            </Button>
-            <Button
-              title="上下文开关"
-              className="px-3"
-              type={contextEnable ? 'primary' : 'default'}
-              danger={contextEnable}
-              ghost={contextEnable}
-              onClick={() => setContextEnable(!contextEnable)}
-            >
-              <RetweetOutlined />
-            </Button> */}
+        <div className="flex flex-row items-center space-x-3">{actions}</div>
 
-          <IconButton
-            aria-label="Setting"
-            icon={<IconSettings stroke={1.5} />}
-            onClick={() => {
-              const draft = chatConfigAtom.get();
-              chatConfigAtom.set({ ...draft, visible: !draft.visible });
-            }}
-          />
-        </div>
+        <div id="page-bottom" />
+
+        <SystemPrompt />
+
         <VoiceView
           ref={(ref) => (voiceRef.current = ref)}
           chatLoading={chatLoading}
