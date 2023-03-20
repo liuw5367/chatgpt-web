@@ -44,7 +44,7 @@ export default function Page() {
   const toast = useToast({ position: "top" });
 
   useEffect(() => {
-    scrollToBottom();
+    scrollToBottom({ behavior: "auto" });
   }, []);
 
   useDebounceEffect(() => {
@@ -241,7 +241,7 @@ export default function Page() {
 
   function scrollToBottom(options: ScrollIntoViewOptions = {}) {
     // scrollToElement("chat-bottom");
-    scrollToElement("page-bottom", { behavior: "auto", block: "end", ...options });
+    scrollToElement("page-bottom", { behavior: "smooth", block: "end", ...options });
   }
 
   function handleClearClick() {
@@ -343,6 +343,7 @@ export default function Page() {
             onRetry={(item) => {
               setInputContent(item.content);
               updateSystemPrompt(item.prompt);
+              scrollToBottom();
             }}
           />
         ))}
