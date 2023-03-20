@@ -6,10 +6,14 @@ import { useState } from "react";
 import promptsZh from "./prompts/zh.json";
 import promptsEn from "./prompts/en.json";
 import promptsOther from "./prompts/other.json";
+import promptsShortcut from "./prompts/shortcuts";
 
-const templates = [
+type TemplateType = { label: string; value: { act: string; prompt: string; desc?: string } };
+
+const templateOptions: TemplateType[] = [
   { label: "中文", value: promptsZh },
   { label: "英文", value: promptsEn },
+  { label: "Shortcut", value: promptsShortcut },
   { label: "其他", value: promptsOther },
 ];
 
@@ -19,7 +23,9 @@ export function SystemPrompt() {
   const currentDate = new Date().toISOString().split("T")[0];
   const placeholder = `Example: You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.\nKnowledge cutoff: 2021-09-01\nCurrent date: ${currentDate}`;
 
+  const [template, setTemplate] = useState("中文");
   const [options, setOptions] = useState(promptsZh);
+  const [desc, setDesc] = useState("");
 
   function update(content?: string) {
     chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: content?.trim() });
@@ -32,13 +38,14 @@ export function SystemPrompt() {
       <div className="flex flex-col space-y-2" sm="flex-row items-center space-x-4 space-y-0">
         <div>
           <Select
-            defaultValue="中文"
+            value={template}
             onChange={(e) => {
               const key = e.target.value;
-              setOptions(templates.find((item) => item.label === key)?.value || []);
+              setTemplate(key);
+              setOptions(templateOptions.find((item) => item.label === key)?.value || []);
             }}
           >
-            {templates.map((item) => (
+            {templateOptions.map((item) => (
               <option key={item.label} value={item.label}>
                 {item.label}
               </option>
@@ -46,15 +53,25 @@ export function SystemPrompt() {
           </Select>
         </div>
         <div sm="min-w-60">
-          <Select placeholder="Select Act" onChange={(e) => update(e.target.value)}>
+          <Select
+            placeholder="Select Act"
+            onChange={(e) => {
+              const key = e.target.value;
+              const item = options.find((item) => item.prompt === key);
+              update(e.target.value);
+              setDesc(item?.desc || "");
+            }}
+          >
             {options.map((item) => (
-              <option key={item.prompt} value={item.prompt}>
+              <option key={template + "-" + item.act} value={item.prompt}>
                 {item.act}
               </option>
             ))}
           </Select>
         </div>
       </div>
+
+      {desc && <div className="px-2 text-[15px] whitespace-pre-wrap">{desc}</div>}
 
       <Textarea
         rows={6}
