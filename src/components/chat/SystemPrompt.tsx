@@ -1,15 +1,16 @@
-import { Button, Select, Textarea } from "@chakra-ui/react";
+import { Button, IconButton, Select, Textarea } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
 import { chatConfigAtom } from "./atom";
 import { useState, useEffect } from "react";
 import { estimateTokens } from "./token";
+import { IconTrash } from "@tabler/icons-react";
 
 import promptsZh from "./prompts/zh.json";
 import promptsEn from "./prompts/en.json";
 import promptsOther from "./prompts/other.json";
 import promptsShortcut from "./prompts/shortcuts";
 
-type TemplateType = { label: string; value: { act: string; prompt: string; desc?: string } };
+type TemplateType = { label: string; value: { act: string; prompt: string; desc?: string }[] };
 
 const templateOptions: TemplateType[] = [
   { label: "中文", value: promptsZh },
@@ -32,10 +33,17 @@ export function SystemPrompt() {
   useEffect(() => {
     if (chatConfig.systemMessage) {
       setToken(estimateTokens(chatConfig.systemMessage));
+    } else {
+      setToken(0);
     }
   }, [chatConfig.systemMessage]);
 
   function update(content?: string) {
+    if (content) {
+      localStorage.setItem("systemMessage", content);
+    } else {
+      localStorage.removeItem("systemMessage");
+    }
     chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: content?.trim() });
   }
 
@@ -89,9 +97,17 @@ export function SystemPrompt() {
         onChange={(e) => update(e.target.value)}
       />
 
-      <Button size="xs" aria-label="Token" title="Token">
-        {token}
-      </Button>
+      <div className="flex flex-row space-x-2">
+        <Button size="xs" aria-label="Token" title="Token">
+          {token}
+        </Button>
+        <IconButton
+          aria-label="clear"
+          size="xs"
+          icon={<IconTrash size="1rem" stroke={1.5} />}
+          onClick={() => update("")}
+        />
+      </div>
     </div>
   );
 }

@@ -36,7 +36,7 @@ export function MessageItem(props: Props) {
       title={item.prompt}
       className={`cursor-pointer ${!isUser && "ml-2"}`}
       onClick={() => {
-        setClipboard(item.prompt);
+        setClipboard(item.prompt || "");
         onCopy();
       }}
     >
