@@ -99,7 +99,6 @@ export default function SettingPanel() {
                   <div className="mb-1 text-sm flex">{item.label}:</div>
                   {item.type === "textarea" ? (
                     <Textarea
-                      size="sm"
                       className="flex-1"
                       rows={4}
                       placeholder={item.placeholder}
@@ -109,7 +108,6 @@ export default function SettingPanel() {
                     />
                   ) : (
                     <Input
-                      size="sm"
                       className="flex-1"
                       placeholder={item.placeholder}
                       // @ts-expect-error

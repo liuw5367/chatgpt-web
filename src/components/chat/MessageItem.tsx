@@ -1,4 +1,18 @@
-import { Avatar, Badge, Button, IconButton, useClipboard, useColorMode } from "@chakra-ui/react";
+import {
+  Avatar,
+  Badge,
+  Button,
+  IconButton,
+  useClipboard,
+  useColorMode,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
+} from "@chakra-ui/react";
 import {
   IconClipboard,
   IconClipboardCheck,
@@ -23,46 +37,51 @@ export function MessageItem(props: Props) {
   const { item, onDelete, onPlay, onRetry, onRegenerate } = props;
 
   const { colorMode } = useColorMode();
-  const { setValue: setClipboard, onCopy, hasCopied } = useClipboard(item.content);
+  const { onCopy: onContentCopy, hasCopied: hasContentCopied } = useClipboard(item.content || item.prompt || "");
+  const { onCopy: onPromptCopy, hasCopied: hasPromptCopied } = useClipboard(item.prompt || "");
 
   const isUser = item.role === "user";
   if (!isUser && !item.markdown) {
     item.markdown = renderMarkdown(item.content);
   }
 
-  const prompt = (
-    <Badge
-      colorScheme="green"
-      title={item.prompt}
-      className={`cursor-pointer ${!isUser && "ml-2"}`}
-      onClick={() => {
-        setClipboard(item.prompt || "");
-        onCopy();
-      }}
-    >
-      Prompt
-    </Badge>
+  const renderPrompt = (placement: "top" | "top-start" = "top-start") => (
+    <Popover placement={placement}>
+      <PopoverTrigger>
+        <Badge
+          colorScheme="green"
+          title={item.prompt}
+          className={`cursor-pointer ${!isUser && "ml-2"}`}
+          onClick={onPromptCopy}
+        >
+          Prompt
+        </Badge>
+      </PopoverTrigger>
+      <PopoverContent>
+        <PopoverHeader fontWeight="semibold">Prompt</PopoverHeader>
+        {/* <PopoverArrow /> */}
+        <PopoverCloseButton />
+        <PopoverBody>{item.prompt}</PopoverBody>
+      </PopoverContent>
+    </Popover>
   );
 
   const actions = (
     <div className={`absolute bottom-0 mt-1 flex ${isUser ? "justify-end right-10" : "left-7"}`}>
       <div className="-mb-8 flex items-center space-x-1">
-        {!isUser && item.prompt && prompt}
+        {!isUser && item.prompt && renderPrompt()}
         <IconButton
           aria-label="Copy"
           variant="ghost"
           icon={
-            hasCopied ? (
+            hasContentCopied || hasPromptCopied ? (
               <IconClipboardCheck size="1rem" className="opacity-64" />
             ) : (
               <IconClipboard size="1rem" className="opacity-64" />
             )
           }
           size="xs"
-          onClick={() => {
-            setClipboard(item.content);
-            onCopy();
-          }}
+          onClick={onContentCopy}
         />
         <IconButton
           aria-label="TTS"
@@ -109,9 +128,9 @@ export function MessageItem(props: Props) {
       className={`mb-10 flex flex-col ${isUser && "items-end"} space-y-1`}
     >
       {(item.time || item.prompt) && (
-        <div className={`flex items-center space-x-2 text-xs text-gray-500`}>
-          {isUser && item.prompt && prompt}
-          {item.time && <span>{item.time}</span>}
+        <div className={`flex items-center space-x-2`}>
+          {isUser && item.prompt && renderPrompt("top")}
+          {item.time && <span className="text-xs text-gray-500">{item.time}</span>}
         </div>
       )}
       <div className={`flex flex-row space-x-2 relative ${isUser && "flex-row-reverse"}`}>
@@ -126,7 +145,7 @@ export function MessageItem(props: Props) {
               ${isUser && "whitespace-pre-wrap"}`}
         >
           {isUser ? (
-            <>{item.content}</>
+            <>{item.content || item.prompt}</>
           ) : (
             <div className="markdown-body" dangerouslySetInnerHTML={{ __html: item.markdown || "" }} />
           )}

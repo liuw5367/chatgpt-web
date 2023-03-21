@@ -31,7 +31,7 @@ export default function App() {
   return (
     <ChakraProvider theme={theme}>
       {loadIcons()}
-      <div className={`v-screen h-screen flex flex-col overflow-auto relative`}>
+      <div className={`v-screen h-screen flex flex-col`}>
         <Header />
         <Chat />
       </div>

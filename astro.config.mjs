@@ -10,6 +10,7 @@ import tabler from "@iconify-json/tabler/icons.json";
 export default defineConfig({
   output: "server",
   adapter: vercel(),
+  server: { host: true },
   integrations: [
     unocss({
       // include: 'src/**/*.{htm,html,tsx,jsx,css,less,sass}',

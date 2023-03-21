@@ -17,7 +17,7 @@ export function scrollToElement(value: string | HTMLElement, option?: ScrollInto
     if (element && element.scrollIntoView) {
       element.scrollIntoView({ behavior: "smooth", block: "center", ...option });
     }
-  }, 40);
+  }, 50);
 }
 
 export function getCurrentTime() {

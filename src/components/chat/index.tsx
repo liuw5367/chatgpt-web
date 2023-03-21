@@ -12,12 +12,12 @@ import type { ChatMessage, Command } from "./type";
 import { Button, IconButton, Textarea, useToast, Spinner } from "@chakra-ui/react";
 import { MessageItem } from "./MessageItem";
 import {
+  IconEraser,
   IconMicrophone,
   IconMicrophoneOff,
   IconPlayerPause,
   IconPlayerPlay,
   IconClearAll,
-  IconSettings,
   IconBrandTelegram,
   IconLoader3,
 } from "@tabler/icons-react";
@@ -44,20 +44,12 @@ export default function Page() {
   const toast = useToast({ position: "top" });
 
   useEffect(() => {
-    scrollToBottom({ behavior: "auto" });
+    scrollToPageBottom({ behavior: "auto" });
   }, []);
 
   useDebounceEffect(() => {
     localStorage.setItem("messages", JSON.stringify(dataSource));
   }, [dataSource]);
-
-  function stopAI() {
-    // if (chatLoading) {
-    //   addResultItem(currentAssistantMessage);
-    // }
-    chatAbortController?.abort();
-    setChatLoading(false);
-  }
 
   function stopTTS() {
     voiceRef.current?.stopTts();
@@ -67,22 +59,24 @@ export default function Page() {
     voiceRef.current?.tts(content);
   }
 
-  function handleAsrResult(result: string, changing: boolean) {
+  function handleAsrResult(result: string) {
     setInputContent(result);
-    // if (!changing && result && result.length > 1) {
-    //   handleChatGPTClick(result);
-    // }
   }
 
-  function handleTTSClick() {
+  function checkUnisound() {
     if (!chatConfig.unisoundAppKey) {
       toast({ status: "error", title: "Please enter  unisound APPKEY" });
-      return;
+      return true;
     }
     if (!chatConfig.unisoundSecret) {
       toast({ status: "error", title: "Please enter  unisound SECRET" });
-      return;
+      return true;
     }
+    return false;
+  }
+
+  function handleTTSClick() {
+    if (checkUnisound()) return;
 
     if (ttsState !== TTSStatusEnum.NORMAL) {
       stopTTS();
@@ -97,14 +91,8 @@ export default function Page() {
   }
 
   function handleASRClick() {
-    if (!chatConfig.unisoundAppKey) {
-      toast({ status: "error", title: "Please enter unisound APPKEY" });
-      return;
-    }
-    if (!chatConfig.unisoundSecret) {
-      toast({ status: "error", title: "Please enter unisound SECRET" });
-      return;
-    }
+    if (checkUnisound()) return;
+
     stopTTS();
     if (asrState === ASRStatusEnum.RECORDING) {
       voiceRef.current?.stopAsr();
@@ -116,38 +104,43 @@ export default function Page() {
   function handleCommandChange(command: Command) {
     console.log("!! command", [command]);
     if (command === "stopAI") {
-      stopAI();
+      stopGenerate();
     } else if (command === "stopTTS") {
       stopTTS();
     }
   }
 
-  async function handleChatGPTClick(inputValue = inputContent) {
+  function stopGenerate() {
+    chatAbortController?.abort();
+    setChatLoading(false);
+    scrollToPageBottom();
+  }
+
+  async function handleSendClick(inputValue = inputContent) {
     if (!chatConfig.openAIKey) {
       toast({ status: "error", title: "Please enter OPENAI_KEY" });
       return;
     }
 
     if (chatLoading) {
-      stopAI();
+      stopGenerate();
       return;
     }
     await sendMessage(inputValue);
   }
 
-  async function sendMessage(inputValue = inputContent) {
+  async function sendMessage(inputValue = inputContent, systemMessage = chatConfig.systemMessage) {
     if (chatLoading) {
       toast({ status: "warning", title: "Generating..." });
       return;
     }
     const content = removeLn(inputValue);
-    if (!content) {
+    if (!systemMessage && !content) {
       toast({ status: "info", title: "Please enter content" });
       return;
     }
     stopTTS();
 
-    const systemMessage = chatConfig.systemMessage;
     const question: ChatMessage = {
       id: uuid(),
       role: "user",
@@ -159,9 +152,10 @@ export default function Page() {
     const messages = [...dataSource, question];
     chatDataAtom.set(messages);
     setInputContent("");
-    scrollToBottom();
 
     setChatLoading(true);
+    scrollToPageBottom();
+    setTimeout(scrollToChatBottom, 50);
 
     const abortController = new AbortController();
     setAbortController(abortController);
@@ -173,7 +167,7 @@ export default function Page() {
         assistantMessage = draft + content;
         return assistantMessage;
       });
-      scrollToBottom();
+      scrollToChatBottom();
     }
     const requestMessages = (contextEnable ? messages : [question]).map(({ role, content }) => ({ role, content }));
     if (systemMessage) {
@@ -218,7 +212,7 @@ export default function Page() {
   }
 
   function addResultItem(content: string, assistantMessage: string, prompt: string = "") {
-    // AI 完整的返回值
+    // 完整的返回值
     console.log([assistantMessage]);
     if (!assistantMessage) return;
 
@@ -233,32 +227,17 @@ export default function Page() {
         prompt,
       },
     ]);
-    // playTTS(assistantMessage);
-    setCurrentAssistantMessage("");
-    scrollToBottom();
     setChatLoading(false);
-  }
-
-  function scrollToBottom(options: ScrollIntoViewOptions = {}) {
-    // scrollToElement("chat-bottom");
-    scrollToElement("page-bottom", { behavior: "smooth", block: "end", ...options });
+    setCurrentAssistantMessage("");
+    scrollToPageBottom();
   }
 
   function handleClearClick() {
     stopTTS();
-    if (asrState === ASRStatusEnum.RECORDING) {
-      setTimeout(() => voiceRef.current?.asr(), 200);
-    }
     voiceRef.current?.stopAsr();
-    stopAI();
+    stopGenerate();
     setInputContent("");
     chatDataAtom.set([]);
-  }
-
-  function handleNewChatClick() {
-    handleClearClick();
-    setConversationId(undefined);
-    setParentMessageId(undefined);
   }
 
   function updateSystemPrompt(prompt: string = "") {
@@ -267,8 +246,8 @@ export default function Page() {
 
   function handleRegenerate(item: ChatMessage) {
     const content = item.role === "user" ? item.content : item.question;
-    sendMessage(content);
     updateSystemPrompt(item.prompt);
+    sendMessage(content, item.prompt);
   }
 
   function handleMessageDelete(item: ChatMessage) {
@@ -278,7 +257,7 @@ export default function Page() {
   const actions = (
     <>
       <Button
-        onClick={() => handleChatGPTClick()}
+        onClick={() => handleSendClick()}
         colorScheme={chatLoading ? "red" : "blue"}
         variant={chatLoading ? "outline" : "solid"}
       >
@@ -288,6 +267,13 @@ export default function Page() {
           <IconBrandTelegram stroke={1.5} />
         )}
       </Button>
+      <IconButton
+        aria-label="Eraser"
+        onClick={() => setInputContent("")}
+        colorScheme="gray"
+        variant="solid"
+        icon={<IconEraser stroke={1.5} />}
+      />
       <IconButton
         aria-label="ASR" //
         onClick={handleASRClick}
@@ -305,34 +291,18 @@ export default function Page() {
         icon={ttsState !== TTSStatusEnum.NORMAL ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />}
       />
       <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
-      {/* <Button title="新对话" className="px-3" onClick={handleNewChatClick}>
-              <ReloadOutlined />
-            </Button>
-            <Button
-              title="上下文开关"
-              className="px-3"
-              type={contextEnable ? 'primary' : 'default'}
-              danger={contextEnable}
-              ghost={contextEnable}
-              onClick={() => setContextEnable(!contextEnable)}
-            >
-              <RetweetOutlined />
-            </Button> */}
-
-      <IconButton
-        aria-label="Setting"
-        icon={<IconSettings stroke={1.5} />}
-        onClick={() => {
-          const draft = chatConfigAtom.get();
-          chatConfigAtom.set({ ...draft, visible: !draft.visible });
-        }}
-      />
     </>
   );
 
   return (
-    <div className="w-full flex-1 flex flex-col bg-cover bg-no-repeat relative">
-      <div className={`p-4 pb-0`} style={{ minHeight: "calc(100vh - 207px)" }}>
+    <div
+      className={`w-full flex-1 flex flex-col overflow-auto`}
+      style={chatLoading ? { height: "calc(100% - 212px)" } : {}}
+    >
+      <div
+        className={`p-4 pb-0 ${chatLoading && "h-full overflow-auto"}`}
+        style={chatLoading ? { minHeight: "calc(100vh - 212px)" } : {}}
+      >
         {dataSource.map((item) => (
           <MessageItem
             key={item.id}
@@ -343,7 +313,7 @@ export default function Page() {
             onRetry={(item) => {
               setInputContent(item.content);
               updateSystemPrompt(item.prompt);
-              scrollToBottom();
+              scrollToPageBottom();
             }}
           />
         ))}
@@ -369,15 +339,11 @@ export default function Page() {
           onChange={(e) => setInputContent(e.target.value)}
           onKeyDown={(e) => {
             if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-              handleChatGPTClick();
+              handleSendClick();
             }
           }}
         />
         <div className="flex flex-row items-center space-x-3">{actions}</div>
-
-        <div id="page-bottom" />
-
-        <SystemPrompt />
 
         <VoiceView
           ref={(ref) => (voiceRef.current = ref)}
@@ -388,7 +354,17 @@ export default function Page() {
           onCommandChange={handleCommandChange}
         />
       </div>
+      <div id="page-bottom" />
+      {!chatLoading && <SystemPrompt />}
       <SettingPanel />
     </div>
   );
+}
+
+function scrollToChatBottom(options: ScrollIntoViewOptions = {}) {
+  scrollToElement("chat-bottom", { behavior: "auto", block: "end", ...options });
+}
+
+function scrollToPageBottom(options: ScrollIntoViewOptions = {}) {
+  scrollToElement("page-bottom", { behavior: "auto", block: "end", ...options });
 }

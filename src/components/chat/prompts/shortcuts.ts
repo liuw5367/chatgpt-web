@@ -1967,7 +1967,8 @@ type Tag = {
 const data = Users.map((item) => ({
   act: item.title,
   prompt: item.description,
-  desc: item.remark + "\n" + item.descn,
+  desc: item.descn,
+  remark: item.remark,
 }));
 
 export default data;

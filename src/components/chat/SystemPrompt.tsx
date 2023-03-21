@@ -10,12 +10,13 @@ import promptsEn from "./prompts/en.json";
 import promptsOther from "./prompts/other.json";
 import promptsShortcut from "./prompts/shortcuts";
 
-type TemplateType = { label: string; value: { act: string; prompt: string; desc?: string }[] };
+type OptionType = { act: string; prompt: string; desc?: string; remark?: string };
+type TemplateType = { label: string; value: OptionType[] };
 
 const templateOptions: TemplateType[] = [
+  { label: "Shortcut", value: promptsShortcut },
   { label: "中文", value: promptsZh },
   { label: "英文", value: promptsEn },
-  { label: "Shortcut", value: promptsShortcut },
   { label: "其他", value: promptsOther },
 ];
 
@@ -25,9 +26,10 @@ export function SystemPrompt() {
   const currentDate = new Date().toISOString().split("T")[0];
   const placeholder = `Example: You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.\nKnowledge cutoff: 2021-09-01\nCurrent date: ${currentDate}`;
 
-  const [template, setTemplate] = useState("中文");
-  const [options, setOptions] = useState(promptsZh);
+  const [template, setTemplate] = useState("Shortcut");
+  const [options, setOptions] = useState(promptsShortcut);
   const [desc, setDesc] = useState("");
+  const [remark, setRemark] = useState("");
   const [token, setToken] = useState(0);
 
   useEffect(() => {
@@ -42,13 +44,15 @@ export function SystemPrompt() {
     if (content) {
       localStorage.setItem("systemMessage", content);
     } else {
+      setDesc("");
+      setRemark("");
       localStorage.removeItem("systemMessage");
     }
     chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: content?.trim() });
   }
 
   return (
-    <div className="mt-4 space-y-3">
+    <div className="mx-6 pb-4 space-y-3">
       <div className="font-medium">System Prompt</div>
 
       <div className="flex flex-col space-y-2" sm="flex-row items-center space-x-4 space-y-0">
@@ -72,10 +76,11 @@ export function SystemPrompt() {
           <Select
             placeholder="Select Act"
             onChange={(e) => {
-              const key = e.target.value;
-              const item = options.find((item) => item.prompt === key);
-              update(e.target.value);
-              setDesc(item?.desc || "");
+              const prompt = e.target.value;
+              const item = options.find((item) => item.prompt === prompt);
+              update(prompt);
+              setRemark(item?.remark || "");
+              setDesc(item?.desc === prompt ? "" : item?.desc || "");
             }}
           >
             {options.map((item) => (
@@ -87,10 +92,11 @@ export function SystemPrompt() {
         </div>
       </div>
 
-      {desc && <div className="px-2 text-[15px] whitespace-pre-wrap">{desc}</div>}
+      {remark && <div className="px-2 text-[15px] whitespace-pre-wrap">{remark}</div>}
+      {desc && <div className="px-4 py-2 text-[15px] whitespace-pre-wrap rounded bg-black/10">{desc}</div>}
 
       <Textarea
-        rows={6}
+        rows={10}
         className="text-[14px] placeholder:text-[14px]"
         placeholder={placeholder}
         value={chatConfig.systemMessage}
