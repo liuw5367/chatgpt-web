@@ -14,7 +14,6 @@ export default function App() {
   useEffect(() => {
     chatDataAtom.set(JSON.parse(localStorage.getItem("messages") || "[]") as ChatMessage[]);
     chatConfigAtom.set({
-      visible: false,
       openAIKey: localStorage.getItem("openAIKey") || import.meta.env.OPENAI_API_KEY,
 
       openAIHost: localStorage.getItem("openAIHost") || import.meta.env.OPENAI_API_SERVER,
@@ -33,7 +32,9 @@ export default function App() {
       {loadIcons()}
       <div className={`v-screen h-screen flex flex-col`}>
         <Header />
-        <Chat />
+        <div style={{ height: "calc(100% - 4rem)" }}>
+          <Chat />
+        </div>
       </div>
     </ChakraProvider>
   );

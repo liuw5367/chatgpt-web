@@ -11,11 +11,9 @@ const local = {
 export const chatDataAtom = atom(
   //
   JSON.parse(local.getItem("messages") || "[]") as ChatMessage[]
-  // [] as ChatMessage[],
 );
 
 export interface ChatConfigType {
-  visible?: boolean;
   openAIKey?: string;
 
   openAIHost?: string;

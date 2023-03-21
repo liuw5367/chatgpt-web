@@ -1,11 +1,10 @@
 import { IconButton, useColorMode } from "@chakra-ui/react";
 import { IconMoonStars, IconRobot, IconSun, IconSettings } from "@tabler/icons-react";
 import { useStore } from "@nanostores/react";
-import { chatConfigAtom } from "./chat/atom";
+import { visibleAtom } from "./atom";
 
 export function Header() {
   const { colorMode, toggleColorMode } = useColorMode();
-  const chatConfig = useStore(chatConfigAtom);
 
   return (
     <div
@@ -28,10 +27,7 @@ export function Header() {
           aria-label="Settings"
           variant="ghost"
           icon={<IconSettings stroke={1.5} />}
-          onClick={() => {
-            const draft = chatConfigAtom.get();
-            chatConfigAtom.set({ ...draft, visible: !draft.visible });
-          }}
+          onClick={() => visibleAtom.set({ ...visibleAtom.get(), settingVisible: true })}
         />
       </div>
     </div>

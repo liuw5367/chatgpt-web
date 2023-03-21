@@ -1,14 +1,27 @@
-import { Button, IconButton, Select, Textarea } from "@chakra-ui/react";
+import {
+  Button,
+  IconButton,
+  Select,
+  Textarea,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
+} from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
 import { chatConfigAtom } from "./atom";
 import { useState, useEffect } from "react";
 import { estimateTokens } from "./token";
-import { IconTrash } from "@tabler/icons-react";
+import { IconEraser, IconTrash } from "@tabler/icons-react";
 
 import promptsZh from "./prompts/zh.json";
 import promptsEn from "./prompts/en.json";
 import promptsOther from "./prompts/other.json";
 import promptsShortcut from "./prompts/shortcuts";
+import { visibleAtom } from "../atom";
 
 type OptionType = { act: string; prompt: string; desc?: string; remark?: string };
 type TemplateType = { label: string; value: OptionType[] };
@@ -22,39 +35,66 @@ const templateOptions: TemplateType[] = [
 
 export function SystemPrompt() {
   const chatConfig = useStore(chatConfigAtom);
+  const { promptVisible } = useStore(visibleAtom);
 
   const currentDate = new Date().toISOString().split("T")[0];
   const placeholder = `Example: You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.\nKnowledge cutoff: 2021-09-01\nCurrent date: ${currentDate}`;
 
+  const [prompt, setPrompt] = useState(chatConfig.systemMessage);
   const [template, setTemplate] = useState("Shortcut");
   const [options, setOptions] = useState(promptsShortcut);
   const [desc, setDesc] = useState("");
   const [remark, setRemark] = useState("");
+
   const [token, setToken] = useState(0);
 
   useEffect(() => {
-    if (chatConfig.systemMessage) {
-      setToken(estimateTokens(chatConfig.systemMessage));
+    if (promptVisible) {
+      setPrompt(chatConfig.systemMessage);
+    }
+  }, [promptVisible]);
+
+  useEffect(() => {
+    if (!promptVisible && prompt !== chatConfig.systemMessage) {
+      handleClear();
+    }
+  }, [promptVisible, chatConfig.systemMessage]);
+
+  useEffect(() => {
+    if (prompt) {
+      setToken(estimateTokens(prompt));
     } else {
       setToken(0);
     }
-  }, [chatConfig.systemMessage]);
+  }, [prompt]);
 
-  function update(content?: string) {
-    if (content) {
-      localStorage.setItem("systemMessage", content);
-    } else {
-      setDesc("");
-      setRemark("");
-      localStorage.removeItem("systemMessage");
-    }
-    chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: content?.trim() });
+  function handleClose() {
+    visibleAtom.set({ ...visibleAtom.get(), promptVisible: false });
   }
 
-  return (
-    <div className="mx-6 pb-4 space-y-3">
-      <div className="font-medium">System Prompt</div>
+  function handleClear() {
+    setPrompt("");
+    setDesc("");
+    setRemark("");
+  }
 
+  function update(content: string = "") {
+    setPrompt(content);
+  }
+
+  function handleSaveClick() {
+    if (prompt) {
+      localStorage.setItem("systemMessage", prompt);
+    } else {
+      localStorage.removeItem("systemMessage");
+      handleClear();
+    }
+    chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: prompt?.trim() });
+    handleClose();
+  }
+
+  const content = (
+    <div className="w-full h-full flex flex-col space-y-2 ">
       <div className="flex flex-col space-y-2" sm="flex-row items-center space-x-4 space-y-0">
         <div>
           <Select
@@ -96,24 +136,49 @@ export function SystemPrompt() {
       {desc && <div className="px-4 py-2 text-[15px] whitespace-pre-wrap rounded bg-black/10">{desc}</div>}
 
       <Textarea
-        rows={10}
-        className="text-[14px] placeholder:text-[14px]"
+        value={prompt}
         placeholder={placeholder}
-        value={chatConfig.systemMessage}
         onChange={(e) => update(e.target.value)}
+        className="flex-1 !min-h-60 text-[14px] placeholder:text-[14px]"
       />
 
-      <div className="flex flex-row space-x-2">
-        <Button size="xs" aria-label="Token" title="Token">
-          {token}
-        </Button>
-        <IconButton
-          aria-label="clear"
-          size="xs"
-          icon={<IconTrash size="1rem" stroke={1.5} />}
-          onClick={() => update("")}
-        />
+      <div className="flex flex-row items-center justify-between space-x-2">
+        <div className="flex flex-row space-x-2">
+          <Button size="xs" aria-label="Token" title="Token">
+            {token}
+          </Button>
+          <IconButton
+            size="xs"
+            aria-label="Clear"
+            title="Clear"
+            icon={<IconEraser size="1rem" stroke={1.5} />}
+            onClick={handleClear}
+          />
+        </div>
+        {/* <div className='text-[14px]'>After setting the prompt, you can send without entering any content</div> */}
+        <div className="text-[14px]">设置后消息内容为空可直接发送</div>
       </div>
     </div>
+  );
+
+  return (
+    <Drawer isOpen={promptVisible} size="md" placement="right" onClose={handleClose}>
+      <DrawerOverlay />
+      <DrawerContent>
+        <DrawerCloseButton />
+        <DrawerHeader>System Prompt</DrawerHeader>
+
+        <DrawerBody>{content}</DrawerBody>
+
+        <DrawerFooter>
+          <Button variant="outline" mr={3} onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button colorScheme="blue" onClick={handleSaveClick}>
+            Save
+          </Button>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

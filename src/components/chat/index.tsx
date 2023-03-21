@@ -1,16 +1,7 @@
 import { useDebounceEffect } from "ahooks";
 import { useStore } from "@nanostores/react";
 import React, { useEffect, useState } from "react";
-
-import { getCurrentTime, removeLn, scrollToElement, uuid } from "./utils";
-import VoiceView, { VoiceRef } from "./ai";
-import { ASRStatusEnum } from "./ai/ASRView";
-import { TTSStatusEnum } from "./ai/TTSView";
-import { chatConfigAtom, chatDataAtom } from "./atom";
-import SettingPanel from "./SettingPanel";
-import type { ChatMessage, Command } from "./type";
 import { Button, IconButton, Textarea, useToast, Spinner } from "@chakra-ui/react";
-import { MessageItem } from "./MessageItem";
 import {
   IconEraser,
   IconMicrophone,
@@ -20,9 +11,20 @@ import {
   IconClearAll,
   IconBrandTelegram,
   IconLoader3,
+  IconMessages,
 } from "@tabler/icons-react";
+
+import { visibleAtom } from "./../atom";
+import { chatConfigAtom, chatDataAtom } from "./atom";
+import { getCurrentTime, removeLn, scrollToElement, uuid } from "./utils";
+import VoiceView, { VoiceRef } from "./ai";
+import { ASRStatusEnum } from "./ai/ASRView";
+import { TTSStatusEnum } from "./ai/TTSView";
+import type { ChatMessage, Command } from "./type";
+import { MessageItem } from "./MessageItem";
 import { estimateTokens } from "./token";
 import { SystemPrompt } from "./SystemPrompt";
+import { SettingPanel } from "./SettingPanel";
 
 export default function Page() {
   const [conversationId, setConversationId] = useState<string>();
@@ -155,7 +157,7 @@ export default function Page() {
 
     setChatLoading(true);
     scrollToPageBottom();
-    setTimeout(scrollToChatBottom, 50);
+    setTimeout(scrollToPageBottom, 50);
 
     const abortController = new AbortController();
     setAbortController(abortController);
@@ -167,7 +169,7 @@ export default function Page() {
         assistantMessage = draft + content;
         return assistantMessage;
       });
-      scrollToChatBottom();
+      scrollToPageBottom();
     }
     const requestMessages = (contextEnable ? messages : [question]).map(({ role, content }) => ({ role, content }));
     if (systemMessage) {
@@ -291,18 +293,19 @@ export default function Page() {
         icon={ttsState !== TTSStatusEnum.NORMAL ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />}
       />
       <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
+      <IconButton
+        aria-label="Prompt"
+        title={chatConfig.systemMessage}
+        colorScheme={chatConfig.systemMessage ? "teal" : "gray"}
+        icon={<IconMessages stroke={1.5} />}
+        onClick={() => visibleAtom.set({ ...visibleAtom.get(), promptVisible: true })}
+      />
     </>
   );
 
   return (
-    <div
-      className={`w-full flex-1 flex flex-col overflow-auto`}
-      style={chatLoading ? { height: "calc(100% - 212px)" } : {}}
-    >
-      <div
-        className={`p-4 pb-0 ${chatLoading && "h-full overflow-auto"}`}
-        style={chatLoading ? { minHeight: "calc(100vh - 212px)" } : {}}
-      >
+    <div className="w-full h-full flex flex-col">
+      <div className={`flex-1 p-4 pb-0 overflow-auto`}>
         {dataSource.map((item) => (
           <MessageItem
             key={item.id}
@@ -313,7 +316,6 @@ export default function Page() {
             onRetry={(item) => {
               setInputContent(item.content);
               updateSystemPrompt(item.prompt);
-              scrollToPageBottom();
             }}
           />
         ))}
@@ -354,17 +356,12 @@ export default function Page() {
           onCommandChange={handleCommandChange}
         />
       </div>
-      <div id="page-bottom" />
-      {!chatLoading && <SystemPrompt />}
+      <SystemPrompt />
       <SettingPanel />
     </div>
   );
 }
 
-function scrollToChatBottom(options: ScrollIntoViewOptions = {}) {
-  scrollToElement("chat-bottom", { behavior: "auto", block: "end", ...options });
-}
-
 function scrollToPageBottom(options: ScrollIntoViewOptions = {}) {
-  scrollToElement("page-bottom", { behavior: "auto", block: "end", ...options });
+  scrollToElement("chat-bottom", { behavior: "smooth", block: "end", ...options });
 }

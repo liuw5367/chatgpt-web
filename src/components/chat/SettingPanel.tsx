@@ -1,6 +1,7 @@
 import { useStore } from "@nanostores/react";
 import { useEffect, useState } from "react";
 import { chatConfigAtom } from "./atom";
+import { visibleAtom } from "./../atom";
 import {
   Input,
   Textarea,
@@ -15,31 +16,35 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-export default function SettingPanel() {
+export function SettingPanel() {
   const toast = useToast({ position: "top" });
   const chatConfig = useStore(chatConfigAtom);
+  const { settingVisible } = useStore(visibleAtom);
 
   const [config, setConfig] = useState({ ...chatConfig });
 
   useEffect(() => {
-    if (chatConfig.visible) {
+    if (settingVisible) {
       setConfig({ ...chatConfig });
     }
-  }, [chatConfig.visible]);
+  }, [settingVisible]);
+
+  function handleClose() {
+    visibleAtom.set({ ...visibleAtom.get(), settingVisible: false });
+  }
 
   function handleSaveClick() {
     const draft = chatConfigAtom.get();
-    const result = { ...draft, ...config, visible: false };
+    const result = { ...draft, ...config };
     Object.entries(result).forEach(([key, value]) => {
-      if (typeof value !== "boolean") {
-        if (value == null || value.trim() === "") {
-          localStorage.removeItem(key);
-        } else {
-          localStorage.setItem(key, value.trim());
-        }
+      if (value == null || value.trim() === "") {
+        localStorage.removeItem(key);
+      } else {
+        localStorage.setItem(key, value.trim());
       }
     });
     chatConfigAtom.set(result);
+    handleClose();
     toast({ status: "success", title: "Success" });
   }
 
@@ -80,12 +85,7 @@ export default function SettingPanel() {
   ];
 
   return (
-    <Drawer
-      isOpen={!!chatConfig.visible}
-      size="sm"
-      placement="right"
-      onClose={() => chatConfigAtom.set({ ...chatConfigAtom.get(), visible: false })}
-    >
+    <Drawer isOpen={settingVisible} size="sm" placement="right" onClose={handleClose}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
@@ -102,7 +102,6 @@ export default function SettingPanel() {
                       className="flex-1"
                       rows={4}
                       placeholder={item.placeholder}
-                      // @ts-expect-error
                       value={config[item.value] || ""}
                       onChange={(e) => setConfig((draft) => ({ ...draft, [item.value]: e.target.value }))}
                     />
@@ -110,7 +109,6 @@ export default function SettingPanel() {
                     <Input
                       className="flex-1"
                       placeholder={item.placeholder}
-                      // @ts-expect-error
                       value={config[item.value] || ""}
                       onChange={(e) => setConfig((draft) => ({ ...draft, [item.value]: e.target.value }))}
                     />
@@ -122,11 +120,7 @@ export default function SettingPanel() {
         </DrawerBody>
 
         <DrawerFooter>
-          <Button
-            variant="outline"
-            mr={3}
-            onClick={() => chatConfigAtom.set({ ...chatConfigAtom.get(), visible: false })}
-          >
+          <Button variant="outline" mr={3} onClick={handleClose}>
             Cancel
           </Button>
           <Button colorScheme="blue" onClick={handleSaveClick}>
