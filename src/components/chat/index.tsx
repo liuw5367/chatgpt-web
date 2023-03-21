@@ -23,8 +23,6 @@ import { TTSStatusEnum } from "./ai/TTSView";
 import type { ChatMessage, Command } from "./type";
 import { MessageItem } from "./MessageItem";
 import { estimateTokens } from "./token";
-import { SystemPrompt } from "./SystemPrompt";
-import { SettingPanel } from "./SettingPanel";
 
 export default function Page() {
   const [conversationId, setConversationId] = useState<string>();
@@ -356,8 +354,6 @@ export default function Page() {
           onCommandChange={handleCommandChange}
         />
       </div>
-      <SystemPrompt />
-      <SettingPanel />
     </div>
   );
 }

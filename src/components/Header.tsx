@@ -1,5 +1,5 @@
 import { IconButton, useColorMode } from "@chakra-ui/react";
-import { IconMoonStars, IconRobot, IconSun, IconSettings } from "@tabler/icons-react";
+import { IconMoonStars, IconRobot, IconSun, IconSettings, IconPhoto } from "@tabler/icons-react";
 import { useStore } from "@nanostores/react";
 import { visibleAtom } from "./atom";
 
@@ -17,6 +17,12 @@ export function Header() {
       </div>
 
       <div className="flex flex-row items-center space-x-1">
+        <IconButton
+          aria-label="Image Create"
+          variant="ghost"
+          icon={<IconPhoto stroke={1.5} />}
+          onClick={() => visibleAtom.set({ ...visibleAtom.get(), imageVisible: true })}
+        />
         <IconButton
           aria-label="ColorMode"
           variant="ghost"

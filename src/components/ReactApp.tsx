@@ -6,6 +6,10 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { Header } from "./Header";
 import { extendTheme } from "@chakra-ui/react";
 
+import { SystemPrompt } from "./chat/SystemPrompt";
+import { SettingPanel } from "./chat/SettingPanel";
+import { ImagePanel } from "./chat/ImagePanel";
+
 import "uno.css";
 import "./app.css";
 import "./markdown.css";
@@ -35,6 +39,10 @@ export default function App() {
         <div style={{ height: "calc(100% - 4rem)" }}>
           <Chat />
         </div>
+
+        <SystemPrompt />
+        <SettingPanel />
+        <ImagePanel />
       </div>
     </ChakraProvider>
   );

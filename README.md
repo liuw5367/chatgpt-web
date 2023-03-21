@@ -2,6 +2,7 @@
 
 - 使用 OPENAI 官方 API
 - 支持配置 OPENAI 接口地址
+- 支持 image create api
 - 支持配置模型
 - ASR 和 TTS 使用 <https://ai.unisound.com>
 
