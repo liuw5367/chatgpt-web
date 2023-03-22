@@ -1,4 +1,4 @@
-import { useDebounceEffect } from "ahooks";
+import { useDebounceEffect, useUpdateEffect } from "ahooks";
 import { useStore } from "@nanostores/react";
 import React, { useEffect, useState } from "react";
 import { Button, IconButton, Textarea, useToast } from "@chakra-ui/react";
@@ -28,8 +28,7 @@ import { MessageItem } from "./MessageItem";
 import { estimateTokens } from "./token";
 
 export default function Page() {
-  const conversationStore = useStore(conversationAtom);
-  const [conversationId, setConversationId] = useState<string | undefined>(conversationStore.conversationId);
+  const { conversationId } = useStore(conversationAtom);
   const [inputContent, setInputContent] = useState("");
   const [currentAssistantMessage, setCurrentAssistantMessage] = useState("");
 
@@ -52,6 +51,17 @@ export default function Page() {
   useDebounceEffect(() => {
     localStorage.setItem("messages", JSON.stringify(dataSource));
   }, [dataSource]);
+
+  useUpdateEffect(() => {
+    const { conversationId } = conversationAtom.get();
+    if (conversationId) {
+      toast({
+        status: "info",
+        title: "System Prompt 变化，将开启新的对话",
+        description: "若是点击重新生成按钮触发，将延续对应的对话",
+      });
+    }
+  }, [chatConfig.systemMessage]);
 
   function stopTTS() {
     voiceRef.current?.stopTts();
@@ -271,6 +281,7 @@ export default function Page() {
 
   async function handleRegenerate(item: ChatMessage) {
     const content = item.role === "user" ? item.content : item.question;
+    updateConversationId(item.conversationId);
     updateSystemPrompt(item.prompt);
     await sendMessage(content, item.prompt);
   }
@@ -279,80 +290,90 @@ export default function Page() {
     chatDataAtom.set(chatDataAtom.get().filter((v) => v.id !== item.id));
   }
 
+  function updateConversationId(id?: string) {
+    if (conversationId) {
+      localStorage.setItem("conversationId", id);
+    } else {
+      localStorage.removeItem("conversationId");
+    }
+    conversationAtom.set({ ...conversationAtom.get(), conversationId: id });
+  }
+
   function handleConversationClick() {
     if (conversationId) {
-      setConversationId(undefined);
-      localStorage.removeItem("conversationId");
+      updateConversationId();
       toast({ status: "info", title: "已关闭连续对话" });
     } else {
-      const id = uuid();
-      setConversationId(id);
-      localStorage.setItem("conversationId", id);
+      updateConversationId(uuid());
       toast({ status: "success", title: "已开启连续对话", description: "该对话不会和之前的消息关联" });
     }
   }
 
   const actions = (
     <>
-      <Button
-        onClick={() => handleSendClick()}
-        colorScheme={chatLoading ? "red" : "blue"}
-        variant={chatLoading ? "outline" : "solid"}
-      >
-        {chatLoading ? ( //
-          <IconLoader3 stroke={1.5} className="rotate-img" />
-        ) : (
-          <IconBrandTelegram stroke={1.5} />
+      <div className="flex flex-row items-center space-x-3">
+        <Button
+          onClick={() => handleSendClick()}
+          colorScheme={chatLoading ? "red" : "blue"}
+          variant={chatLoading ? "outline" : "solid"}
+        >
+          {chatLoading ? ( //
+            <IconLoader3 stroke={1.5} className="rotate-img" />
+          ) : (
+            <IconBrandTelegram stroke={1.5} />
+          )}
+        </Button>
+        <IconButton
+          aria-label="Eraser"
+          onClick={() => setInputContent("")}
+          colorScheme="gray"
+          variant="solid"
+          icon={<IconEraser stroke={1.5} />}
+        />
+        <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
+      </div>
+      <div className="flex flex-row items-center space-x-3">
+        {chatConfig.unisoundAppKey && chatConfig.unisoundSecret && (
+          <>
+            <IconButton
+              aria-label="ASR" //
+              onClick={handleASRClick}
+              colorScheme={asrState === ASRStatusEnum.RECORDING ? "red" : "gray"}
+              variant={asrState === ASRStatusEnum.RECORDING ? "outline" : "solid"}
+              icon={
+                asrState === ASRStatusEnum.RECORDING ? (
+                  <IconMicrophoneOff stroke={1.5} />
+                ) : (
+                  <IconMicrophone stroke={1.5} />
+                )
+              }
+            />
+            <IconButton
+              aria-label="TTS" //
+              onClick={handleTTSClick}
+              colorScheme={ttsState === TTSStatusEnum.PLAYING ? "red" : "gray"}
+              variant={ttsState === TTSStatusEnum.PLAYING ? "outline" : "solid"}
+              icon={
+                ttsState !== TTSStatusEnum.NORMAL ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />
+              }
+            />
+          </>
         )}
-      </Button>
-      <IconButton
-        aria-label="Eraser"
-        onClick={() => setInputContent("")}
-        colorScheme="gray"
-        variant="solid"
-        icon={<IconEraser stroke={1.5} />}
-      />
-      {chatConfig.unisoundAppKey && chatConfig.unisoundSecret && (
-        <>
-          <IconButton
-            aria-label="ASR" //
-            onClick={handleASRClick}
-            colorScheme={asrState === ASRStatusEnum.RECORDING ? "red" : "gray"}
-            variant={asrState === ASRStatusEnum.RECORDING ? "outline" : "solid"}
-            icon={
-              asrState === ASRStatusEnum.RECORDING ? (
-                <IconMicrophoneOff stroke={1.5} />
-              ) : (
-                <IconMicrophone stroke={1.5} />
-              )
-            }
-          />
-          <IconButton
-            aria-label="TTS" //
-            onClick={handleTTSClick}
-            colorScheme={ttsState === TTSStatusEnum.PLAYING ? "red" : "gray"}
-            variant={ttsState === TTSStatusEnum.PLAYING ? "outline" : "solid"}
-            icon={
-              ttsState !== TTSStatusEnum.NORMAL ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />
-            }
-          />
-        </>
-      )}
-      <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
-      <IconButton
-        aria-label="Conversation"
-        title="Continuous conversation"
-        colorScheme={conversationId ? "teal" : "gray"}
-        icon={conversationId ? <IconMessages stroke={1.5} /> : <IconMessagesOff stroke={1.5} />}
-        onClick={handleConversationClick}
-      />
-      <IconButton
-        aria-label="Prompt"
-        title={chatConfig.systemMessage}
-        colorScheme={chatConfig.systemMessage ? "whatsapp" : "gray"}
-        icon={chatConfig.systemMessage ? <IconMessagePlus stroke={1.5} /> : <IconMessage stroke={1.5} />}
-        onClick={() => visibleAtom.set({ ...visibleAtom.get(), promptVisible: true })}
-      />
+        <IconButton
+          aria-label="Conversation"
+          title="Continuous conversation"
+          colorScheme={conversationId ? "teal" : "gray"}
+          icon={conversationId ? <IconMessages stroke={1.5} /> : <IconMessagesOff stroke={1.5} />}
+          onClick={handleConversationClick}
+        />
+        <IconButton
+          aria-label="Prompt"
+          title={chatConfig.systemMessage}
+          colorScheme={chatConfig.systemMessage ? "whatsapp" : "gray"}
+          icon={chatConfig.systemMessage ? <IconMessagePlus stroke={1.5} /> : <IconMessage stroke={1.5} />}
+          onClick={() => visibleAtom.set({ ...visibleAtom.get(), promptVisible: true })}
+        />
+      </div>
     </>
   );
 
@@ -368,6 +389,7 @@ export default function Page() {
             onRegenerate={handleRegenerate}
             onRetry={(item) => {
               setInputContent(item.content);
+              updateConversationId(item.conversationId);
               updateSystemPrompt(item.prompt);
             }}
           />
@@ -405,7 +427,7 @@ export default function Page() {
             }
           }}
         />
-        <div className="flex flex-row items-center space-x-3">{actions}</div>
+        <div className="flex flex-row flex-wrap items-center justify-between lg:justify-start space-x-3">{actions}</div>
 
         <VoiceView
           ref={(ref) => (voiceRef.current = ref)}

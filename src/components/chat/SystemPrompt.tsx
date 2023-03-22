@@ -10,12 +10,13 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
+  useToast,
 } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
-import { chatConfigAtom } from "./atom";
+import { chatConfigAtom, conversationAtom } from "./atom";
 import { useState, useEffect } from "react";
 import { estimateTokens } from "./token";
-import { IconEraser, IconTrash } from "@tabler/icons-react";
+import { IconEraser } from "@tabler/icons-react";
 
 import promptsZh from "./prompts/zh.json";
 import promptsEn from "./prompts/en.json";
@@ -34,6 +35,7 @@ const templateOptions: TemplateType[] = [
 ];
 
 export function SystemPrompt() {
+  const toast = useToast({ position: "top" });
   const chatConfig = useStore(chatConfigAtom);
   const { promptVisible } = useStore(visibleAtom);
 
@@ -83,6 +85,10 @@ export function SystemPrompt() {
   }
 
   function handleSaveClick() {
+    const { conversationId } = conversationAtom.get();
+    if (!conversationId) {
+      toast({ status: "success", title: "Save Success" });
+    }
     if (prompt) {
       localStorage.setItem("systemMessage", prompt);
     } else {
@@ -90,6 +96,16 @@ export function SystemPrompt() {
       handleClear();
     }
     chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: prompt?.trim() });
+    handleClose();
+  }
+
+  function handleRemoveClick() {
+    const { conversationId } = conversationAtom.get();
+    if (!conversationId) {
+      toast({ status: "success", title: "Remove Success" });
+    }
+    localStorage.removeItem("systemMessage");
+    chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: undefined });
     handleClose();
   }
 
@@ -171,12 +187,20 @@ export function SystemPrompt() {
         <DrawerBody>{content}</DrawerBody>
 
         <DrawerFooter>
-          <Button variant="outline" mr={3} onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button colorScheme="blue" onClick={handleSaveClick}>
-            Save
-          </Button>
+          <div className="w-full flex flex-row justify-between">
+            <Button colorScheme="teal" onClick={handleRemoveClick}>
+              Remove
+            </Button>
+
+            <div className="flex flex-row">
+              <Button variant="outline" mr={3} onClick={handleClose}>
+                Cancel
+              </Button>
+              <Button colorScheme="blue" onClick={handleSaveClick}>
+                Save
+              </Button>
+            </div>
+          </div>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
