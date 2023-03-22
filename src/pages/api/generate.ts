@@ -7,6 +7,8 @@ export const post: APIRoute = async (context) => {
   const apiKey = body.apiKey || import.meta.env.OPENAI_API_KEY;
   const model = body.model;
   const messages = body.messages;
+  const config = body.config || {};
+
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
@@ -26,7 +28,7 @@ export const post: APIRoute = async (context) => {
         model: model || "gpt-3.5-turbo",
         messages,
         stream: true,
-        temperature: 0.6,
+        ...config,
       }),
     });
   } catch (e) {

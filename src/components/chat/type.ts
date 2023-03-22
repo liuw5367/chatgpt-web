@@ -6,11 +6,6 @@ export interface ChatMessage extends ChatCompletionResponseMessage {
   token?: number;
   question?: string;
   prompt?: string;
-
   conversationId?: string;
-  parentMessageId?: string;
-
   markdown?: string;
 }
-
-export type Command = "stopAI" | "stopTTS";

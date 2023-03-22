@@ -36,13 +36,13 @@ const templateOptions: TemplateType[] = [
 
 export function SystemPrompt() {
   const toast = useToast({ position: "top" });
-  const chatConfig = useStore(chatConfigAtom);
+  const { systemMessage } = useStore(chatConfigAtom);
   const { promptVisible } = useStore(visibleAtom);
 
   const currentDate = new Date().toISOString().split("T")[0];
-  const placeholder = `Example: You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.\nKnowledge cutoff: 2021-09-01\nCurrent date: ${currentDate}`;
+  const placeholder = `Example:\nYou are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.\nKnowledge cutoff: 2021-09-01\nCurrent date: ${currentDate}`;
 
-  const [prompt, setPrompt] = useState(chatConfig.systemMessage);
+  const [prompt, setPrompt] = useState(systemMessage);
   const [template, setTemplate] = useState("Shortcut");
   const [options, setOptions] = useState(promptsShortcut);
   const [desc, setDesc] = useState("");
@@ -52,15 +52,15 @@ export function SystemPrompt() {
 
   useEffect(() => {
     if (promptVisible) {
-      setPrompt(chatConfig.systemMessage);
+      setPrompt(chatConfigAtom.get().systemMessage);
     }
   }, [promptVisible]);
 
   useEffect(() => {
-    if (!promptVisible && prompt !== chatConfig.systemMessage) {
+    if (!promptVisible && prompt !== systemMessage) {
       handleClear();
     }
-  }, [promptVisible, chatConfig.systemMessage]);
+  }, [promptVisible, systemMessage]);
 
   useEffect(() => {
     if (prompt) {
@@ -80,8 +80,13 @@ export function SystemPrompt() {
     setRemark("");
   }
 
-  function update(content: string = "") {
-    setPrompt(content);
+  function updateSystemPrompt(prompt?: string) {
+    if (prompt) {
+      localStorage.setItem("systemMessage", prompt);
+    } else {
+      localStorage.removeItem("systemMessage");
+    }
+    chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: prompt });
   }
 
   function handleSaveClick() {
@@ -89,13 +94,10 @@ export function SystemPrompt() {
     if (!conversationId) {
       toast({ status: "success", title: "Save Success" });
     }
-    if (prompt) {
-      localStorage.setItem("systemMessage", prompt);
-    } else {
-      localStorage.removeItem("systemMessage");
-      handleClear();
+    updateSystemPrompt(prompt);
+    if (!prompt) {
+      clear();
     }
-    chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: prompt?.trim() });
     handleClose();
   }
 
@@ -104,8 +106,8 @@ export function SystemPrompt() {
     if (!conversationId) {
       toast({ status: "success", title: "Remove Success" });
     }
-    localStorage.removeItem("systemMessage");
-    chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: undefined });
+    updateSystemPrompt();
+    handleClear();
     handleClose();
   }
 
@@ -134,7 +136,7 @@ export function SystemPrompt() {
             onChange={(e) => {
               const prompt = e.target.value;
               const item = options.find((item) => item.prompt === prompt);
-              update(prompt);
+              setPrompt(prompt);
               setRemark(item?.remark || "");
               setDesc(item?.desc === prompt ? "" : item?.desc || "");
             }}
@@ -152,9 +154,9 @@ export function SystemPrompt() {
       {desc && <div className="px-4 py-2 text-[15px] whitespace-pre-wrap rounded bg-black/10">{desc}</div>}
 
       <Textarea
-        value={prompt}
+        value={prompt ?? ""}
         placeholder={placeholder}
-        onChange={(e) => update(e.target.value)}
+        onChange={(e) => setPrompt(e.target.value)}
         className="flex-1 !min-h-60 text-[14px] placeholder:text-[14px]"
       />
 

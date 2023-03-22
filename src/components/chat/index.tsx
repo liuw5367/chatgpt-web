@@ -1,6 +1,6 @@
 import { useDebounceEffect, useUpdateEffect } from "ahooks";
 import { useStore } from "@nanostores/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, IconButton, Textarea, useToast } from "@chakra-ui/react";
 import {
   IconEraser,
@@ -36,25 +36,31 @@ export default function Page() {
   const [ttsState, setTtsState] = useState<TTSStatusEnum>(TTSStatusEnum.NORMAL);
   const voiceRef = React.useRef<VoiceRef | null>();
 
-  const dataSource = useStore(chatDataAtom);
+  const messageList = useStore(chatDataAtom);
   const [chatLoading, setChatLoading] = useState(false);
   const [chatAbortController, setAbortController] = useState<AbortController>();
 
   const chatConfig = useStore(chatConfigAtom);
 
   const toast = useToast({ position: "top" });
+  /** 页面第一次加载，因为是从 localstorage 中获取的，导致多触发了一次 */
+  const promptFlag = useRef(true);
 
   useEffect(() => {
     scrollToPageBottom({ behavior: "auto" });
   }, []);
 
   useDebounceEffect(() => {
-    localStorage.setItem("messages", JSON.stringify(dataSource));
-  }, [dataSource]);
+    localStorage.setItem("messages", JSON.stringify(messageList));
+  }, [messageList]);
 
   useUpdateEffect(() => {
+    if (promptFlag.current) {
+      promptFlag.current = false;
+      return;
+    }
     const { conversationId } = conversationAtom.get();
-    if (conversationId) {
+    if (!promptFlag.current && conversationId) {
       toast({
         status: "info",
         title: "System Prompt 变化，将开启新的对话",
@@ -93,7 +99,7 @@ export default function Page() {
     if (ttsState !== TTSStatusEnum.NORMAL) {
       stopTTS();
     } else {
-      const data = [...dataSource].filter((v) => v.role === "assistant").reverse();
+      const data = [...messageList].filter((v) => v.role === "assistant").reverse();
       const content = data?.[0].content;
       if (content) {
         voiceRef.current?.stopAsr();
@@ -138,36 +144,36 @@ export default function Page() {
     conversationId: string | undefined,
     systemMessage?: string
   ) {
-    let count = 0;
-    if (systemMessage) {
-      count += estimateTokens(systemMessage);
-    }
-    if (question.content) {
-      count += estimateTokens(question.content);
-    }
-
-    const maxToken = 3000;
+    const allTokens = 4000;
+    const maxTokens = 3000;
+    let tokenCount = estimateTokens(question.content) + estimateTokens(systemMessage);
     const list: ChatMessage[] = [];
     if (conversationId) {
       const conversationList = [...messages.filter((v) => v.conversationId === conversationId)].reverse();
       conversationList.some((item) => {
-        const token = count + item.token;
-        if (token > maxToken) {
+        const token = tokenCount + item.token;
+        if (token > maxTokens) {
+          // 已超出 token 数量限制，跳出
           return true;
         }
         list.push(item);
-        count = token;
+        tokenCount = token;
         return false;
       });
     }
     list.reverse();
-    console.log(["token", count]);
+
+    console.log("messages token：", [tokenCount]);
 
     if (systemMessage) {
       list.unshift({ role: "system", content: systemMessage });
     }
     list.push(question);
-    return list.map(({ role, content }) => ({ role, content }));
+    const max_tokens = allTokens - tokenCount;
+    return {
+      max_tokens,
+      messages: list.map(({ role, content }) => ({ role, content })),
+    };
   }
 
   async function sendMessage(inputValue = inputContent, systemMessage = chatConfig.systemMessage) {
@@ -191,7 +197,7 @@ export default function Page() {
       prompt: systemMessage,
       conversationId,
     };
-    chatDataAtom.set([...dataSource, question]);
+    chatDataAtom.set([...messageList, question]);
     setInputContent("");
     scrollToPageBottom();
 
@@ -212,14 +218,20 @@ export default function Page() {
     }
 
     try {
+      const { messages, max_tokens } = buildRequestMessages(messageList, question, conversationId, systemMessage);
       const response = await fetch("/api/generate", {
         method: "POST",
         signal: abortController.signal,
         body: JSON.stringify({
-          messages: buildRequestMessages(dataSource, question, conversationId, systemMessage),
+          messages,
           apiKey: chatConfig.openAIKey,
           host: chatConfig.openAIHost,
           model: chatConfig.openAIModel,
+          config: {
+            temperature: chatConfig.temperature ? Number(chatConfig.temperature) : undefined,
+            top_p: chatConfig.top_p ? Number(chatConfig.top_p) : undefined,
+            max_tokens,
+          },
         }),
       });
 
@@ -275,7 +287,7 @@ export default function Page() {
     chatDataAtom.set([]);
   }
 
-  function updateSystemPrompt(prompt: string = "") {
+  function updateSystemPrompt(prompt?: string) {
     chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: prompt });
   }
 
@@ -291,7 +303,7 @@ export default function Page() {
   }
 
   function updateConversationId(id?: string) {
-    if (conversationId) {
+    if (id) {
       localStorage.setItem("conversationId", id);
     } else {
       localStorage.removeItem("conversationId");
@@ -310,8 +322,8 @@ export default function Page() {
   }
 
   const actions = (
-    <>
-      <div className="flex flex-row items-center space-x-3">
+    <div className="flex flex-row flex-wrap items-center justify-between lg:justify-start">
+      <div className="mb-4 flex flex-row items-center space-x-3">
         <Button
           onClick={() => handleSendClick()}
           colorScheme={chatLoading ? "red" : "blue"}
@@ -332,7 +344,7 @@ export default function Page() {
         />
         <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
       </div>
-      <div className="flex flex-row items-center space-x-3">
+      <div className="mb-4 flex flex-row items-center space-x-3">
         {chatConfig.unisoundAppKey && chatConfig.unisoundSecret && (
           <>
             <IconButton
@@ -374,13 +386,13 @@ export default function Page() {
           onClick={() => visibleAtom.set({ ...visibleAtom.get(), promptVisible: true })}
         />
       </div>
-    </>
+    </div>
   );
 
   return (
     <div className="w-full h-full flex flex-col">
       <div className={`flex-1 p-4 pb-0 overflow-auto`}>
-        {dataSource.map((item) => (
+        {messageList?.map((item) => (
           <MessageItem
             key={item.id}
             item={item}
@@ -407,19 +419,19 @@ export default function Page() {
         <div id="chat-bottom" />
       </div>
 
-      <div className="px-6 py-4 border-t flex flex-col justify-end space-y-3">
+      <div className="px-6 pt-4 border-t flex flex-col justify-end space-y-3">
         <Textarea
           rows={2}
           className="resize-none placeholder:text-[14px]"
           value={inputContent}
-          placeholder="Shortcuts: Ctrl + Enter / Command + Enter"
+          placeholder="Shortcuts: Ctrl + ↩ / ⌘ + ↩"
           onChange={(e) => setInputContent(e.target.value)}
           onKeyDown={(e) => {
             if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
               handleSendClick();
             } else if (e.key === "ArrowUp") {
               if (!inputContent?.trim()) {
-                const content = [...dataSource].reverse().find((v) => v.role === "user" && v.content)?.content;
+                const content = [...messageList].reverse().find((v) => v.role === "user" && v.content)?.content;
                 if (content) {
                   setInputContent(content);
                 }
@@ -427,7 +439,7 @@ export default function Page() {
             }
           }}
         />
-        <div className="flex flex-row flex-wrap items-center justify-between lg:justify-start space-x-3">{actions}</div>
+        {actions}
 
         <VoiceView
           ref={(ref) => (voiceRef.current = ref)}

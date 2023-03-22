@@ -6,7 +6,7 @@ import { isEmpty } from "lodash-es";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import { chatConfigAtom } from "../atom";
-import { APP_CONFIG, Speaker, TTS_CONFIG } from "../Config";
+import { APP_CONFIG, Speaker, TTS_CONFIG } from "./Config";
 import PCMPlayer from "./PCMPlayer";
 
 export enum TTSStatusEnum {

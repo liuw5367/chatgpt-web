@@ -1,7 +1,7 @@
 import { useStore } from "@nanostores/react";
 import { useEffect, useState } from "react";
 import { chatConfigAtom } from "./atom";
-import { visibleAtom } from "./../atom";
+import { visibleAtom } from "../atom";
 import {
   Input,
   Textarea,
@@ -54,6 +54,7 @@ export function SettingPanel() {
     label: string;
     value: keyof ConfigType;
     placeholder: string;
+    desc?: string;
   };
 
   const list: ListItemType[] = [
@@ -71,6 +72,24 @@ export function SettingPanel() {
       label: "OPENAI_MODEL",
       value: "openAIModel",
       placeholder: "gpt-3.5-turbo",
+    },
+    {
+      label: "temperature",
+      value: "temperature",
+      placeholder: "Defaults to 1. ",
+      desc:
+        "What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.\n" +
+        "\n" +
+        "We generally recommend altering this or top_p but not both.",
+    },
+    {
+      label: "top_p",
+      value: "top_p",
+      placeholder: "Defaults to 1. ",
+      desc:
+        "An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.\n" +
+        "\n" +
+        "We generally recommend altering this or temperature but not both.",
     },
     {
       label: "Unisound_APPKEY",
@@ -95,8 +114,9 @@ export function SettingPanel() {
           <div className="flex flex-col space-y-4">
             {list.map((item) => {
               return (
-                <div key={item.value}>
-                  <div className="mb-1 text-sm flex">{item.label}:</div>
+                <div key={item.value} className="space-y-1">
+                  <div>{item.label}:</div>
+                  {item.desc && <div className="text-sm text-gray-500/80">{item.desc}</div>}
                   {item.type === "textarea" ? (
                     <Textarea
                       className="flex-1"

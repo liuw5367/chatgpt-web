@@ -1,8 +1,5 @@
 import { atom } from "nanostores";
-
 import type { ChatMessage } from "./type";
-
-export const chatDataAtom = atom<ChatMessage[]>([] as ChatMessage[]);
 
 export interface ChatConfigType {
   openAIKey?: string;
@@ -10,6 +7,8 @@ export interface ChatConfigType {
   openAIHost?: string;
   openAIModel?: string;
   systemMessage?: string;
+  temperature?: string;
+  top_p?: string;
 
   unisoundAppKey?: string;
   unisoundSecret?: string;
@@ -18,6 +17,8 @@ export interface ChatConfigType {
 export interface ConversationType {
   conversationId?: string;
 }
+
+export const chatDataAtom = atom<ChatMessage[]>([] as ChatMessage[]);
 
 export const chatConfigAtom = atom<ChatConfigType>({});
 

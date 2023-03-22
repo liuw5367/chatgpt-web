@@ -16,6 +16,7 @@ import "./app.css";
 
 export default function App() {
   useEffect(() => {
+    // 因为服务端渲染无法使用 localStorage，所以这里重新设置一次
     chatDataAtom.set(JSON.parse(localStorage.getItem("messages") || "[]") as ChatMessage[]);
     conversationAtom.set({
       conversationId: localStorage.getItem("conversationId"),
@@ -26,7 +27,9 @@ export default function App() {
 
       openAIHost: localStorage.getItem("openAIHost") || import.meta.env.OPENAI_API_HOST,
       openAIModel: localStorage.getItem("openAIModel") || import.meta.env.OPENAI_API_MODEL,
-      systemMessage: localStorage.getItem("systemMessage") || undefined,
+      systemMessage: localStorage.getItem("systemMessage"),
+      temperature: localStorage.getItem("temperature"),
+      top_p: localStorage.getItem("top_p"),
 
       unisoundAppKey: localStorage.getItem("unisoundAppKey") || import.meta.env.UNISOUND_AI_KEY,
       unisoundSecret: localStorage.getItem("unisoundSecret") || import.meta.env.UNISOUND_AI_SECRET,

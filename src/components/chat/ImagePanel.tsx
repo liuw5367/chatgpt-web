@@ -5,7 +5,6 @@ import {
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   useToast,
@@ -82,7 +81,7 @@ export function ImagePanel() {
       </div>
       <SimpleGrid columns={2} spacing={2} className="pb-4">
         {imageList?.map((url) => (
-          <img src={url} key={url} className="w-full rounded" />
+          <img src={url} key={url} className="w-full rounded" alt={url} />
         ))}
       </SimpleGrid>
     </div>
@@ -96,12 +95,6 @@ export function ImagePanel() {
         <DrawerHeader>Image Create</DrawerHeader>
 
         <DrawerBody>{content}</DrawerBody>
-
-        {/* <DrawerFooter>
-          <Button variant="outline" mr={3} onClick={handleClose}>
-            Close
-          </Button>
-        </DrawerFooter> */}
       </DrawerContent>
     </Drawer>
   );

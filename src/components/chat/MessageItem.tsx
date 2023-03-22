@@ -6,7 +6,6 @@ import {
   useClipboard,
   useColorMode,
   Popover,
-  PopoverArrow,
   PopoverBody,
   PopoverCloseButton,
   PopoverContent,
@@ -25,6 +24,8 @@ import {
 } from "@tabler/icons-react";
 import { renderMarkdown } from "./markdown";
 import type { ChatMessage } from "./type";
+import { useStore } from "@nanostores/react";
+import { chatConfigAtom } from "./atom";
 
 interface Props {
   item: ChatMessage;
@@ -37,6 +38,7 @@ interface Props {
 export function MessageItem(props: Props) {
   const { item, onDelete, onPlay, onRetry, onRegenerate } = props;
 
+  const chatConfig = useStore(chatConfigAtom);
   const { colorMode } = useColorMode();
   const { onCopy: onContentCopy, hasCopied: hasContentCopied } = useClipboard(item.content || item.prompt || "");
   const { onCopy: onPromptCopy, hasCopied: hasPromptCopied } = useClipboard(item.prompt || "");
@@ -64,7 +66,7 @@ export function MessageItem(props: Props) {
 
   const renderConversation = () => (
     <Badge variant="ghost" title={"conversationId: " + item.conversationId} className={`text-[14px] cursor-pointer`}>
-      <IconMessages stoke={1.5} size="1rem" class="text-teal" />
+      <IconMessages stoke={1.5} size="1rem" className="text-teal" />
     </Badge>
   );
 
@@ -86,13 +88,15 @@ export function MessageItem(props: Props) {
           size="xs"
           onClick={onContentCopy}
         />
-        <IconButton
-          aria-label="TTS"
-          variant="ghost"
-          icon={<IconPlayerPlay size="1rem" className="opacity-64" />}
-          size="xs"
-          onClick={() => onPlay?.(item)}
-        />
+        {chatConfig.unisoundAppKey && chatConfig.unisoundSecret && (
+          <IconButton
+            aria-label="TTS"
+            variant="ghost"
+            icon={<IconPlayerPlay size="1rem" className="opacity-64" />}
+            size="xs"
+            onClick={() => onPlay?.(item)}
+          />
+        )}
         <IconButton
           aria-label="Delete"
           variant="ghost"

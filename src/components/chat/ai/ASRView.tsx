@@ -4,7 +4,7 @@ import { sha256 } from "js-sha256";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import { chatConfigAtom } from "../atom";
-import { APP_CONFIG, ASR_CONFIG } from "../Config";
+import { APP_CONFIG, ASR_CONFIG } from "./Config";
 import Recorder from "./Recorder";
 
 export enum ASRStatusEnum {
