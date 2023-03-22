@@ -1,6 +1,5 @@
 import { IconButton, useColorMode } from "@chakra-ui/react";
 import { IconMoonStars, IconRobot, IconSun, IconSettings, IconPhoto } from "@tabler/icons-react";
-import { useStore } from "@nanostores/react";
 import { visibleAtom } from "./atom";
 
 export function Header() {
@@ -24,16 +23,16 @@ export function Header() {
           onClick={() => visibleAtom.set({ ...visibleAtom.get(), imageVisible: true })}
         />
         <IconButton
-          aria-label="ColorMode"
-          variant="ghost"
-          onClick={toggleColorMode}
-          icon={colorMode === "light" ? <IconMoonStars stroke={1.5} /> : <IconSun stroke={1.5} />}
-        />
-        <IconButton
           aria-label="Settings"
           variant="ghost"
           icon={<IconSettings stroke={1.5} />}
           onClick={() => visibleAtom.set({ ...visibleAtom.get(), settingVisible: true })}
+        />
+        <IconButton
+          aria-label="ColorMode"
+          variant="ghost"
+          onClick={toggleColorMode}
+          icon={colorMode === "light" ? <IconMoonStars stroke={1.5} /> : <IconSun stroke={1.5} />}
         />
       </div>
     </div>

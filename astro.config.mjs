@@ -26,8 +26,6 @@ export default defineConfig({
           collections: {
             // https://tabler-icons.io/
             tabler,
-            // https://icon-sets.iconify.design/ant-design/
-            //  'ant-design': AntdIcons as any,
           },
           extraProperties: {
             display: "inline-block",

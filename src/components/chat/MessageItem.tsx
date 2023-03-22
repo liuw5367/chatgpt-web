@@ -21,6 +21,7 @@ import {
   IconRobot,
   IconTrash,
   IconUser,
+  IconMessages,
 } from "@tabler/icons-react";
 import { renderMarkdown } from "./markdown";
 import type { ChatMessage } from "./type";
@@ -48,12 +49,7 @@ export function MessageItem(props: Props) {
   const renderPrompt = (placement: "top" | "top-start" = "top-start") => (
     <Popover placement={placement}>
       <PopoverTrigger>
-        <Badge
-          colorScheme="green"
-          title={item.prompt}
-          className={`cursor-pointer ${!isUser && "ml-2"}`}
-          onClick={onPromptCopy}
-        >
+        <Badge colorScheme="green" title={item.prompt} className={`text-[14px] cursor-pointer`} onClick={onPromptCopy}>
           Prompt
         </Badge>
       </PopoverTrigger>
@@ -61,14 +57,21 @@ export function MessageItem(props: Props) {
         <PopoverHeader fontWeight="semibold">Prompt</PopoverHeader>
         {/* <PopoverArrow /> */}
         <PopoverCloseButton />
-        <PopoverBody>{item.prompt}</PopoverBody>
+        <PopoverBody className="text-[14px]">{item.prompt}</PopoverBody>
       </PopoverContent>
     </Popover>
   );
 
+  const renderConversation = () => (
+    <Badge variant="ghost" title={"conversationId: " + item.conversationId} className={`text-[14px] cursor-pointer`}>
+      <IconMessages stoke={1.5} size="1rem" class="text-teal" />
+    </Badge>
+  );
+
   const actions = (
-    <div className={`absolute bottom-0 mt-1 flex ${isUser ? "justify-end right-10" : "left-7"}`}>
+    <div className={`absolute bottom-0 mt-1 flex ${isUser ? "justify-end right-10" : "left-8"}`}>
       <div className="-mb-8 flex items-center space-x-1">
+        {!isUser && item.conversationId && renderConversation()}
         {!isUser && item.prompt && renderPrompt()}
         <IconButton
           aria-label="Copy"
@@ -127,8 +130,9 @@ export function MessageItem(props: Props) {
       id={item.id}
       className={`mb-10 flex flex-col ${isUser && "items-end"} space-y-1`}
     >
-      {(item.time || item.prompt) && (
+      {(item.time || item.prompt || item.conversationId) && (
         <div className={`flex items-center space-x-2`}>
+          {isUser && item.conversationId && renderConversation()}
           {isUser && item.prompt && renderPrompt("top")}
           {item.time && <span className="text-xs text-gray-500">{item.time}</span>}
         </div>

@@ -1,6 +1,6 @@
 import Chat from "./chat/index";
 import { useEffect } from "react";
-import { chatConfigAtom, chatDataAtom } from "./chat/atom";
+import { chatConfigAtom, chatDataAtom, conversationAtom } from "./chat/atom";
 import type { ChatMessage } from "./chat/type";
 import { ChakraProvider } from "@chakra-ui/react";
 import { Header } from "./Header";
@@ -11,16 +11,20 @@ import { SettingPanel } from "./chat/SettingPanel";
 import { ImagePanel } from "./chat/ImagePanel";
 
 import "uno.css";
-import "./app.css";
 import "./markdown.css";
+import "./app.css";
 
 export default function App() {
   useEffect(() => {
     chatDataAtom.set(JSON.parse(localStorage.getItem("messages") || "[]") as ChatMessage[]);
+    conversationAtom.set({
+      conversationId: localStorage.getItem("conversationId"),
+    });
+
     chatConfigAtom.set({
       openAIKey: localStorage.getItem("openAIKey") || import.meta.env.OPENAI_API_KEY,
 
-      openAIHost: localStorage.getItem("openAIHost") || import.meta.env.OPENAI_API_SERVER,
+      openAIHost: localStorage.getItem("openAIHost") || import.meta.env.OPENAI_API_HOST,
       openAIModel: localStorage.getItem("openAIModel") || import.meta.env.OPENAI_API_MODEL,
       systemMessage: localStorage.getItem("systemMessage") || undefined,
 
@@ -48,6 +52,7 @@ export default function App() {
   );
 }
 
+/** 代码复制使用的图标。这里加载一下，不然无法显示 */
 function loadIcons() {
   return (
     <>
