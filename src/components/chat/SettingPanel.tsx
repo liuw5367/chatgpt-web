@@ -157,7 +157,7 @@ export function SettingPanel() {
                 <div key={item.value} className="space-y-1">
                   <div>
                     <span>{item.label}:&nbsp;</span>
-                    {(item.label = "OPENAI_KEY" && <span>{balance}</span>)}
+                    {item.label === "OPENAI_KEY" && <span>{balance}</span>}
                   </div>
                   {item.desc && <div className="text-sm text-gray-500/80">{item.desc}</div>}
                   {item.type === "textarea" ? (
