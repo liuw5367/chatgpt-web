@@ -17,16 +17,16 @@ export function Header() {
 
       <div className="flex flex-row items-center space-x-1">
         <IconButton
-          aria-label="Image Create"
-          variant="ghost"
-          icon={<IconPhoto stroke={1.5} />}
-          onClick={() => visibleAtom.set({ ...visibleAtom.get(), imageVisible: true })}
-        />
-        <IconButton
           aria-label="Settings"
           variant="ghost"
           icon={<IconSettings stroke={1.5} />}
           onClick={() => visibleAtom.set({ ...visibleAtom.get(), settingVisible: true })}
+        />
+        <IconButton
+          aria-label="Image Create"
+          variant="ghost"
+          icon={<IconPhoto stroke={1.5} />}
+          onClick={() => visibleAtom.set({ ...visibleAtom.get(), imageVisible: true })}
         />
         <IconButton
           aria-label="ColorMode"

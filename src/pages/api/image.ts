@@ -8,11 +8,11 @@ export const post: APIRoute = async (context) => {
 
   try {
     return await fetch(host + "/v1/images/generations", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      method: "POST",
       body: JSON.stringify({
         n: 2,
         size: "1024x1024",

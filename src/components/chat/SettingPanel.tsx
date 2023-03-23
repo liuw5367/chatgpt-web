@@ -15,6 +15,7 @@ import {
   DrawerOverlay,
   Button,
 } from "@chakra-ui/react";
+import { PasswordInput } from "../PasswordInput";
 
 export function SettingPanel() {
   const toast = useToast({ position: "top" });
@@ -86,7 +87,7 @@ export function SettingPanel() {
 
   type ConfigType = typeof chatConfig;
   type ListItemType = {
-    type?: string;
+    type?: "textarea" | "password";
     label: string;
     value: keyof ConfigType;
     placeholder: string;
@@ -102,6 +103,7 @@ export function SettingPanel() {
     {
       label: "OPENAI_KEY",
       value: "openAIKey",
+      type: "password",
       placeholder: "Please enter OPENAI_KEY",
     },
     {
@@ -130,11 +132,13 @@ export function SettingPanel() {
     {
       label: "Unisound_APPKEY",
       value: "unisoundAppKey",
+      type: "password",
       placeholder: "Please enter ai.unisound.com APPKEY",
     },
     {
       label: "Unisound_SECRET",
       value: "unisoundSecret",
+      type: "password",
       placeholder: "Please enter ai.unisound.com SECRET",
     },
   ];
@@ -160,6 +164,13 @@ export function SettingPanel() {
                     <Textarea
                       className="flex-1"
                       rows={4}
+                      placeholder={item.placeholder}
+                      value={config[item.value] || ""}
+                      onChange={(e) => setConfig((draft) => ({ ...draft, [item.value]: e.target.value }))}
+                    />
+                  ) : item.type === "password" ? (
+                    <PasswordInput
+                      className="flex-1"
                       placeholder={item.placeholder}
                       value={config[item.value] || ""}
                       onChange={(e) => setConfig((draft) => ({ ...draft, [item.value]: e.target.value }))}

@@ -19,7 +19,7 @@ export default function App() {
     // 因为服务端渲染无法使用 localStorage，所以这里重新设置一次
     chatDataAtom.set(JSON.parse(localStorage.getItem("messages") || "[]") as ChatMessage[]);
     conversationAtom.set({
-      conversationId: localStorage.getItem("conversationId"),
+      conversationId: localStorage.getItem("conversationId") || undefined,
     });
 
     chatConfigAtom.set({
@@ -27,9 +27,9 @@ export default function App() {
 
       openAIHost: localStorage.getItem("openAIHost") || import.meta.env.OPENAI_API_HOST,
       openAIModel: localStorage.getItem("openAIModel") || import.meta.env.OPENAI_API_MODEL,
-      systemMessage: localStorage.getItem("systemMessage"),
-      temperature: localStorage.getItem("temperature"),
-      top_p: localStorage.getItem("top_p"),
+      systemMessage: localStorage.getItem("systemMessage") || undefined,
+      temperature: localStorage.getItem("temperature") || undefined,
+      top_p: localStorage.getItem("top_p") || undefined,
 
       unisoundAppKey: localStorage.getItem("unisoundAppKey") || import.meta.env.UNISOUND_AI_KEY,
       unisoundSecret: localStorage.getItem("unisoundSecret") || import.meta.env.UNISOUND_AI_SECRET,
@@ -41,9 +41,9 @@ export default function App() {
   return (
     <ChakraProvider theme={theme}>
       {loadIcons()}
-      <div className={`v-screen h-screen flex flex-col`}>
+      <div className={`v-screen h-screen flex flex-col overflow-hidden`}>
         <Header />
-        <div style={{ height: "calc(100% - 4rem)" }}>
+        <div className="w-full" style={{ height: "calc(100% - 4rem)" }}>
           <Chat />
         </div>
 

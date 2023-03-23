@@ -19,11 +19,11 @@ export const post: APIRoute = async (context) => {
   let completion: Response;
   try {
     completion = await fetch(host + "/v1/chat/completions", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      method: "POST",
       body: JSON.stringify({
         model: model || "gpt-3.5-turbo",
         messages,

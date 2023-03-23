@@ -66,15 +66,15 @@ export function MessageItem(props: Props) {
 
   const renderConversation = () => (
     <Badge variant="ghost" title={"conversationId: " + item.conversationId} className={`text-[14px] cursor-pointer`}>
-      <IconMessages stoke={1.5} size="1rem" className="text-teal" />
+      <IconMessages stroke={1.5} size="1rem" className="text-teal" />
     </Badge>
   );
 
   const actions = (
     <div className={`absolute bottom-0 mt-1 flex ${isUser ? "justify-end right-10" : "left-8"}`}>
       <div className="-mb-8 flex items-center space-x-1">
-        {!isUser && item.conversationId && renderConversation()}
-        {!isUser && item.prompt && renderPrompt()}
+        {item.conversationId && renderConversation()}
+        {item.prompt && renderPrompt()}
         <IconButton
           aria-label="Copy"
           variant="ghost"
@@ -134,30 +134,27 @@ export function MessageItem(props: Props) {
       id={item.id}
       className={`mb-10 flex flex-col ${isUser && "items-end"} space-y-1`}
     >
-      {(item.time || item.prompt || item.conversationId) && (
-        <div className={`flex items-center space-x-2`}>
-          {isUser && item.conversationId && renderConversation()}
-          {isUser && item.prompt && renderPrompt("top")}
-          {item.time && <span className="text-xs text-gray-500">{item.time}</span>}
-        </div>
-      )}
-      <div className={`flex flex-row space-x-2 relative ${isUser && "flex-row-reverse"}`}>
-        <Avatar
-          size="sm"
-          className={`mt-1 ${isUser ? "!bg-blue-800/60 ml-2" : "!bg-teal-600"}`}
-          icon={isUser ? <IconUser size="1.3rem" stroke={1.5} /> : <IconRobot size="1.3rem" stroke={1.5} />}
-        />
+      {item.time && <span className="text-xs text-gray-500">{item.time}</span>}
+      <div className={`flex flex-row space-x-2 relative`} style={{ maxWidth: "calc(100vw - 2rem)" }}>
+        {!isUser && (
+          <Avatar size="sm" className={`mt-1 !bg-teal-600`} icon={<IconRobot size="1.3rem" stroke={1.5} />} />
+        )}
+
         <div
           className={`flex-1 overflow-hidden rounded-lg py-2 px-3
               ${colorMode === "light" ? "bg-[#EDF2F7]" : "bg-[#021627]"}
               ${isUser && "whitespace-pre-wrap"}`}
         >
           {isUser ? (
-            <>{item.content || item.prompt}</>
+            <div dangerouslySetInnerHTML={{ __html: item.content || item.prompt || "" }} />
           ) : (
             <div className="markdown-body" dangerouslySetInnerHTML={{ __html: item.markdown || "" }} />
           )}
         </div>
+
+        {isUser && (
+          <Avatar size="sm" className={`mt-1 ml-2 !bg-blue-800/60 `} icon={<IconUser size="1.3rem" stroke={1.5} />} />
+        )}
         {item.id !== "-1" && actions}
       </div>
     </div>

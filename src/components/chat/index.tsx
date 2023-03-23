@@ -139,19 +139,34 @@ export default function Page() {
   }
 
   function buildRequestMessages(
-    messages: ChatMessage[],
+    messageList: ChatMessage[],
     question: ChatMessage,
     conversationId: string | undefined,
     systemMessage?: string
   ) {
-    const allTokens = 4000;
-    const maxTokens = 3000;
+    let maxModelTokens = 4095;
+    /** 发送出去的内容最多可使用的 token */
+    let maxTokens = 3000;
+
+    const model = chatConfig.openAIModel || "";
+    if (model.toLowerCase().includes("gpt-4")) {
+      if (model.toLowerCase().includes("32k")) {
+        const maxResponseTokens = 8192;
+        maxModelTokens = 32768;
+        maxTokens = maxModelTokens - maxResponseTokens;
+      } else {
+        const maxResponseTokens = 2048;
+        maxModelTokens = 8192;
+        maxTokens = maxModelTokens - maxResponseTokens;
+      }
+    }
+
     let tokenCount = estimateTokens(question.content) + estimateTokens(systemMessage);
     const list: ChatMessage[] = [];
     if (conversationId) {
-      const conversationList = [...messages.filter((v) => v.conversationId === conversationId)].reverse();
+      const conversationList = [...messageList.filter((v) => v.conversationId === conversationId)].reverse();
       conversationList.some((item) => {
-        const token = tokenCount + item.token;
+        const token = tokenCount + item.token || 0;
         if (token > maxTokens) {
           // 已超出 token 数量限制，跳出
           return true;
@@ -165,15 +180,13 @@ export default function Page() {
 
     console.log("messages token：", [tokenCount]);
 
-    if (systemMessage) {
-      list.unshift({ role: "system", content: systemMessage });
-    }
     list.push(question);
-    const max_tokens = allTokens - tokenCount;
-    return {
-      max_tokens,
-      messages: list.map(({ role, content }) => ({ role, content })),
-    };
+    const messages = list.map(({ role, content }) => ({ role, content }));
+    if (systemMessage) {
+      messages.unshift({ role: "system", content: systemMessage });
+    }
+    const max_tokens = maxModelTokens - tokenCount;
+    return { max_tokens, messages };
   }
 
   async function sendMessage(inputValue = inputContent, systemMessage = chatConfig.systemMessage) {
@@ -322,7 +335,7 @@ export default function Page() {
   }
 
   const actions = (
-    <div className="flex flex-row flex-wrap items-center justify-between lg:justify-start">
+    <div className="flex flex-row flex-wrap items-center justify-between lg:justify-start space-x-0 lg:space-x-3">
       <div className="mb-4 flex flex-row items-center space-x-3">
         <Button
           onClick={() => handleSendClick()}
@@ -391,7 +404,7 @@ export default function Page() {
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className={`flex-1 p-4 pb-0 overflow-auto`}>
+      <div className={`w-full flex-1 p-4 pb-0 overflow-y-auto overflow-x-hidden`}>
         {messageList?.map((item) => (
           <MessageItem
             key={item.id}

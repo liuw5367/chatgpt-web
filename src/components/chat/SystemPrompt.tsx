@@ -157,7 +157,7 @@ export function SystemPrompt() {
         value={prompt ?? ""}
         placeholder={placeholder}
         onChange={(e) => setPrompt(e.target.value)}
-        className="flex-1 !min-h-60 text-[14px] placeholder:text-[14px]"
+        className="flex-1 !min-h-[50%] text-[14px] placeholder:text-[14px]"
       />
 
       <div className="flex flex-row items-center justify-between space-x-2">
@@ -180,7 +180,7 @@ export function SystemPrompt() {
   );
 
   return (
-    <Drawer isOpen={promptVisible} size="md" placement="right" onClose={handleClose}>
+    <Drawer isOpen={promptVisible} size="lg" placement="right" onClose={handleClose}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />

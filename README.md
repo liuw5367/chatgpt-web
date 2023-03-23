@@ -81,6 +81,6 @@ prompt 模版来自：
 
 ## Screenshot
 
-![Light](./screenshot-light.png)
-
 ![Dark](./screenshot-dark.png)
+
+![Light](./screenshot-light.png)
