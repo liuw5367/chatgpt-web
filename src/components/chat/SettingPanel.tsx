@@ -22,12 +22,48 @@ export function SettingPanel() {
   const { settingVisible } = useStore(visibleAtom);
 
   const [config, setConfig] = useState({ ...chatConfig });
+  const [balance, setBalance] = useState("");
+  const [chatAbortController, setAbortController] = useState<AbortController>();
+
+  useEffect(() => {
+    return () => {
+      chatAbortController?.abort();
+    };
+  }, []);
 
   useEffect(() => {
     if (settingVisible) {
-      setConfig({ ...chatConfig });
+      const data = chatConfigAtom.get();
+      setConfig({ ...data });
+      if (data.openAIKey) {
+        requestBalance();
+      }
     }
   }, [settingVisible]);
+
+  async function requestBalance() {
+    try {
+      const abortController = new AbortController();
+      setAbortController(abortController);
+
+      const response = await fetch("/api/balance", {
+        method: "POST",
+        signal: abortController.signal,
+        body: JSON.stringify({
+          apiKey: chatConfig.openAIKey,
+          config: { prompt },
+        }),
+      });
+
+      const json = await response.json();
+      const { total_available } = json;
+      if (total_available != null && total_available !== "") {
+        setBalance("$" + total_available);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   function handleClose() {
     visibleAtom.set({ ...visibleAtom.get(), settingVisible: false });
@@ -104,7 +140,7 @@ export function SettingPanel() {
   ];
 
   return (
-    <Drawer isOpen={settingVisible} size="sm" placement="right" onClose={handleClose}>
+    <Drawer isOpen={settingVisible} size="md" placement="right" onClose={handleClose}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
@@ -115,7 +151,10 @@ export function SettingPanel() {
             {list.map((item) => {
               return (
                 <div key={item.value} className="space-y-1">
-                  <div>{item.label}:</div>
+                  <div>
+                    <span>{item.label}:&nbsp;</span>
+                    {(item.label = "OPENAI_KEY" && <span>{balance}</span>)}
+                  </div>
                   {item.desc && <div className="text-sm text-gray-500/80">{item.desc}</div>}
                   {item.type === "textarea" ? (
                     <Textarea
