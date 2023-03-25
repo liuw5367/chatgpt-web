@@ -1,9 +1,15 @@
 import type { APIRoute } from "astro";
+import { buildError, getEnv } from "./_utils";
 
 export const post: APIRoute = async (context) => {
   const body = await context.request.json();
-  const host = body.host || "https://api.openai.com";
-  const apiKey = body.apiKey || import.meta.env.OPENAI_API_KEY;
+  const env = getEnv();
+  const host = body.host || env.HOST || "https://api.openai.com";
+  const apiKey = body.apiKey || env.KEY;
+
+  if (!apiKey) {
+    return new Response("{}");
+  }
 
   try {
     return await fetch(host + "/dashboard/billing/credit_grants", {
@@ -14,6 +20,7 @@ export const post: APIRoute = async (context) => {
       },
     });
   } catch (e) {
-    return new Response("Http Request Error");
+    console.log("balance error:", e);
+    return new Response(buildError(e.toString()));
   }
 };

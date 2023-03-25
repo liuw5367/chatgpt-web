@@ -1,10 +1,8 @@
 import { useMemoizedFn } from "ahooks";
-import { useStore } from "@nanostores/react";
 import { sha256 } from "js-sha256";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 
-import { chatConfigAtom } from "../atom";
-import { APP_CONFIG, ASR_CONFIG } from "./Config";
+import { APP_CONFIG, ASR_CONFIG, getUnisoundKeySecret } from "./Config";
 import Recorder from "./Recorder";
 
 export enum ASRStatusEnum {
@@ -41,7 +39,6 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   const recorderRef = React.useRef<Recorder | null>();
   const socketRef = React.useRef<WebSocket | null>();
 
-  const chatConfig = useStore(chatConfigAtom);
   const errorCountRef = useRef(0);
   const retryRef = useRef<any>();
 
@@ -105,8 +102,9 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   function createSocket() {
     let sid: any;
 
-    const appKey = chatConfig.unisoundAppKey;
-    const secret = chatConfig.unisoundSecret;
+    const chatConfig = getUnisoundKeySecret();
+    const appKey = chatConfig.KEY;
+    const secret = chatConfig.SECRET;
     const path = ASR_CONFIG.SOCKET_URL;
     const time: number = +new Date();
     const sign = sha256(`${appKey}${time}${secret}`).toUpperCase();

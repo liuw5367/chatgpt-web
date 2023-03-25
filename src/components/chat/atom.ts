@@ -9,9 +9,6 @@ export interface ChatConfigType {
   systemMessage?: string;
   temperature?: string;
   top_p?: string;
-
-  unisoundAppKey?: string;
-  unisoundSecret?: string;
 }
 
 export interface ConversationType {

@@ -11,6 +11,7 @@ import {
   PopoverContent,
   PopoverHeader,
   PopoverTrigger,
+  Tooltip,
 } from "@chakra-ui/react";
 import {
   IconClipboard,
@@ -24,8 +25,7 @@ import {
 } from "@tabler/icons-react";
 import { renderMarkdown } from "./markdown";
 import type { ChatMessage } from "./type";
-import { useStore } from "@nanostores/react";
-import { chatConfigAtom } from "./atom";
+import { hasUnisoundConfig } from "./ai/Config";
 
 interface Props {
   item: ChatMessage;
@@ -38,7 +38,6 @@ interface Props {
 export function MessageItem(props: Props) {
   const { item, onDelete, onPlay, onRetry, onRegenerate } = props;
 
-  const chatConfig = useStore(chatConfigAtom);
   const { colorMode } = useColorMode();
   const { onCopy: onContentCopy, hasCopied: hasContentCopied } = useClipboard(item.content || item.prompt || "");
   const { onCopy: onPromptCopy, hasCopied: hasPromptCopied } = useClipboard(item.prompt || "");
@@ -64,17 +63,25 @@ export function MessageItem(props: Props) {
     </Popover>
   );
 
-  const renderConversation = () => (
-    <Badge variant="ghost" title={"conversationId: " + item.conversationId} className={`text-[14px] cursor-pointer`}>
-      <IconMessages stroke={1.5} size="1rem" className="text-teal" />
-    </Badge>
+  const renderConversation = (placement: "top" | "top-start" = "top-start") => (
+    <Tooltip
+      placement={placement}
+      label={"conversationId: " + item.conversationId}
+      aria-label="tooltip"
+      bg="gray.600"
+      className="rounded"
+    >
+      <Badge variant="ghost" title={"conversationId: " + item.conversationId} className={`text-[14px] cursor-pointer`}>
+        <IconMessages stroke={1.5} size="1rem" className="text-teal" />
+      </Badge>
+    </Tooltip>
   );
 
   const actions = (
     <div className={`absolute bottom-0 mt-1 flex ${isUser ? "justify-end right-10" : "left-8"}`}>
       <div className="-mb-8 flex items-center space-x-1">
         {item.conversationId && renderConversation()}
-        {item.prompt && renderPrompt()}
+        {item.prompt && renderPrompt(isUser ? "top" : "top-start")}
         <IconButton
           aria-label="Copy"
           variant="ghost"
@@ -88,7 +95,7 @@ export function MessageItem(props: Props) {
           size="xs"
           onClick={onContentCopy}
         />
-        {chatConfig.unisoundAppKey && chatConfig.unisoundSecret && (
+        {hasUnisoundConfig() && (
           <IconButton
             aria-label="TTS"
             variant="ghost"

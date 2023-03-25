@@ -18,7 +18,7 @@ import {
 import { PasswordInput } from "../PasswordInput";
 
 export function SettingPanel() {
-  const toast = useToast({ position: "top" });
+  const toast = useToast({ position: "top", duration: 2000 });
   const chatConfig = useStore(chatConfigAtom);
   const { settingVisible } = useStore(visibleAtom);
 
@@ -36,9 +36,7 @@ export function SettingPanel() {
     if (settingVisible) {
       const data = chatConfigAtom.get();
       setConfig({ ...data });
-      if (data.openAIKey) {
-        requestBalance();
-      }
+      requestBalance();
     }
   }, [settingVisible]);
 
@@ -57,12 +55,16 @@ export function SettingPanel() {
       });
 
       const json = await response.json();
-      const { total_available } = json;
-      if (total_available != null && total_available !== "") {
-        setBalance("$" + total_available);
+      if (json.error) {
+        toast({ status: "error", title: json.error });
+      } else {
+        const { total_available } = json;
+        if (total_available != null && total_available !== "") {
+          setBalance("$" + total_available);
+        }
       }
     } catch (e) {
-      console.log(e);
+      toast({ status: "error", title: e.toString() });
     }
   }
 

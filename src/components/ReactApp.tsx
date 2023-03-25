@@ -23,20 +23,16 @@ export default function App() {
     });
 
     chatConfigAtom.set({
-      openAIKey: localStorage.getItem("openAIKey") || import.meta.env.OPENAI_API_KEY,
-
-      openAIHost: localStorage.getItem("openAIHost") || import.meta.env.OPENAI_API_HOST,
-      openAIModel: localStorage.getItem("openAIModel") || import.meta.env.OPENAI_API_MODEL,
+      openAIKey: localStorage.getItem("openAIKey") || undefined,
+      openAIHost: localStorage.getItem("openAIHost") || undefined,
+      openAIModel: localStorage.getItem("openAIModel") || undefined,
       systemMessage: localStorage.getItem("systemMessage") || undefined,
       temperature: localStorage.getItem("temperature") || undefined,
       top_p: localStorage.getItem("top_p") || undefined,
-
-      unisoundAppKey: localStorage.getItem("unisoundAppKey") || import.meta.env.UNISOUND_AI_KEY,
-      unisoundSecret: localStorage.getItem("unisoundSecret") || import.meta.env.UNISOUND_AI_SECRET,
     });
   }, []);
 
-  const theme = extendTheme({ initialColorMode: "light", useSystemColorMode: true });
+  const theme = extendTheme({ initialColorMode: "dark", useSystemColorMode: true });
 
   return (
     <ChakraProvider theme={theme}>

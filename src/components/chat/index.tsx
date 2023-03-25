@@ -26,6 +26,7 @@ import { TTSStatusEnum } from "./ai/TTSView";
 import type { ChatMessage } from "./type";
 import { MessageItem } from "./MessageItem";
 import { estimateTokens } from "./token";
+import { getUnisoundKeySecret, hasUnisoundConfig } from "./ai/Config";
 
 export default function Page() {
   const { conversationId } = useStore(conversationAtom);
@@ -42,7 +43,7 @@ export default function Page() {
 
   const chatConfig = useStore(chatConfigAtom);
 
-  const toast = useToast({ position: "top" });
+  const toast = useToast({ position: "top", duration: 2000 });
   /** 页面第一次加载，因为是从 localstorage 中获取的，导致多触发了一次 */
   const promptFlag = useRef(true);
 
@@ -82,12 +83,13 @@ export default function Page() {
   }
 
   function checkUnisound() {
-    if (!chatConfig.unisoundAppKey) {
-      toast({ status: "error", title: "Please enter  unisound APPKEY" });
+    const config = getUnisoundKeySecret();
+    if (!config.KEY) {
+      toast({ status: "error", title: "Please enter unisound APPKEY" });
       return true;
     }
-    if (!chatConfig.unisoundSecret) {
-      toast({ status: "error", title: "Please enter  unisound SECRET" });
+    if (!config.SECRET) {
+      toast({ status: "error", title: "Please enter unisound SECRET" });
       return true;
     }
     return false;
@@ -126,11 +128,6 @@ export default function Page() {
   }
 
   async function handleSendClick(inputValue = inputContent) {
-    if (!chatConfig.openAIKey) {
-      toast({ status: "error", title: "Please enter OPENAI_KEY" });
-      return;
-    }
-
     if (chatLoading) {
       stopGenerate();
       return;
@@ -249,7 +246,7 @@ export default function Page() {
       });
 
       if (!response.ok || !response.body) {
-        toast({ status: "warning", title: "Request Error" });
+        toast({ status: "error", title: "Request Error" });
         setChatLoading(false);
         return;
       }
@@ -327,9 +324,11 @@ export default function Page() {
   function handleConversationClick() {
     if (conversationId) {
       updateConversationId();
+      toast.closeAll();
       toast({ status: "info", title: "已关闭连续对话" });
     } else {
       updateConversationId(uuid());
+      toast.closeAll();
       toast({ status: "success", title: "已开启连续对话", description: "该对话不会和之前的消息关联" });
     }
   }
@@ -358,7 +357,7 @@ export default function Page() {
         <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
       </div>
       <div className="mb-4 flex flex-row items-center space-x-3">
-        {chatConfig.unisoundAppKey && chatConfig.unisoundSecret && (
+        {hasUnisoundConfig() && (
           <>
             <IconButton
               aria-label="ASR" //
@@ -437,7 +436,7 @@ export default function Page() {
           rows={2}
           className="resize-none placeholder:text-[14px]"
           value={inputContent}
-          placeholder="Shortcuts: Ctrl + ↩ / ⌘ + ↩"
+          placeholder="Shortcuts: ⬆️ / Ctrl + ↩ / ⌘ + ↩"
           onChange={(e) => setInputContent(e.target.value)}
           onKeyDown={(e) => {
             if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {

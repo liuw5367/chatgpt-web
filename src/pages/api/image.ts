@@ -1,10 +1,15 @@
 import type { APIRoute } from "astro";
+import { buildError } from "./_utils";
 
 export const post: APIRoute = async (context) => {
   const body = await context.request.json();
-  const host = body.host || "https://api.openai.com";
-  const apiKey = body.apiKey || import.meta.env.OPENAI_API_KEY;
+  const host = body.host || env.HOST || "https://api.openai.com";
+  const apiKey = body.apiKey || env.KEY;
   const config = body.config || {};
+
+  if (!apiKey) {
+    return new Response(buildError("NO API KEY"));
+  }
 
   try {
     return await fetch(host + "/v1/images/generations", {
@@ -20,6 +25,7 @@ export const post: APIRoute = async (context) => {
       }),
     });
   } catch (e) {
-    return new Response("AI Http Request Error");
+    console.log("images generations error:", e);
+    return new Response(buildError(e.toString()));
   }
 };

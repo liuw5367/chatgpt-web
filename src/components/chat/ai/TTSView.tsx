@@ -1,12 +1,9 @@
 import { useMemoizedFn } from "ahooks";
-import axios from "axios";
-import { useStore } from "@nanostores/react";
 import { sha256 } from "js-sha256";
 import { isEmpty } from "lodash-es";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 
-import { chatConfigAtom } from "../atom";
-import { APP_CONFIG, Speaker, TTS_CONFIG } from "./Config";
+import { getUnisoundKeySecret, Speaker, TTS_CONFIG } from "./Config";
 import PCMPlayer from "./PCMPlayer";
 
 export enum TTSStatusEnum {
@@ -37,10 +34,6 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
   const socketRef = useRef<WebSocket>();
   const playerRef = useRef<PCMPlayer>();
 
-  const chatConfig = useStore(chatConfigAtom);
-  const appKey = chatConfig.unisoundAppKey;
-  const secret = chatConfig.unisoundSecret;
-
   useImperativeHandle(
     ref,
     () => {
@@ -62,6 +55,9 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
       content = content.substring(0, 500);
     }
 
+    const chatConfig = getUnisoundKeySecret();
+    const appKey = chatConfig.KEY;
+    const secret = chatConfig.SECRET;
     const time: number = +new Date();
     const sign = sha256(`${appKey}${time}${secret}`).toUpperCase();
 
@@ -126,92 +122,9 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     };
   });
 
-  const startTtsLong = useMemoizedFn((content: string) => {
-    if (isEmpty(content.trim())) return;
-
-    const time: number = +new Date();
-    const sign = sha256(`${appKey}${time}${secret}`).toUpperCase();
-
-    let startTime = 0;
-
-    const abortController = new AbortController();
-    setAbortController(abortController);
-
-    onStatusChange?.(TTSStatusEnum.GENERATING);
-    axios
-      .post(
-        `${TTS_CONFIG.URL}/start`,
-        {
-          appkey: appKey,
-          user_id: APP_CONFIG.USER_ID,
-          time: time,
-          sign: sign,
-          format: "wav",
-          vcn: speaker.code,
-          text: content,
-          sample: 16000,
-          speed: 50,
-          volume: 50,
-          pitch: 50,
-          bright: 50,
-          ...config,
-        },
-        { signal: abortController.signal }
-      )
-      .then((res) => {
-        const taskId = res.data.task_id;
-        if (taskId) {
-          startTime = Date.now();
-          getResult(taskId);
-        } else {
-          alert("TTS错误，请重试");
-          onStatusChange?.(TTSStatusEnum.NORMAL);
-        }
-      })
-      .catch((e) => {
-        onStatusChange?.(TTSStatusEnum.NORMAL);
-        console.log(e);
-      });
-
-    const getResult = (taskId: string | number) => {
-      axios
-        .post(
-          `${TTS_CONFIG.URL}/progress`,
-          {
-            time: time,
-            sign: sign,
-            task_id: taskId,
-            appkey: appKey,
-            user_id: APP_CONFIG.USER_ID,
-          },
-          { signal: abortController.signal }
-        )
-        .then((res) => {
-          if (res.data.task_status !== "done") {
-            setTimeout(() => getResult(taskId), 500);
-          } else {
-            const now = Date.now();
-            const used = now - startTime;
-            console.log("tts result:", used, "ms", res.data);
-            const audio = audioRef.current;
-            if (audio) {
-              onStatusChange?.(TTSStatusEnum.PLAYING);
-              audio.src = res.data.audio_address;
-              audio.play();
-            }
-          }
-        })
-        .catch((e) => {
-          onStatusChange?.(TTSStatusEnum.NORMAL);
-          console.log(e);
-        });
-    };
-  });
-
   const start = useMemoizedFn((content: string) => {
     stop();
     startTts(content);
-    // startTtsLong(content);
   });
 
   const stop = useMemoizedFn(() => {

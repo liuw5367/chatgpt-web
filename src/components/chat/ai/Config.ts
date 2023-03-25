@@ -1,12 +1,21 @@
-export function getKeySecret() {
-  const KEY = import.meta.env.UNISOUND_AI_KEY;
-  const SECRET = import.meta.env.UNISOUND_AI_SECRET;
-  return { KEY, SECRET };
+const ENV_KEY = import.meta.env.UNISOUND_AI_KEY;
+const ENV_SECRET = import.meta.env.UNISOUND_AI_SECRET;
+
+export function getUnisoundKeySecret() {
+  return {
+    KEY: localStorage.getItem("unisoundAppKey") || ENV_KEY,
+    SECRET: localStorage.getItem("unisoundSecret") || ENV_SECRET,
+  };
+}
+
+export function hasUnisoundConfig(): boolean {
+  const config = getUnisoundKeySecret();
+  return config.KEY && config.SECRET;
 }
 
 export const APP_CONFIG = {
-  USER_ID: "demoUser" || "test_123123",
-  UDID: "demoWebDevice",
+  USER_ID: "abcdefg12345",
+  UDID: "abcdefg12345",
 };
 
 export const ASR_CONFIG = {

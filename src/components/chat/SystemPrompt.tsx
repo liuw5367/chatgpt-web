@@ -35,7 +35,7 @@ const templateOptions: TemplateType[] = [
 ];
 
 export function SystemPrompt() {
-  const toast = useToast({ position: "top" });
+  const toast = useToast({ position: "top", duration: 2000 });
   const { systemMessage } = useStore(chatConfigAtom);
   const { promptVisible } = useStore(visibleAtom);
 

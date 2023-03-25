@@ -3,14 +3,18 @@ import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser
 
 export const post: APIRoute = async (context) => {
   const body = await context.request.json();
-  const host = body.host || "https://api.openai.com";
-  const apiKey = body.apiKey || import.meta.env.OPENAI_API_KEY;
-  const model = body.model;
+  const host = body.host || env.HOST || "https://api.openai.com";
+  const apiKey = body.apiKey || env.KEY;
+  const model = body.model || env.MODEL;
   const messages = body.messages;
   const config = body.config || {};
 
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
+
+  if (!apiKey) {
+    return new Response("NO API KEY");
+  }
 
   if (!messages) {
     return new Response("No Input Text");
@@ -32,7 +36,8 @@ export const post: APIRoute = async (context) => {
       }),
     });
   } catch (e) {
-    return new Response("AI Http Request Error");
+    console.log("chat completions error:", e);
+    return new Response(e.toString());
   }
 
   const stream = new ReadableStream({

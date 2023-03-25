@@ -9,14 +9,16 @@ import {
   DrawerOverlay,
   useToast,
   SimpleGrid,
+  IconButton,
 } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
 import { chatConfigAtom } from "./atom";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { visibleAtom } from "../atom";
+import { IconEraser } from "@tabler/icons-react";
 
 export function ImagePanel() {
-  const toast = useToast({ position: "top" });
+  const toast = useToast({ position: "top", duration: 2000 });
 
   const chatConfig = useStore(chatConfigAtom);
   const { imageVisible } = useStore(visibleAtom);
@@ -37,6 +39,10 @@ export function ImagePanel() {
   }
 
   async function handleSend() {
+    if (!prompt?.trim()) {
+      toast({ status: "info", title: "Please enter content" });
+      return;
+    }
     setLoading(true);
     try {
       const abortController = new AbortController();
@@ -45,6 +51,7 @@ export function ImagePanel() {
       const response = await fetch("/api/image", {
         method: "POST",
         signal: abortController.signal,
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           apiKey: chatConfig.openAIKey,
           config: { prompt },
@@ -52,14 +59,15 @@ export function ImagePanel() {
       });
 
       const json = await response.json();
-
-      if (json.data) {
-        setImageList(json.data.map((v) => v.url));
+      if (json.error) {
+        toast({ status: "error", title: json.error });
       } else {
-        toast({ status: "error", title: "Request Error" });
+        if (json.data && Array.isArray(json.data)) {
+          setImageList(json.data.map((v) => v.url));
+        }
       }
     } catch (e) {
-      toast({ status: "error", title: "Request Error" });
+      toast({ status: "error", title: e.toString() });
     }
     setLoading(false);
     setAbortController(undefined);
@@ -74,14 +82,29 @@ export function ImagePanel() {
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
       />
-      <div>
+      <div className="flex flex-row space-x-3 justify-end">
+        <IconButton
+          aria-label="Eraser"
+          onClick={() => setPrompt("")}
+          colorScheme="gray"
+          variant="solid"
+          icon={<IconEraser stroke={1.5} />}
+        />
         <Button colorScheme="teal" onClick={handleSend} isLoading={loading}>
           Send
         </Button>
       </div>
       <SimpleGrid columns={2} spacing={2} className="pb-4">
         {imageList?.map((url) => (
-          <img src={url} key={url} className="w-full rounded" alt={url} />
+          <img
+            key={url}
+            src={url}
+            alt={url}
+            className="w-full rounded bg-black/20"
+            onClick={() => {
+              window.open(url, "_blank");
+            }}
+          />
         ))}
       </SimpleGrid>
     </div>
