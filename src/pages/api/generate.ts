@@ -1,8 +1,10 @@
 import type { APIRoute } from "astro";
 import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
+import { getEnv } from "./_utils";
 
 export const post: APIRoute = async (context) => {
   const body = await context.request.json();
+  const env = getEnv();
   const host = body.host || env.HOST || "https://api.openai.com";
   const apiKey = body.apiKey || env.KEY;
   const model = body.model || env.MODEL;

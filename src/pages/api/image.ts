@@ -1,8 +1,9 @@
 import type { APIRoute } from "astro";
-import { buildError } from "./_utils";
+import { buildError, getEnv } from "./_utils";
 
 export const post: APIRoute = async (context) => {
   const body = await context.request.json();
+  const env = getEnv();
   const host = body.host || env.HOST || "https://api.openai.com";
   const apiKey = body.apiKey || env.KEY;
   const config = body.config || {};
