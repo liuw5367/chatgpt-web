@@ -22,6 +22,7 @@ import promptsZh from "./prompts/zh.json";
 import promptsEn from "./prompts/en.json";
 import promptsOther from "./prompts/other.json";
 import promptsShortcut from "./prompts/shortcuts";
+import openPrompts from "./prompts/openPrompts";
 import { visibleAtom } from "../atom";
 
 type OptionType = { act: string; prompt: string; desc?: string; remark?: string };
@@ -29,6 +30,7 @@ type TemplateType = { label: string; value: OptionType[] };
 
 const templateOptions: TemplateType[] = [
   { label: "Shortcut", value: promptsShortcut },
+  { label: "openPrompts", value: openPrompts },
   { label: "中文", value: promptsZh },
   { label: "英文", value: promptsEn },
   { label: "其他", value: promptsOther },
@@ -132,7 +134,7 @@ export function SystemPrompt() {
         </div>
         <div sm="min-w-60">
           <Select
-            placeholder="Select Act"
+            placeholder="Select Prompt"
             onChange={(e) => {
               const prompt = e.target.value;
               const item = options.find((item) => item.prompt === prompt);

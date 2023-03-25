@@ -1,5 +1,7 @@
 # ChatGPT
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fliuw5367%2Fchatgpt-asr-tts)
+
 ## 功能介绍
 
 - 对话使用 OPENAI 官方 API `/v1/chat/completions`
@@ -68,6 +70,7 @@ prompt 模版来自：
 - [rockbenben / ChatGPT-Shortcut](https://github.com/rockbenben/ChatGPT-Shortcut)
 - [PlexPt / awesome-chatgpt-prompts-zh](https://github.com/PlexPt/awesome-chatgpt-prompts-zh)
 - [f/awesome-chatgpt-prompts](https://github.com/f/awesome-chatgpt-prompts)
+- [timqian/openprompt.co](https://github.com/timqian/openprompt.co)
 - [GaiZhenbiao / ChuanhuChatGPT](https://github.com/GaiZhenbiao/ChuanhuChatGPT)
 
 ## 依赖库
