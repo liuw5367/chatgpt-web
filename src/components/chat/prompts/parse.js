@@ -1,6 +1,6 @@
 import fs from "fs";
 
-const data = fs.readFileSync("./source/./en.csv");
+const data = fs.readFileSync("./en.csv");
 const text = new String(data);
 
 const json = text
