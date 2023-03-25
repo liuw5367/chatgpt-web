@@ -22,7 +22,7 @@ import promptsZh from "./prompts/zh.json";
 import promptsEn from "./prompts/en.json";
 import promptsOther from "./prompts/other.json";
 import promptsShortcut from "./prompts/shortcuts";
-import { openPrompts } from "./prompts/openPrompts";
+import { openPrompts } from "./prompts/openprompts";
 import { visibleAtom } from "../atom";
 
 type OptionType = { act: string; prompt: string; desc?: string; remark?: string };
