@@ -1,6 +1,6 @@
 import data from "./source/openprompts.json";
 
-const prompts = data.map((item) => {
+const openPrompts = data.map((item) => {
   const { name, description, prompt } = item;
   return {
     act: name,
@@ -9,4 +9,4 @@ const prompts = data.map((item) => {
   };
 });
 
-export default prompts;
+export { openPrompts };
