@@ -13,6 +13,7 @@ specifiers:
   '@types/markdown-it': ^12.2.3
   '@types/react': ^18.0.21
   '@types/react-dom': ^18.0.6
+  '@types/react-helmet': ^6.1.6
   '@types/uuid': ^9.0.1
   '@unocss/preset-attributify': ^0.50.6
   '@unocss/preset-icons': ^0.50.6
@@ -39,6 +40,7 @@ specifiers:
   punycode: ^2.3.0
   react: ^18.0.0
   react-dom: ^18.0.0
+  react-helmet: ^6.1.0
   unocss: ^0.50.6
   uuid: ^9.0.0
   vite-plugin-pwa: ^0.14.6
@@ -53,6 +55,7 @@ dependencies:
   '@iconify-json/tabler': 1.1.67
   '@nanostores/react': 0.4.1_nkfnbc2tpc77iht7asm3uqwau4
   '@tabler/icons-react': 2.10.0_react@18.2.0
+  '@types/react-helmet': 6.1.6
   '@unocss/reset': 0.50.6
   ahooks: 3.7.5_react@18.2.0
   astro: 2.1.2
@@ -73,6 +76,7 @@ dependencies:
   openai: 3.2.1
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
+  react-helmet: 6.1.0_react@18.2.0
   uuid: 9.0.0
   workbox-window: 6.5.4
 
@@ -3128,6 +3132,12 @@ packages:
     dependencies:
       '@types/react': 18.0.28
 
+  /@types/react-helmet/6.1.6:
+    resolution: {integrity: sha512-ZKcoOdW/Tg+kiUbkFCBtvDw0k3nD4HJ/h/B9yWxN4uDO8OkRksWTO+EL+z/Qu3aHTeTll3Ro0Cc/8UhwBCMG5A==}
+    dependencies:
+      '@types/react': 18.0.28
+    dev: false
+
   /@types/react/18.0.28:
     resolution: {integrity: sha512-RD0ivG1kEztNBdoAK7lekI9M+azSnitIn85h4iOiaLjaTrMjzslhaqCGaI4IyCJ1RljWiLCEu4jyrLLgqxBTew==}
     dependencies:
@@ -6081,6 +6091,18 @@ packages:
       use-sidecar: 1.1.2_pmekkgnqduwlme35zpnqhenc34
     dev: false
 
+  /react-helmet/6.1.0_react@18.2.0:
+    resolution: {integrity: sha512-4uMzEY9nlDlgxr61NL3XbKRy1hEkXmKNXhjbAIOVw5vcFrsdYbH2FEwcNyWvWinl103nXgzYNlns9ca+8kFiWw==}
+    peerDependencies:
+      react: '>=16.3.0'
+    dependencies:
+      object-assign: 4.1.1
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-fast-compare: 3.2.0
+      react-side-effect: 2.1.2_react@18.2.0
+    dev: false
+
   /react-is/16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
     dev: false
@@ -6118,6 +6140,14 @@ packages:
       tslib: 2.5.0
       use-callback-ref: 1.3.0_pmekkgnqduwlme35zpnqhenc34
       use-sidecar: 1.1.2_pmekkgnqduwlme35zpnqhenc34
+    dev: false
+
+  /react-side-effect/2.1.2_react@18.2.0:
+    resolution: {integrity: sha512-PVjOcvVOyIILrYoyGEpDN3vmYNLdy1CajSFNt4TDsVQC5KpTijDvWVoR+/7Rz2xT978D8/ZtFceXxzsPwZEDvw==}
+    peerDependencies:
+      react: ^16.3.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /react-style-singleton/2.2.1_pmekkgnqduwlme35zpnqhenc34:

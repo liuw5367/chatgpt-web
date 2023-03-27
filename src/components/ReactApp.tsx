@@ -1,11 +1,10 @@
-import Chat from "./chat/index";
 import { useEffect } from "react";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+
 import { chatConfigAtom, chatDataAtom, conversationAtom } from "./chat/atom";
 import type { ChatMessage } from "./chat/type";
-import { ChakraProvider } from "@chakra-ui/react";
 import { Header } from "./Header";
-import { extendTheme } from "@chakra-ui/react";
-
+import Chat from "./chat/index";
 import { SystemPrompt } from "./chat/SystemPrompt";
 import { SettingPanel } from "./chat/SettingPanel";
 import { ImagePanel } from "./chat/ImagePanel";

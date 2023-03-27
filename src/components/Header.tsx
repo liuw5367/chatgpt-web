@@ -1,6 +1,7 @@
 import { IconButton, useColorMode } from "@chakra-ui/react";
 import { IconMoonStars, IconRobot, IconSun, IconSettings, IconPhoto } from "@tabler/icons-react";
 import { visibleAtom } from "./atom";
+import { Helmet } from "react-helmet";
 
 export function Header() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -35,6 +36,18 @@ export function Header() {
           icon={colorMode === "light" ? <IconMoonStars stroke={1.5} /> : <IconSun stroke={1.5} />}
         />
       </div>
+
+      {colorMode === "light" ? (
+        <Helmet>
+          <meta name="apple-mobile-web-app-status-bar-style" content="#FFFFFF" />
+          <meta name="theme-color" content="#FFFFFF"></meta>
+        </Helmet>
+      ) : (
+        <Helmet>
+          <meta name="apple-mobile-web-app-status-bar-style" content="#1A202C" />
+          <meta name="theme-color" content="#1A202C"></meta>
+        </Helmet>
+      )}
     </div>
   );
 }
