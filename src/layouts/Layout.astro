@@ -19,6 +19,8 @@ const { title } = Astro.props;
     <link rel="mask-icon" href="/favicon.svg" color="#FFFFFF" />
     <meta name="msapplication-TileColor" content="#FFFFFF" />
     <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1A202C">
     <title>{title}</title>
     <meta name="description" content={title} />
     <style>
