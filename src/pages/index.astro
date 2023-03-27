@@ -1,15 +1,19 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import ReactApp from '../components/ReactApp';
+import Layout from "../layouts/Layout.astro";
+import ReactApp from "../components/ReactApp";
+
+import "uno.css";
+import "../components/markdown.css";
+import "../components/app.css";
 ---
 
-<Layout title="AI ChatGPT">
-	<main><ReactApp client:only="react" /></main>
+<Layout title="ChatGPT">
+  <main><ReactApp client:only="react" /></main>
 </Layout>
 
 <style>
-	main {
-		height: 100vh;
-		padding: 0;
-	}
+  main {
+    height: 100vh;
+    padding: 0;
+  }
 </style>

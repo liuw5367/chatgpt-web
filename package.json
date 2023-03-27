@@ -1,6 +1,6 @@
 {
   "name": "astro-gpt",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "type": "module",
   "private": true,
   "scripts": {
@@ -39,7 +39,8 @@
     "openai": "^3.2.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "workbox-window": "^6.5.4"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",
@@ -50,7 +51,9 @@
     "@unocss/preset-attributify": "^0.50.6",
     "@unocss/preset-icons": "^0.50.6",
     "@unocss/transformer-variant-group": "^0.50.6",
+    "@vite-pwa/astro": "^0.0.5",
     "punycode": "^2.3.0",
-    "unocss": "^0.50.6"
+    "unocss": "^0.50.6",
+    "vite-plugin-pwa": "^0.14.6"
   }
 }

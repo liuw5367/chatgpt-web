@@ -16,6 +16,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { PasswordInput } from "../PasswordInput";
+import { APP_VERSION } from "../constants";
 
 export function SettingPanel() {
   const toast = useToast({ position: "top", duration: 2000 });
@@ -150,7 +151,10 @@ export function SettingPanel() {
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader>Settings</DrawerHeader>
+        <DrawerHeader className="space-x-4">
+          <span>Settings</span>
+          <span className="text-sm font-normal">{APP_VERSION}</span>
+        </DrawerHeader>
 
         <DrawerBody>
           <div className="flex flex-col space-y-4">

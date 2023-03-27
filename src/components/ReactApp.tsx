@@ -10,10 +10,6 @@ import { SystemPrompt } from "./chat/SystemPrompt";
 import { SettingPanel } from "./chat/SettingPanel";
 import { ImagePanel } from "./chat/ImagePanel";
 
-import "uno.css";
-import "./markdown.css";
-import "./app.css";
-
 export default function App() {
   useEffect(() => {
     // 因为服务端渲染无法使用 localStorage，所以这里重新设置一次

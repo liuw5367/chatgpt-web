@@ -91,7 +91,7 @@ export function ImagePanel() {
           icon={<IconEraser stroke={1.5} />}
         />
         <Button colorScheme="teal" onClick={handleSend} isLoading={loading}>
-          Send
+          Generate
         </Button>
       </div>
       <SimpleGrid columns={2} spacing={2} className="pb-4">
