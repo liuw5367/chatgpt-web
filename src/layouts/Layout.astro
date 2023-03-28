@@ -23,12 +23,6 @@ const { title } = Astro.props;
     <!-- <meta name="theme-color" content="#FFFFFF"> -->
     <title>{title}</title>
     <meta name="description" content={title} />
-    <style>
-      main,
-      footer {
-        text-align: center;
-      }
-    </style>
     {pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
   </head>
   <body>
