@@ -6,6 +6,7 @@ import unocss from "unocss/astro";
 import { presetUno, presetAttributify, transformerVariantGroup, presetIcons } from "unocss";
 import tabler from "@iconify-json/tabler/icons.json";
 import AstroPWA from "@vite-pwa/astro";
+import { APP_NAME } from "./src/constants";
 
 // https://astro.build/config
 export default defineConfig({
@@ -49,8 +50,8 @@ export default defineConfig({
       scope: "/",
       includeAssets: ["favicon.svg"],
       manifest: {
-        name: "ChatGPT",
-        short_name: "ChatGPT",
+        name: APP_NAME,
+        short_name: APP_NAME,
         theme_color: "#ffffff",
         icons: [
           {
@@ -76,7 +77,7 @@ export default defineConfig({
         globPatterns: ["**/*.{css,js,html,svg,png,ico,txt}"],
       },
       devOptions: {
-        enabled: true,
+        enabled: false,
         navigateFallbackAllowlist: [/^\/404$/],
       },
     }),

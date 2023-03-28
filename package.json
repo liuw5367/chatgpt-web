@@ -41,6 +41,7 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-helmet": "^6.1.0",
+    "react-textarea-autosize": "^8.4.1",
     "uuid": "^9.0.0",
     "workbox-window": "^6.5.4"
   },

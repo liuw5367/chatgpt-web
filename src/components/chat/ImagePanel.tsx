@@ -40,7 +40,7 @@ export function ImagePanel() {
 
   async function handleSend() {
     if (!prompt?.trim()) {
-      toast({ status: "info", title: "Please enter content" });
+      toast({ status: "info", title: "please enter content" });
       return;
     }
     setLoading(true);
@@ -78,7 +78,7 @@ export function ImagePanel() {
       <Textarea
         className="min-h-[84px]"
         rows={3}
-        placeholder=""
+        placeholder="please enter prompt"
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
       />

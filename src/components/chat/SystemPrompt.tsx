@@ -41,9 +41,6 @@ export function SystemPrompt() {
   const { systemMessage } = useStore(chatConfigAtom);
   const { promptVisible } = useStore(visibleAtom);
 
-  const currentDate = new Date().toISOString().split("T")[0];
-  const placeholder = `Example:\nYou are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.\nKnowledge cutoff: 2021-09-01\nCurrent date: ${currentDate}`;
-
   const [prompt, setPrompt] = useState(systemMessage);
   const [template, setTemplate] = useState("Shortcut");
   const [options, setOptions] = useState(promptsShortcut);
@@ -157,7 +154,6 @@ export function SystemPrompt() {
 
       <Textarea
         value={prompt ?? ""}
-        placeholder={placeholder}
         onChange={(e) => setPrompt(e.target.value)}
         className="flex-1 !min-h-[50%] text-[14px] placeholder:text-[14px]"
       />

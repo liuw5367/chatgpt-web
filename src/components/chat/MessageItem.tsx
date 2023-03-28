@@ -26,6 +26,7 @@ import {
 import { renderMarkdown } from "./markdown";
 import type { ChatMessage } from "./type";
 import { hasUnisoundConfig } from "./ai/Config";
+import { estimateTokens } from "./token";
 
 interface Props {
   item: ChatMessage;
@@ -55,10 +56,12 @@ export function MessageItem(props: Props) {
         </Badge>
       </PopoverTrigger>
       <PopoverContent>
-        <PopoverHeader fontWeight="semibold">Prompt</PopoverHeader>
+        <PopoverHeader fontWeight="semibold">System Prompt</PopoverHeader>
         {/* <PopoverArrow /> */}
         <PopoverCloseButton />
-        <PopoverBody className="text-[14px]">{item.prompt}</PopoverBody>
+        <PopoverBody className="text-[14px]">
+          {item.prompt} Tokens: [{estimateTokens(item.prompt)}]
+        </PopoverBody>
       </PopoverContent>
     </Popover>
   );

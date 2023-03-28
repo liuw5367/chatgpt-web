@@ -16,7 +16,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { PasswordInput } from "../PasswordInput";
-import { APP_VERSION } from "../constants";
+import { APP_VERSION } from "../../constants";
 
 export function SettingPanel() {
   const toast = useToast({ position: "top", duration: 2000 });
@@ -99,18 +99,18 @@ export function SettingPanel() {
 
   const list: ListItemType[] = [
     {
-      label: "OPENAI_HOST",
+      label: "OPENAI HOST",
       value: "openAIHost",
       placeholder: "https://api.openai.com",
     },
     {
-      label: "OPENAI_KEY",
+      label: "OPENAI KEY",
       value: "openAIKey",
       type: "password",
-      placeholder: "Please enter OPENAI_KEY",
+      placeholder: "please enter OPENAI_KEY",
     },
     {
-      label: "OPENAI_MODEL",
+      label: "OPENAI MODEL",
       value: "openAIModel",
       placeholder: "gpt-3.5-turbo",
     },
@@ -133,16 +133,16 @@ export function SettingPanel() {
         "We generally recommend altering this or temperature but not both.",
     },
     {
-      label: "Unisound_APPKEY",
+      label: "Unisound APPKEY",
       value: "unisoundAppKey",
       type: "password",
-      placeholder: "Please enter ai.unisound.com APPKEY",
+      placeholder: "https://ai.unisound.com",
     },
     {
-      label: "Unisound_SECRET",
+      label: "Unisound SECRET",
       value: "unisoundSecret",
       type: "password",
-      placeholder: "Please enter ai.unisound.com SECRET",
+      placeholder: "https://ai.unisound.com",
     },
   ];
 

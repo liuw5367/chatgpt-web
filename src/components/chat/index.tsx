@@ -1,7 +1,7 @@
 import { useDebounceEffect, useUpdateEffect } from "ahooks";
 import { useStore } from "@nanostores/react";
 import React, { useEffect, useRef, useState } from "react";
-import { Button, IconButton, Textarea, useToast } from "@chakra-ui/react";
+import { Button, IconButton, useToast, Progress } from "@chakra-ui/react";
 import {
   IconEraser,
   IconMicrophone,
@@ -27,6 +27,7 @@ import type { ChatMessage } from "./type";
 import { MessageItem } from "./MessageItem";
 import { estimateTokens } from "./token";
 import { getUnisoundKeySecret, hasUnisoundConfig } from "./ai/Config";
+import { AutoResizeTextarea } from "../AutoResizeTextarea";
 
 export default function Page() {
   const { conversationId } = useStore(conversationAtom);
@@ -85,11 +86,11 @@ export default function Page() {
   function checkUnisound() {
     const config = getUnisoundKeySecret();
     if (!config.KEY) {
-      toast({ status: "error", title: "Please enter unisound APPKEY" });
+      toast({ status: "error", title: "please enter unisound APPKEY" });
       return true;
     }
     if (!config.SECRET) {
-      toast({ status: "error", title: "Please enter unisound SECRET" });
+      toast({ status: "error", title: "please enter unisound SECRET" });
       return true;
     }
     return false;
@@ -193,7 +194,7 @@ export default function Page() {
     }
     const content = removeLn(inputValue);
     if (!systemMessage && !content) {
-      toast({ status: "info", title: "Please enter content" });
+      toast({ status: "info", title: "please enter content" });
       return;
     }
     stopTTS();
@@ -430,11 +431,12 @@ export default function Page() {
         )}
         <div id="chat-bottom" />
       </div>
-
+      {chatLoading && <Progress size="xs" isIndeterminate />}
       <div className="px-6 pt-4 border-t flex flex-col justify-end space-y-3">
-        <Textarea
-          rows={2}
-          className="resize-none placeholder:text-[14px]"
+        <AutoResizeTextarea
+          minRows={2}
+          maxRows={10}
+          className="placeholder:text-[14px]"
           value={inputContent}
           placeholder="Shortcuts: ⬆️ / Ctrl + ↩ / ⌘ + ↩"
           onChange={(e) => setInputContent(e.target.value)}

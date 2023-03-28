@@ -2,6 +2,7 @@ import { IconButton, useColorMode } from "@chakra-ui/react";
 import { IconMoonStars, IconRobot, IconSun, IconSettings, IconPhoto } from "@tabler/icons-react";
 import { visibleAtom } from "./atom";
 import { Helmet } from "react-helmet";
+import { APP_NAME } from "../constants";
 
 export function Header() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -13,7 +14,7 @@ export function Header() {
     >
       <div className="flex items-center space-x-2 font-medium">
         <IconRobot size="2rem" stroke={1.5} className="fill-teal-600" />
-        <div className="tracking-wider font-bold">ChatGPT</div>
+        <div className="tracking-wider font-bold">{APP_NAME}</div>
       </div>
 
       <div className="flex flex-row items-center space-x-1">
@@ -40,12 +41,12 @@ export function Header() {
       {colorMode === "light" ? (
         <Helmet>
           <meta name="apple-mobile-web-app-status-bar-style" content="#FFFFFF" />
-          <meta name="theme-color" content="#FFFFFF"></meta>
+          <meta name="theme-color" content="#FFFFFF" />
         </Helmet>
       ) : (
         <Helmet>
           <meta name="apple-mobile-web-app-status-bar-style" content="#1A202C" />
-          <meta name="theme-color" content="#1A202C"></meta>
+          <meta name="theme-color" content="#1A202C" />
         </Helmet>
       )}
     </div>

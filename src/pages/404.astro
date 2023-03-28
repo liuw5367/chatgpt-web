@@ -1,8 +1,10 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { APP_NAME } from "../constants";
+
 ---
 
-<Layout title="ChatGPT">
+<Layout title={APP_NAME}>
   <h1>Page not found</h1>
   <h1>Upps, something is wrong, the requested page not found!</h1>
   <a href="/">Back home</a>
