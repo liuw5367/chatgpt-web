@@ -5,9 +5,7 @@ import { chatConfigAtom, chatDataAtom, conversationAtom } from "./chat/atom";
 import type { ChatMessage } from "./chat/type";
 import { Header } from "./Header";
 import Chat from "./chat/index";
-import { SystemPrompt } from "./chat/SystemPrompt";
-import { SettingPanel } from "./chat/SettingPanel";
-import { ImagePanel } from "./chat/ImagePanel";
+import { ImagePanel, SettingPanel, SystemPromptPanel } from "./panels";
 
 export default function App() {
   useEffect(() => {
@@ -38,7 +36,7 @@ export default function App() {
           <Chat />
         </div>
 
-        <SystemPrompt />
+        <SystemPromptPanel />
         <SettingPanel />
         <ImagePanel />
       </div>

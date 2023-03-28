@@ -13,16 +13,16 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
-import { chatConfigAtom, conversationAtom } from "./atom";
+import { chatConfigAtom, conversationAtom } from "../chat/atom";
 import { useState, useEffect } from "react";
-import { estimateTokens } from "./token";
+import { estimateTokens } from "../chat/token";
 import { IconEraser } from "@tabler/icons-react";
 
-import promptsZh from "./prompts/zh.json";
-import promptsEn from "./prompts/en.json";
-import promptsOther from "./prompts/other.json";
-import promptsShortcut from "./prompts/shortcuts";
-import { openPrompts } from "./prompts/openprompts";
+import promptsZh from "../prompts/zh.json";
+import promptsEn from "../prompts/en.json";
+import promptsOther from "../prompts/other.json";
+import promptsShortcut from "../prompts/shortcuts";
+import { openPrompts } from "../prompts/openprompts";
 import { visibleAtom } from "../atom";
 
 type OptionType = { act: string; prompt: string; desc?: string; remark?: string };
@@ -36,7 +36,7 @@ const templateOptions: TemplateType[] = [
   { label: "其他", value: promptsOther },
 ];
 
-export function SystemPrompt() {
+export function SystemPromptPanel() {
   const toast = useToast({ position: "top", duration: 2000 });
   const { systemMessage } = useStore(chatConfigAtom);
   const { promptVisible } = useStore(visibleAtom);

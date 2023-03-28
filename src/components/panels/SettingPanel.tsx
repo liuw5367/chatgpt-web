@@ -1,6 +1,6 @@
 import { useStore } from "@nanostores/react";
 import { useEffect, useState } from "react";
-import { chatConfigAtom } from "./atom";
+import { chatConfigAtom } from "../chat/atom";
 import { visibleAtom } from "../atom";
 import {
   Input,

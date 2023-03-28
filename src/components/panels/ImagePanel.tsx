@@ -12,7 +12,7 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
-import { chatConfigAtom } from "./atom";
+import { chatConfigAtom } from "../chat/atom";
 import React, { useState, useEffect } from "react";
 import { visibleAtom } from "../atom";
 import { IconEraser } from "@tabler/icons-react";
