@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import { v4 as uuidFn } from "uuid";
 
 export function uuid(replace = true) {
@@ -21,7 +20,8 @@ export function scrollToElement(value: string | HTMLElement, option?: ScrollInto
 }
 
 export function getCurrentTime() {
-  return format(new Date(), "yyyy-MM-dd HH:mm:ss");
+  const date = new Date();
+  return date.toLocaleDateString() + " " + date.toTimeString();
 }
 
 export function removeLn(content?: string): string {

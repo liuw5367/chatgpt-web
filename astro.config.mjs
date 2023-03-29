@@ -21,21 +21,10 @@ export default defineConfig({
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (
-              id.includes("gpt3-tokenizer") ||
-              id.includes("highlight.js") ||
-              id.includes("react-dom") ||
-              id.includes("katex") ||
-              id.includes("framer-motion") ||
-              id.includes("lodash") ||
-              id.includes("markdown-it") ||
-              id.includes("@chakra-ui")
-            ) {
-              if (id.includes("node_modules/.pnpm/")) {
-                return id.toString().split("node_modules/.pnpm/")[1].split("/")[0].toString();
-              } else if (id.includes("node_modules/")) {
-                return id.toString().split("node_modules/")[1].split("/")[0].toString();
-              }
+            if (id.includes("node_modules/.pnpm/")) {
+              return id.toString().split("node_modules/.pnpm/")[1].split("/")[0].toString();
+            } else if (id.includes("node_modules/")) {
+              return id.toString().split("node_modules/")[1].split("/")[0].toString();
             }
           },
         },
