@@ -6,7 +6,8 @@ window.addEventListener("load", () => {
   const pwaCloseBtn = pwaToast.querySelector<HTMLButtonElement>("#pwa-close")!;
   const pwaRefreshBtn = pwaToast.querySelector<HTMLButtonElement>("#pwa-refresh")!;
 
-  const refreshSW: ((reloadPage?: boolean) => Promise<void>) | undefined;
+  // eslint-disable-next-line prefer-const
+  let refreshSW: ((reloadPage?: boolean) => Promise<void>) | undefined;
 
   const refreshCallback = () => refreshSW?.(true);
 
