@@ -20,8 +20,8 @@ export default function App() {
       openAIHost: localStorage.getItem("openAIHost") || undefined,
       openAIModel: localStorage.getItem("openAIModel") || undefined,
       systemMessage: localStorage.getItem("systemMessage") || undefined,
-      temperature: localStorage.getItem("temperature") || undefined,
-      top_p: localStorage.getItem("top_p") || undefined,
+      temperature: localStorage.getItem("temperature") ?? "0.6",
+      top_p: localStorage.getItem("top_p") ?? "1",
     });
   }, []);
 

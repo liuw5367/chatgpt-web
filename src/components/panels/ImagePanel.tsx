@@ -1,21 +1,10 @@
-import {
-  Button,
-  Textarea,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
-  useToast,
-  SimpleGrid,
-  IconButton,
-} from "@chakra-ui/react";
+import { Button, Textarea, useToast, SimpleGrid, IconButton } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
 import { chatConfigAtom } from "../chat/atom";
 import React, { useState, useEffect } from "react";
 import { visibleAtom } from "../atom";
 import { IconEraser } from "@tabler/icons-react";
+import SimpleDrawer from "../SimpleDrawer";
 
 export function ImagePanel() {
   const toast = useToast({ position: "top", duration: 2000 });
@@ -73,52 +62,42 @@ export function ImagePanel() {
     setAbortController(undefined);
   }
 
-  const content = (
-    <div className="w-full h-full flex flex-col space-y-3">
-      <Textarea
-        className="min-h-[84px]"
-        rows={3}
-        placeholder="please enter prompt"
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
-      />
-      <div className="flex flex-row space-x-3 justify-end">
-        <IconButton
-          aria-label="Eraser"
-          onClick={() => setPrompt("")}
-          colorScheme="gray"
-          variant="solid"
-          icon={<IconEraser stroke={1.5} />}
-        />
-        <Button colorScheme="teal" onClick={handleSend} isLoading={loading}>
-          Generate
-        </Button>
-      </div>
-      <SimpleGrid columns={2} spacing={2} className="pb-4">
-        {imageList?.map((url) => (
-          <img
-            key={url}
-            src={url}
-            alt={url}
-            className="w-full rounded bg-black/20"
-            onClick={() => {
-              window.open(url, "_blank");
-            }}
-          />
-        ))}
-      </SimpleGrid>
-    </div>
-  );
-
   return (
-    <Drawer isOpen={imageVisible} size="lg" placement="right" onClose={handleClose}>
-      <DrawerOverlay />
-      <DrawerContent>
-        <DrawerCloseButton />
-        <DrawerHeader>Image Create</DrawerHeader>
-
-        <DrawerBody>{content}</DrawerBody>
-      </DrawerContent>
-    </Drawer>
+    <SimpleDrawer isOpen={imageVisible} onClose={handleClose} size="lg" header={<>Image Create</>}>
+      <div className="w-full h-full flex flex-col space-y-3">
+        <Textarea
+          className="min-h-[84px]"
+          rows={3}
+          placeholder="please enter prompt"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+        />
+        <div className="flex flex-row space-x-3 justify-end">
+          <IconButton
+            aria-label="Eraser"
+            onClick={() => setPrompt("")}
+            colorScheme="gray"
+            variant="solid"
+            icon={<IconEraser stroke={1.5} />}
+          />
+          <Button colorScheme="teal" onClick={handleSend} isLoading={loading}>
+            Generate
+          </Button>
+        </div>
+        <SimpleGrid columns={2} spacing={2} className="pb-4">
+          {imageList?.map((url) => (
+            <img
+              key={url}
+              src={url}
+              alt={url}
+              className="w-full rounded bg-black/20"
+              onClick={() => {
+                window.open(url, "_blank");
+              }}
+            />
+          ))}
+        </SimpleGrid>
+      </div>
+    </SimpleDrawer>
   );
 }

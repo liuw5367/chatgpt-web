@@ -20,8 +20,7 @@ export function scrollToElement(value: string | HTMLElement, option?: ScrollInto
 }
 
 export function getCurrentTime() {
-  const date = new Date();
-  return date.toLocaleDateString() + " " + date.toTimeString();
+  return new Date().toLocaleString();
 }
 
 export function removeLn(content?: string): string {

@@ -1,6 +1,5 @@
 import { useMemoizedFn } from "ahooks";
 import { sha256 } from "js-sha256";
-import { isEmpty } from "lodash-es";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import { getUnisoundKeySecret, Speaker, TTS_CONFIG } from "./Config";
@@ -49,7 +48,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
   }, []);
 
   const startTts = useMemoizedFn((inputContent: string) => {
-    if (isEmpty(inputContent.trim())) return;
+    if (!inputContent.trim()) return;
     let content = inputContent;
     if (content.length > 500) {
       content = content.substring(0, 500);
