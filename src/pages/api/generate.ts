@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
+
 import { getEnv } from "./_utils";
 
 export const post: APIRoute = async (context) => {

@@ -1,22 +1,23 @@
-import { useStore } from "@nanostores/react";
-import { useEffect, useState } from "react";
-import { chatConfigAtom } from "../chat/atom";
-import { visibleAtom } from "../atom";
 import {
   Button,
   FormControl,
-  FormLabel,
   FormHelperText,
+  FormLabel,
   Input,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
   useToast,
 } from "@chakra-ui/react";
-import { PasswordInput } from "../PasswordInput";
+import { useStore } from "@nanostores/react";
+import { useEffect, useState } from "react";
+
 import { APP_VERSION } from "../../constants";
+import { visibleAtom } from "../atom";
+import { chatConfigAtom } from "../chat/atom";
+import { PasswordInput } from "../PasswordInput";
 import SimpleDrawer from "../SimpleDrawer";
 
 type ListItemType<T = string> = {

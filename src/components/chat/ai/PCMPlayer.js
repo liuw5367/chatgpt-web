@@ -5,7 +5,7 @@ class PCMPlayer {
 
   init(option) {
     const defaultOption = {
-      inputCodec: 'Int16', // 传入的数据是采用多少位编码，默认16位
+      inputCodec: "Int16", // 传入的数据是采用多少位编码，默认16位
       channels: 1, // 声道数
       sampleRate: 8000, // 采样率 单位Hz
       flushTime: 1000, // 缓存时间 单位 ms
@@ -29,7 +29,7 @@ class PCMPlayer {
       Float32: 1,
     };
     if (!inputCodecs[this.option.inputCodec]) {
-      throw new Error('wrong codec.please input one of these codecs:Int8,Int16,Int32,Float32');
+      throw new Error("wrong codec.please input one of these codecs:Int8,Int16,Int32,Float32");
     }
     return inputCodecs[this.option.inputCodec];
   }
@@ -46,7 +46,7 @@ class PCMPlayer {
       Float32: Float32Array,
     };
     if (!typedArrays[this.option.inputCodec]) {
-      throw new Error('wrong codec.please input one of these codecs:Int8,Int16,Int32,Float32');
+      throw new Error("wrong codec.please input one of these codecs:Int8,Int16,Int32,Float32");
     }
     return typedArrays[this.option.inputCodec];
   }
@@ -65,7 +65,7 @@ class PCMPlayer {
   static isTypedArray(data) {
     // 检测输入的数据是否为 TypedArray 类型或 ArrayBuffer 类型
     return (
-      (data.byteLength && data.buffer && data.buffer.constructor == ArrayBuffer) || data.constructor == ArrayBuffer
+      (data.byteLength && data.buffer && data.buffer.constructor === ArrayBuffer) || data.constructor === ArrayBuffer
     );
   }
 
@@ -73,7 +73,7 @@ class PCMPlayer {
     // 数据类型是否支持
     // 目前支持 ArrayBuffer 或者 TypedArray
     if (!PCMPlayer.isTypedArray(data)) {
-      throw new Error('请传入ArrayBuffer或者任意TypedArray');
+      throw new Error("请传入ArrayBuffer或者任意TypedArray");
     }
     return true;
   }
@@ -99,7 +99,7 @@ class PCMPlayer {
   }
 
   getFormattedValue(data) {
-    if (data.constructor == ArrayBuffer) {
+    if (data.constructor === ArrayBuffer) {
       data = new this.typedArray(data);
     } else {
       data = new this.typedArray(data.buffer);
@@ -165,7 +165,7 @@ class PCMPlayer {
     if (this.inputFinished) {
       // console.log('finished', +new Date(), (this.audioCtx.currentTime - this.startTime + audioBuffer.duration) * 1000 + 500)
       this.timer = setTimeout(() => {
-        console.log('real finished', new Date().toISOString());
+        console.log("real finished", new Date().toISOString());
         this.onEnded && this.onEnded();
         // console.log('real  finished', +new Date())
       }, (this.startTime - this.audioCtx.currentTime + audioBuffer.duration) * 1000 + 500);

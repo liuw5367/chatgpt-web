@@ -1,8 +1,8 @@
 import { useMemoizedFn } from "ahooks";
 import React, { useImperativeHandle, useState } from "react";
 
-import { defaultSpeaker } from "./Config";
 import ASRView, { ASRRef, ASRStatusEnum } from "./ASRView";
+import { defaultSpeaker } from "./Config";
 import TTSView, { TTSRef, TTSStatusEnum } from "./TTSView";
 import type { Command } from "./type";
 

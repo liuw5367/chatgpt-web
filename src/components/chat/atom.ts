@@ -1,4 +1,5 @@
 import { atom } from "nanostores";
+
 import type { ChatMessage } from "./type";
 
 export interface ChatConfigType {

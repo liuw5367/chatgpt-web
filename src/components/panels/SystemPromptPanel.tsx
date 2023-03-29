@@ -1,16 +1,16 @@
 import { Button, IconButton, Select, Textarea, useToast } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
-import { chatConfigAtom, conversationAtom } from "../chat/atom";
-import { useState, useEffect } from "react";
-import { estimateTokens } from "../chat/token";
 import { IconEraser } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 
-import promptsZh from "../prompts/zh.json";
+import { visibleAtom } from "../atom";
+import { chatConfigAtom, conversationAtom } from "../chat/atom";
+import { estimateTokens } from "../chat/token";
 import promptsEn from "../prompts/en.json";
+import { openPrompts } from "../prompts/openprompts";
 import promptsOther from "../prompts/other.json";
 import promptsShortcut from "../prompts/shortcuts";
-import { openPrompts } from "../prompts/openprompts";
-import { visibleAtom } from "../atom";
+import promptsZh from "../prompts/zh.json";
 import SimpleDrawer from "../SimpleDrawer";
 
 type OptionType = { act: string; prompt: string; desc?: string; remark?: string };

@@ -1,8 +1,9 @@
 import { IconButton, useColorMode } from "@chakra-ui/react";
-import { IconMoonStars, IconRobot, IconSun, IconSettings, IconPhoto } from "@tabler/icons-react";
-import { visibleAtom } from "./atom";
+import { IconMoonStars, IconPhoto, IconRobot, IconSettings, IconSun } from "@tabler/icons-react";
 import { Helmet } from "react-helmet";
+
 import { APP_NAME } from "../constants";
+import { visibleAtom } from "./atom";
 
 export function Header() {
   const { colorMode, toggleColorMode } = useColorMode();

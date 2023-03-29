@@ -3,8 +3,6 @@ import {
   Badge,
   Button,
   IconButton,
-  useClipboard,
-  useColorMode,
   Popover,
   PopoverBody,
   PopoverCloseButton,
@@ -12,21 +10,24 @@ import {
   PopoverHeader,
   PopoverTrigger,
   Tooltip,
+  useClipboard,
+  useColorMode,
 } from "@chakra-ui/react";
 import {
   IconClipboard,
   IconClipboardCheck,
+  IconMessages,
   IconPlayerPlay,
   IconReload,
   IconRobot,
   IconTrash,
   IconUser,
-  IconMessages,
 } from "@tabler/icons-react";
-import { renderMarkdown } from "./markdown";
-import type { ChatMessage } from "./type";
+
 import { hasUnisoundConfig } from "./ai/Config";
+import { renderMarkdown } from "./markdown";
 import { estimateTokens } from "./token";
+import type { ChatMessage } from "./type";
 
 interface Props {
   item: ChatMessage;

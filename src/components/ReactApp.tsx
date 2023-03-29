@@ -1,10 +1,10 @@
-import { useEffect } from "react";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { useEffect } from "react";
 
 import { chatConfigAtom, chatDataAtom, conversationAtom } from "./chat/atom";
+import Chat from "./chat/index";
 import type { ChatMessage } from "./chat/type";
 import { Header } from "./Header";
-import Chat from "./chat/index";
 import { ImagePanel, SettingPanel, SystemPromptPanel } from "./panels";
 
 export default function App() {

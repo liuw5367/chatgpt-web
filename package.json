@@ -8,7 +8,8 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "eslint": "eslint src --quiet --fix --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
     "@astrojs/react": "^2.1.0",
@@ -48,11 +49,23 @@
     "@types/react": "^18.0.31",
     "@types/react-dom": "^18.0.11",
     "@types/uuid": "^9.0.1",
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
     "@unocss/preset-attributify": "^0.50.6",
     "@unocss/preset-icons": "^0.50.6",
     "@unocss/transformer-variant-group": "^0.50.6",
     "@vite-pwa/astro": "^0.0.5",
+    "eslint": "^8.37.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "prettier": "^2.8.7",
     "punycode": "^2.3.0",
+    "typescript": "^5.0.2",
     "unocss": "^0.50.6",
     "vite-plugin-pwa": "^0.14.7"
   }

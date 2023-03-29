@@ -1,9 +1,10 @@
-import { Button, Textarea, useToast, SimpleGrid, IconButton } from "@chakra-ui/react";
+import { Button, IconButton, SimpleGrid, Textarea, useToast } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
-import { chatConfigAtom } from "../chat/atom";
-import React, { useState, useEffect } from "react";
-import { visibleAtom } from "../atom";
 import { IconEraser } from "@tabler/icons-react";
+import React, { useEffect, useState } from "react";
+
+import { visibleAtom } from "../atom";
+import { chatConfigAtom } from "../chat/atom";
 import SimpleDrawer from "../SimpleDrawer";
 
 export function ImagePanel() {

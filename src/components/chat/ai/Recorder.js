@@ -111,7 +111,9 @@ Recorder.prototype.start = function () {
 };
 
 Recorder.prototype.destroy = function () {
-  this.context.close().then(function () {});
+  this.context.close().then(function () {
+    //
+  });
 };
 
 // 停止录音

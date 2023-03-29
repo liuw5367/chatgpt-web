@@ -1,16 +1,16 @@
-import MarkdownIt from "markdown-it";
-// @ts-ignore
-import mdKatex from "markdown-it-katex";
-import hljs from "highlight.js";
-// @ts-expect-error
-import mdCopy from "markdown-it-code-copy";
 import "highlight.js/styles/github-dark.css";
 import "github-markdown-css";
 
+import type { HLJSApi, LanguageFn } from "highlight.js";
+import hljs from "highlight.js";
+import MarkdownIt from "markdown-it";
 import type Renderer from "markdown-it/lib/renderer";
 import type StateCore from "markdown-it/lib/rules_core/state_core";
 import type Token from "markdown-it/lib/token";
-import type { HLJSApi, LanguageFn } from "highlight.js";
+// @ts-expect-error
+import mdCopy from "markdown-it-code-copy";
+// @ts-ignore
+import mdKatex from "markdown-it-katex";
 
 export function renderMarkdown(content: string) {
   const markdown = MarkdownIt({
