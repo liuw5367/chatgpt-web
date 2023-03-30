@@ -182,8 +182,7 @@ export default function Page() {
     if (systemMessage) {
       messages.unshift({ role: "system", content: systemMessage });
     }
-    const max_tokens = maxModelTokens - tokenCount;
-    return { max_tokens, messages };
+    return { messages };
   }
 
   async function sendMessage(inputValue = inputContent, systemMessage = chatConfig.systemMessage) {
@@ -229,7 +228,7 @@ export default function Page() {
     }
 
     try {
-      const { messages, max_tokens } = buildRequestMessages(messageList, question, conversationId, systemMessage);
+      const { messages } = buildRequestMessages(messageList, question, conversationId, systemMessage);
       const response = await fetch("/api/generate", {
         method: "POST",
         signal: abortController.signal,
@@ -241,7 +240,6 @@ export default function Page() {
           config: {
             temperature: chatConfig.temperature ? Number(chatConfig.temperature) : undefined,
             top_p: chatConfig.top_p ? Number(chatConfig.top_p) : undefined,
-            max_tokens,
           },
         }),
       });
