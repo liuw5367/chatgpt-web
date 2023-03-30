@@ -50,7 +50,7 @@
 
 ## 环境变量
 
-以下是支持的环境变量，非 PUBLIC 开头的环境变量只在 `/pages/api/` 调用
+以下是支持的环境变量，非 `PUBLIC_` 开头的环境变量只在 `/pages/api/` 调用
 
 - `OPENAI_API_KEY`
 - `OPENAI_API_HOST`
@@ -59,9 +59,11 @@
 - `PUBLIC_UNISOUND_AI_KEY`
 - `UNISOUND_AI_SECRET`
 
-问题：不知道为什么非 PUBLIC 开头的环境变量无法读取
+已知问题：部署在 Vercel 中非 `PUBLIC_` 开头的环境变量在 `/api` 服务端中无法读取。
 
-临时添加以下环境变量
+当前使用的是 `@astrojs/vercel/edge`，但是测试发现 `@astrojs/vercel/serverless` 是正常的，应该是 astrojs 的 bug
+
+临时添加以下环境变量，客户端页面中未读取这些环境变量可放心使用
 
 - `PUBLIC_OPENAI_API_KEY`
 - `PUBLIC_OPENAI_API_HOST`
