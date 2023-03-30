@@ -56,7 +56,6 @@ specifiers:
   typescript: ^5.0.2
   unocss: ^0.50.6
   uuid: ^9.0.0
-  vite-plugin-package-version: ^1.0.2
   vite-plugin-pwa: ^0.14.7
   workbox-window: ^6.5.4
 
@@ -119,7 +118,6 @@ devDependencies:
   punycode: 2.3.0
   typescript: 5.0.2
   unocss: 0.50.6
-  vite-plugin-package-version: 1.0.2
   vite-plugin-pwa: 0.14.7_workbox-window@6.5.4
 
 packages:
@@ -8352,12 +8350,6 @@ packages:
       is-buffer: 2.0.5
       unist-util-stringify-position: 3.0.3
       vfile-message: 3.1.4
-
-  /vite-plugin-package-version/1.0.2:
-    resolution: {integrity: sha512-xCJMR0KD4rqSUwINyHJlLizio2VzYzaMrRkqC9xWaVGXgw1lIrzdD+wBUf1XDM8EhL1JoQ7aykLOfKrlZd1SoQ==}
-    peerDependencies:
-      vite: '>=2.0.0-beta.69'
-    dev: true
 
   /vite-plugin-pwa/0.14.7_workbox-window@6.5.4:
     resolution: {integrity: sha512-dNJaf0fYOWncmjxv9HiSa2xrSjipjff7IkYE5oIUJ2x5HKu3cXgA8LRgzOwTc5MhwyFYRSU0xyN0Phbx3NsQYw==}

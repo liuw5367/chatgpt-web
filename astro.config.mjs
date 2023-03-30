@@ -7,7 +7,6 @@ import AstroPWA from "@vite-pwa/astro";
 import { defineConfig } from "astro/config";
 import { presetAttributify, presetIcons, presetUno, transformerVariantGroup } from "unocss";
 import unocss from "unocss/astro";
-import loadVersion from "vite-plugin-package-version";
 
 import disableBlocks from "./plugins/disableBlocks";
 import { APP_NAME } from "./src/constants";
@@ -30,7 +29,6 @@ export default defineConfig({
       // conflict highlight.js
       // __DATE__: `'${new Date().toISOString()}'`,
     },
-    plugins: [loadVersion()],
     build: {
       chunkSizeWarningLimit: 1300,
       rollupOptions: {
