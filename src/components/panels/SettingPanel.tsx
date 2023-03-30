@@ -66,7 +66,7 @@ const voiceList: ListItemType[] = [
 ];
 
 export function SettingPanel() {
-  const toast = useToast({ position: "top", duration: 2000 });
+  const toast = useToast({ position: "top", duration: 3000 });
   const chatConfig = useStore(chatConfigAtom);
   const { settingVisible } = useStore(visibleAtom);
 
@@ -103,8 +103,8 @@ export function SettingPanel() {
       });
 
       const json = await response.json();
-      if (json.error) {
-        toast({ status: "error", title: json.error });
+      if (json.error?.code) {
+        toast({ status: "error", title: json.error.code });
       } else {
         const { total_available } = json;
         if (total_available != null && total_available !== "") {

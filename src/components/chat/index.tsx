@@ -24,6 +24,7 @@ import { ASRStatusEnum } from "./ai/ASRView";
 import { getUnisoundKeySecret, hasUnisoundConfig } from "./ai/Config";
 import { TTSStatusEnum } from "./ai/TTSView";
 import { chatConfigAtom, chatDataAtom, conversationAtom } from "./atom";
+import ErrorItem from "./ErrorItem";
 import { MessageItem } from "./MessageItem";
 import { estimateTokens } from "./token";
 import type { ChatMessage } from "./type";
@@ -47,6 +48,8 @@ export default function Page() {
   const toast = useToast({ position: "top", duration: 2000 });
   /** 页面第一次加载，因为是从 localstorage 中获取的，导致多触发了一次 */
   const promptFlag = useRef(true);
+
+  const [errorItem, setErrorItem] = useState<{ code: string; message?: string }>();
 
   useEffect(() => {
     scrollToPageBottom({ behavior: "auto" });
@@ -87,10 +90,6 @@ export default function Page() {
     const config = getUnisoundKeySecret();
     if (!config.KEY) {
       toast({ status: "error", title: "please enter unisound APPKEY" });
-      return true;
-    }
-    if (!config.SECRET) {
-      toast({ status: "error", title: "please enter unisound SECRET" });
       return true;
     }
     return false;
@@ -198,6 +197,7 @@ export default function Page() {
       return;
     }
     stopTTS();
+    setErrorItem(undefined);
 
     const question: ChatMessage = {
       id: uuid(),
@@ -246,8 +246,19 @@ export default function Page() {
         }),
       });
 
-      if (!response.ok || !response.body) {
-        toast({ status: "error", title: "Request Error" });
+      if (!response.ok) {
+        const json = await response.json();
+        if (json?.error?.code || json?.error?.message) {
+          setErrorItem(json.error as any);
+          scrollToPageBottom();
+        } else {
+          toast({ status: "error", title: "Request Error" });
+        }
+        setChatLoading(false);
+        return;
+      }
+      if (!response.body) {
+        toast({ status: "warning", title: "No Data" });
         setChatLoading(false);
         return;
       }
@@ -429,6 +440,7 @@ export default function Page() {
             }}
           />
         )}
+        <ErrorItem error={errorItem} onClose={() => setErrorItem(undefined)} />
         <div id="chat-bottom" />
       </div>
       {chatLoading && <Progress size="xs" isIndeterminate />}

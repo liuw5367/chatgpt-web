@@ -5,12 +5,12 @@ import { buildError, getEnv } from "./_utils";
 export const post: APIRoute = async (context) => {
   const body = await context.request.json();
   const env = getEnv();
-  const host = body.host || env.HOST || "https://api.openai.com";
+  const host = body.host || env.HOST;
   const apiKey = body.apiKey || env.KEY;
   const config = body.config || {};
 
   if (!apiKey) {
-    return new Response(buildError("NO API KEY"));
+    return buildError({ code: "No Api Key" }, 401);
   }
 
   try {
@@ -26,8 +26,8 @@ export const post: APIRoute = async (context) => {
         ...config,
       }),
     });
-  } catch (e) {
+  } catch (e: Error) {
     console.log("images generations error:", e);
-    return new Response(buildError(e.toString()));
+    return buildError({ code: e.name, message: e.message }, 500);
   }
 };

@@ -6,6 +6,11 @@ export function getEnv() {
   return { HOST, KEY, MODEL };
 }
 
-export function buildError(error: string) {
-  return JSON.stringify({ error });
+export interface ResponseError {
+  code: string;
+  message?: string;
+}
+
+export function buildError(error: ResponseError, status = 400) {
+  return new Response(JSON.stringify({ error }), { status });
 }

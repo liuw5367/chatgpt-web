@@ -5,10 +5,11 @@ import { buildError, getEnv } from "./_utils";
 export const post: APIRoute = async (context) => {
   const body = await context.request.json();
   const env = getEnv();
-  const host = body.host || env.HOST || "https://api.openai.com";
+  const host = body.host || env.HOST;
   const apiKey = body.apiKey || env.KEY;
 
   if (!apiKey) {
+    // 没有 key 不需要提示
     return new Response("{}");
   }
 
@@ -20,8 +21,8 @@ export const post: APIRoute = async (context) => {
         Authorization: `Bearer ${apiKey}`,
       },
     });
-  } catch (e) {
+  } catch (e: Error) {
     console.log("balance error:", e);
-    return new Response(buildError(e.toString()));
+    return buildError({ code: e.name, message: e.message }, 500);
   }
 };

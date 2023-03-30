@@ -8,7 +8,7 @@ import { chatConfigAtom } from "../chat/atom";
 import SimpleDrawer from "../SimpleDrawer";
 
 export function ImagePanel() {
-  const toast = useToast({ position: "top", duration: 2000 });
+  const toast = useToast({ position: "top", duration: 3000 });
 
   const chatConfig = useStore(chatConfigAtom);
   const { imageVisible } = useStore(visibleAtom);
@@ -30,7 +30,7 @@ export function ImagePanel() {
 
   async function handleSend() {
     if (!prompt?.trim()) {
-      toast({ status: "info", title: "please enter content" });
+      toast({ status: "info", title: "please enter prompt" });
       return;
     }
     setLoading(true);
@@ -49,8 +49,8 @@ export function ImagePanel() {
       });
 
       const json = await response.json();
-      if (json.error) {
-        toast({ status: "error", title: json.error });
+      if (json.error?.code) {
+        toast({ status: "error", title: json.error.code });
       } else {
         if (json.data && Array.isArray(json.data)) {
           setImageList(json.data.map((v) => v.url));
