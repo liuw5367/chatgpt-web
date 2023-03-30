@@ -1,12 +1,26 @@
-import { defineConfig } from "astro/config";
-
+import netlify from "@astrojs/netlify/edge-functions";
+import node from "@astrojs/node";
 import react from "@astrojs/react";
 import vercel from "@astrojs/vercel/edge";
-import unocss from "unocss/astro";
-import { presetUno, presetAttributify, transformerVariantGroup, presetIcons } from "unocss";
 import tabler from "@iconify-json/tabler/icons.json";
 import AstroPWA from "@vite-pwa/astro";
+import { defineConfig } from "astro/config";
+import { presetAttributify, presetIcons, presetUno, transformerVariantGroup } from "unocss";
+import unocss from "unocss/astro";
+import loadVersion from "vite-plugin-package-version";
+
+import disableBlocks from "./plugins/disableBlocks";
 import { APP_NAME } from "./src/constants";
+
+const envAdapter = () => {
+  if (process.env.OUTPUT === "vercel") {
+    return vercel();
+  } else if (process.env.OUTPUT === "netlify") {
+    return netlify();
+  } else {
+    return node({ mode: "standalone" });
+  }
+};
 
 // https://astro.build/config
 export default defineConfig({
@@ -16,6 +30,7 @@ export default defineConfig({
       // conflict highlight.js
       // __DATE__: `'${new Date().toISOString()}'`,
     },
+    plugins: [loadVersion()],
     build: {
       chunkSizeWarningLimit: 1300,
       rollupOptions: {
@@ -32,7 +47,7 @@ export default defineConfig({
     },
   },
   output: "server",
-  adapter: vercel(),
+  adapter: envAdapter(),
   server: { host: true },
   integrations: [
     unocss({
@@ -58,42 +73,45 @@ export default defineConfig({
       ],
     }),
     react(),
-    AstroPWA({
-      mode: "development",
-      base: "/",
-      scope: "/",
-      includeAssets: ["favicon.svg"],
-      manifest: {
-        name: APP_NAME,
-        short_name: APP_NAME,
-        theme_color: "#ffffff",
-        icons: [
-          {
-            src: "favicon-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-          },
-          {
-            src: "favicon-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-          },
-          {
-            src: "favicon-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any maskable",
-          },
-        ],
-      },
-      workbox: {
-        navigateFallback: "/404",
-        globPatterns: ["**/*.{css,js,html,svg,png,ico,txt}"],
-      },
-      devOptions: {
-        enabled: false,
-        navigateFallbackAllowlist: [/^\/404$/],
-      },
-    }),
+    process.env.OUTPUT === "vercel" && disableBlocks(),
+    process.env.OUTPUT === "netlify" && disableBlocks("netlify"),
+    process.env.OUTPUT !== "netlify" &&
+      AstroPWA({
+        mode: "development",
+        base: "/",
+        scope: "/",
+        includeAssets: ["favicon.svg"],
+        manifest: {
+          name: APP_NAME,
+          short_name: APP_NAME,
+          theme_color: "#ffffff",
+          icons: [
+            {
+              src: "favicon-192x192.png",
+              sizes: "192x192",
+              type: "image/png",
+            },
+            {
+              src: "favicon-512x512.png",
+              sizes: "512x512",
+              type: "image/png",
+            },
+            {
+              src: "favicon-512x512.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "any maskable",
+            },
+          ],
+        },
+        workbox: {
+          navigateFallback: "/404",
+          globPatterns: ["**/*.{css,js,html,svg,png,ico,txt}"],
+        },
+        devOptions: {
+          enabled: false,
+          navigateFallbackAllowlist: [/^\/404$/],
+        },
+      }),
   ],
 });

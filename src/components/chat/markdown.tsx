@@ -1,6 +1,3 @@
-import "highlight.js/styles/github-dark.css";
-import "github-markdown-css";
-
 import type { HLJSApi, LanguageFn } from "highlight.js";
 import hljs from "highlight.js";
 import MarkdownIt from "markdown-it";

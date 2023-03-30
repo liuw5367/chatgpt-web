@@ -91,7 +91,7 @@ export function SystemPromptPanel() {
   function handleRemoveClick() {
     const { conversationId } = conversationAtom.get();
     if (!conversationId) {
-      toast({ status: "success", title: "Remove Success" });
+      toast({ status: "success", title: "Removed" });
     }
     updateSystemPrompt();
     handleClear();

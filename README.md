@@ -1,6 +1,8 @@
 # ChatGPT
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fliuw5367%2Fchatgpt-asr-tts)
+[![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/liuw5367/chatgpt-asr-tts)
+
 
 ## 功能
 
@@ -50,7 +52,7 @@
 
 ## 环境变量
 
-以下是支持的环境变量
+以下是支持的环境变量，非 PUBLIC 开头的环境变量只在 `/pages/api/` 调用
 
 - `OPENAI_API_KEY`
 - `OPENAI_API_HOST`
@@ -59,9 +61,9 @@
 - `PUBLIC_UNISOUND_AI_KEY`
 - `UNISOUND_AI_SECRET`
 
-问题：不知道为什么环境变量无法读取
+问题：不知道为什么非 PUBLIC 开头的环境变量无法读取
 
-临时添加以下环境变量。因为只在服务端使用的，所以不用担心在浏览器端泄漏
+临时添加以下环境变量
 
 - `PUBLIC_OPENAI_API_KEY`
 - `PUBLIC_OPENAI_API_HOST`

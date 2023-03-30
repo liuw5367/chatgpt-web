@@ -1,6 +1,6 @@
 {
   "name": "astro-gpt",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "type": "module",
   "private": true,
   "scripts": {
@@ -8,10 +8,14 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "build:vercel": "OUTPUT=vercel astro build",
+    "build:netlify": "OUTPUT=netlify astro build",
     "astro": "astro",
     "eslint": "eslint src --quiet --fix --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@astrojs/netlify": "^2.2.0",
+    "@astrojs/node": "^5.1.0",
     "@astrojs/react": "^2.1.0",
     "@astrojs/vercel": "^3.2.1",
     "@chakra-ui/react": "^2.5.4",
@@ -32,6 +36,7 @@
     "gpt3-tokenizer": "^1.1.5",
     "highlight.js": "^11.7.0",
     "js-sha256": "^0.9.0",
+    "katex": "^0.16.4",
     "markdown-it": "^13.0.1",
     "markdown-it-code-copy": "^0.1.1",
     "markdown-it-katex": "^2.0.3",
@@ -67,6 +72,7 @@
     "punycode": "^2.3.0",
     "typescript": "^5.0.2",
     "unocss": "^0.50.6",
+    "vite-plugin-package-version": "^1.0.2",
     "vite-plugin-pwa": "^0.14.7"
   }
 }
