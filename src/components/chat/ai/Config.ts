@@ -1,16 +1,15 @@
-const ENV_KEY = import.meta.env.UNISOUND_AI_KEY;
-const ENV_SECRET = import.meta.env.UNISOUND_AI_SECRET;
+const ENV_KEY = import.meta.env.PUBLIC_UNISOUND_AI_KEY;
 
 export function getUnisoundKeySecret() {
   return {
     KEY: localStorage.getItem("unisoundAppKey") || ENV_KEY,
-    SECRET: localStorage.getItem("unisoundSecret") || ENV_SECRET,
+    SECRET: localStorage.getItem("unisoundSecret") || undefined,
   };
 }
 
 export function hasUnisoundConfig(): boolean {
   const config = getUnisoundKeySecret();
-  return config.KEY && config.SECRET;
+  return config.KEY;
 }
 
 export const APP_CONFIG = {

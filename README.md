@@ -56,8 +56,17 @@
 - `OPENAI_API_HOST`
 - `OPENAI_API_MODEL`
 
-- `UNISOUND_AI_KEY`
+- `PUBLIC_UNISOUND_AI_KEY`
 - `UNISOUND_AI_SECRET`
+
+问题：不知道为什么环境变量无法读取
+
+临时添加以下环境变量。因为只在服务端使用的，所以不用担心在浏览器端泄漏
+
+- `PUBLIC_OPENAI_API_KEY`
+- `PUBLIC_OPENAI_API_HOST`
+- `PUBLIC_OPENAI_API_MODEL`
+- `PUBLIC_UNISOUND_AI_SECRET`
 
 ## 感谢
 

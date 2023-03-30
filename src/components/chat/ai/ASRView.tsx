@@ -99,7 +99,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     );
   }
 
-  function createSocket() {
+  async function createSocket() {
     let sid: any;
 
     const chatConfig = getUnisoundKeySecret();
@@ -107,7 +107,27 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     const secret = chatConfig.SECRET;
     const path = ASR_CONFIG.SOCKET_URL;
     const time: number = +new Date();
-    const sign = sha256(`${appKey}${time}${secret}`).toUpperCase();
+    let sign: string;
+    if (secret) {
+      sign = sha256(`${appKey}${time}${secret}`).toUpperCase();
+    } else {
+      try {
+        const response = await fetch("/api/unisound", {
+          method: "POST",
+          body: JSON.stringify({ key: appKey, time }),
+        });
+        if (!response.ok) {
+          const json = await response.json();
+          throw Error(json?.error?.code);
+        }
+        const json = await response.json();
+        sign = json.sign;
+      } catch (e: Error) {
+        console.log(e);
+        alert(e.message || "asr sign error");
+        return;
+      }
+    }
 
     const socket = new WebSocket(`${path}?appkey=${appKey}&time=${time}&sign=${sign}`);
     socketRef.current = socket;

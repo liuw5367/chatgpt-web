@@ -2,7 +2,7 @@ import { useMemoizedFn } from "ahooks";
 import { sha256 } from "js-sha256";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 
-import { getUnisoundKeySecret, Speaker, TTS_CONFIG } from "./Config";
+import { ASR_CONFIG, getUnisoundKeySecret, Speaker, TTS_CONFIG } from "./Config";
 import PCMPlayer from "./PCMPlayer";
 
 export enum TTSStatusEnum {
@@ -47,7 +47,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     };
   }, []);
 
-  const startTts = useMemoizedFn((inputContent: string) => {
+  const startTts = useMemoizedFn(async (inputContent: string) => {
     if (!inputContent.trim()) return;
     let content = inputContent;
     if (content.length > 500) {
@@ -58,7 +58,27 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     const appKey = chatConfig.KEY;
     const secret = chatConfig.SECRET;
     const time: number = +new Date();
-    const sign = sha256(`${appKey}${time}${secret}`).toUpperCase();
+    let sign: string;
+    if (secret) {
+      sign = sha256(`${appKey}${time}${secret}`).toUpperCase();
+    } else {
+      try {
+        const response = await fetch("/api/unisound", {
+          method: "POST",
+          body: JSON.stringify({ key: appKey, time }),
+        });
+        if (!response.ok) {
+          const json = await response.json();
+          throw Error(json?.error?.code);
+        }
+        const json = await response.json();
+        sign = json.sign;
+      } catch (e: Error) {
+        console.log(e);
+        alert(e.message || "asr sign error");
+        return;
+      }
+    }
 
     try {
       new window.AudioContext();
