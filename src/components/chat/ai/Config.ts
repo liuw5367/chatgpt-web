@@ -9,7 +9,7 @@ export function getUnisoundKeySecret() {
 
 export function hasUnisoundConfig(): boolean {
   const config = getUnisoundKeySecret();
-  return config.KEY;
+  return config.KEY != null && config.KEY !== "";
 }
 
 /** 官方 demo 中有这个。应该是区分用户的，可以随便填 */

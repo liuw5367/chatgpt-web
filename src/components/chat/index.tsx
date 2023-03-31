@@ -46,10 +46,10 @@ export default function Page() {
   const chatConfig = useStore(chatConfigAtom);
 
   const toast = useToast({ position: "top", duration: 2000 });
-  /** 页面第一次加载，因为是从 localstorage 中获取的，导致多触发了一次 */
+  /** 页面第一次加载，因为是从 localStorage 中获取的，导致多触发了一次 */
   const promptFlag = useRef(true);
 
-  const [errorItem, setErrorItem] = useState<{ code: string; message?: string }>();
+  const [errorInfo, setErrorInfo] = useState<{ code: string; message?: string }>();
 
   useEffect(() => {
     scrollToPageBottom({ behavior: "auto" });
@@ -196,7 +196,7 @@ export default function Page() {
       return;
     }
     stopTTS();
-    setErrorItem(undefined);
+    setErrorInfo(undefined);
 
     const question: ChatMessage = {
       id: uuid(),
@@ -247,7 +247,7 @@ export default function Page() {
       if (!response.ok) {
         const json = await response.json();
         if (json?.error?.code || json?.error?.message) {
-          setErrorItem(json.error as any);
+          setErrorInfo(json.error as any);
           scrollToPageBottom();
         } else {
           toast({ status: "error", title: "Request Error" });
@@ -344,7 +344,7 @@ export default function Page() {
   }
 
   const actions = (
-    <div className="flex flex-row flex-wrap items-center justify-between lg:justify-start space-x-0 lg:space-x-3">
+    <div className="flex flex-row flex-wrap items-center justify-between space-x-0 lg:space-x-3">
       <div className="mb-4 flex flex-row items-center space-x-3">
         <Button
           onClick={() => handleSendClick()}
@@ -411,68 +411,73 @@ export default function Page() {
     </div>
   );
 
+  const pageWidth = "md:max-w-160 lg:max-w-200 xl:max-w-240";
+
   return (
     <div className="w-full h-full flex flex-col">
-      <div className={`w-full flex-1 p-4 pb-0 overflow-y-auto overflow-x-hidden`}>
-        {messageList?.map((item) => (
-          <MessageItem
-            key={item.id}
-            item={item}
-            onDelete={handleMessageDelete}
-            onPlay={(item) => playTTS(item.content)}
-            onRegenerate={handleRegenerate}
-            onRetry={(item) => {
-              setInputContent(item.content);
-              updateConversationId(item.conversationId);
-              updateSystemPrompt(item.prompt);
-            }}
-          />
-        ))}
-        {currentAssistantMessage && (
-          <MessageItem
-            key={"-1"}
-            item={{
-              id: "-1",
-              role: "assistant",
-              content: currentAssistantMessage,
-            }}
-          />
-        )}
-        <ErrorItem error={errorItem} onClose={() => setErrorItem(undefined)} />
-        <div id="chat-bottom" />
+      <div className={`w-full flex-1 p-4 pb-0 flex flex-col items-center overflow-y-auto overflow-x-hidden`}>
+        <div className={`flex flex-col ${pageWidth}`}>
+          {messageList?.map((item) => (
+            <MessageItem
+              key={item.id}
+              item={item}
+              onDelete={handleMessageDelete}
+              onPlay={(item) => playTTS(item.content)}
+              onRegenerate={handleRegenerate}
+              onRetry={(item) => {
+                setInputContent(item.content);
+                updateConversationId(item.conversationId);
+                updateSystemPrompt(item.prompt);
+              }}
+            />
+          ))}
+          {currentAssistantMessage && (
+            <MessageItem
+              key={"-1"}
+              item={{
+                id: "-1",
+                role: "assistant",
+                content: currentAssistantMessage,
+              }}
+            />
+          )}
+          <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
+          <div id="chat-bottom" />
+        </div>
       </div>
       {chatLoading && <Progress size="xs" isIndeterminate />}
-      <div className="px-6 pt-4 border-t flex flex-col justify-end space-y-3">
-        <AutoResizeTextarea
-          minRows={2}
-          maxRows={10}
-          className="placeholder:text-[14px]"
-          value={inputContent}
-          placeholder="Shortcuts: ⬆️ / Ctrl + ↩ / ⌘ + ↩"
-          onChange={(e) => setInputContent(e.target.value)}
-          onKeyDown={(e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-              handleSendClick();
-            } else if (e.key === "ArrowUp") {
-              if (!inputContent?.trim()) {
-                const content = [...messageList].reverse().find((v) => v.role === "user" && v.content)?.content;
-                if (content) {
-                  setInputContent(content);
+      <div className={`px-6 pt-4 border-t flex flex-col items-center`}>
+        <div className={`w-full flex flex-col justify-end space-y-3 ${pageWidth}`}>
+          <AutoResizeTextarea
+            minRows={2}
+            maxRows={10}
+            className="placeholder:text-[14px]"
+            value={inputContent}
+            placeholder="Shortcuts: ⬆️ / Ctrl + ↩ / ⌘ + ↩"
+            onChange={(e) => setInputContent(e.target.value)}
+            onKeyDown={(e) => {
+              if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                handleSendClick();
+              } else if (e.key === "ArrowUp") {
+                if (!inputContent?.trim()) {
+                  const content = [...messageList].reverse().find((v) => v.role === "user" && v.content)?.content;
+                  if (content) {
+                    setInputContent(content);
+                  }
                 }
               }
-            }
-          }}
-        />
-        {actions}
-
-        <VoiceView
-          ref={(ref) => (voiceRef.current = ref)}
-          chatLoading={chatLoading}
-          onAsrResultChange={handleAsrResult}
-          onAsrStatusChange={setAsrState}
-          onTtsStatusChange={setTtsState}
-        />
+            }}
+          />
+          {actions}
+        </div>
       </div>
+      <VoiceView
+        ref={(ref) => (voiceRef.current = ref)}
+        chatLoading={chatLoading}
+        onAsrResultChange={handleAsrResult}
+        onAsrStatusChange={setAsrState}
+        onTtsStatusChange={setTtsState}
+      />
     </div>
   );
 }

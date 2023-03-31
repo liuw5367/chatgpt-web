@@ -6,22 +6,26 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
+  DrawerPlacement,
 } from "@chakra-ui/react";
-import React from "react";
+import type React from "react";
 
 interface Props {
   isOpen?: boolean;
-  onClose?: () => void;
+  onClose: () => void;
+
   size?: string;
+  placement?: DrawerPlacement;
+
   header?: React.ReactNode;
   footer?: React.ReactNode;
   children?: React.ReactNode;
 }
 
 export default function SimpleDrawer(props: Props) {
-  const { isOpen, onClose, size = "sm", header, footer, children } = props;
+  const { isOpen = false, onClose, size = "sm", placement = "right", header, footer, children } = props;
   return (
-    <Drawer isOpen={isOpen} size={size} placement="right" onClose={onClose}>
+    <Drawer isOpen={isOpen} size={size} placement={placement} onClose={onClose}>
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
