@@ -1,5 +1,6 @@
 import {
   Button,
+  CloseButton,
   IconButton,
   Popover,
   PopoverBody,
@@ -81,10 +82,17 @@ export function ImagePanel() {
     setAbortController(undefined);
   }
 
+  function updateHistory(data: ImageItem[]) {
+    setHistoryList(data);
+    localStorage.setItem(IMAGE_KEY, JSON.stringify(data));
+  }
+
   function addToHistory(data: ImageItem[]) {
-    const list = [...data, ...historyList];
-    setHistoryList(list);
-    localStorage.setItem(IMAGE_KEY, JSON.stringify(list));
+    updateHistory([...data, ...historyList]);
+  }
+
+  function deleteImage(url: string) {
+    updateHistory(historyList.filter((item) => item.url !== url));
   }
 
   let displayList = imageList;
@@ -128,6 +136,9 @@ export function ImagePanel() {
           {displayList?.map(({ url, prompt }) => (
             <div key={url} className="w-full rounded bg-black/20 relative aspect-square">
               <img src={url} alt={url} className="w-full rounded aspect-square" />
+              <div className="absolute top-1 right-1">
+                <CloseButton size="sm" onClick={() => deleteImage(url)} />
+              </div>
               <div className="absolute bottom-1 right-1 space-x-1">
                 {imageList.length === 0 && (
                   <Popover placement="top">

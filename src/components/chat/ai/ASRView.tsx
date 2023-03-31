@@ -122,9 +122,9 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
         }
         const json = await response.json();
         sign = json.sign;
-      } catch (e: Error) {
+      } catch (e: any) {
         console.log(e);
-        alert(e.message || "asr sign error");
+        alert(e?.message || "asr sign error");
         return;
       }
     }

@@ -24,7 +24,6 @@ const envAdapter = () => {
 // https://astro.build/config
 export default defineConfig({
   vite: {
-    logLevel: "info",
     define: {
       // conflict highlight.js
       // __DATE__: `'${new Date().toISOString()}'`,
@@ -43,6 +42,10 @@ export default defineConfig({
         },
       },
     },
+    plugins: [
+      process.env.OUTPUT === "vercel" && disableBlocks(),
+      process.env.OUTPUT === "netlify" && disableBlocks("netlify"),
+    ],
   },
   output: "server",
   adapter: envAdapter(),
@@ -71,8 +74,6 @@ export default defineConfig({
       ],
     }),
     react(),
-    process.env.OUTPUT === "vercel" && disableBlocks(),
-    process.env.OUTPUT === "netlify" && disableBlocks("netlify"),
     process.env.OUTPUT !== "netlify" &&
       AstroPWA({
         mode: "development",

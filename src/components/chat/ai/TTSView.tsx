@@ -2,7 +2,7 @@ import { useMemoizedFn } from "ahooks";
 import { sha256 } from "js-sha256";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 
-import { ASR_CONFIG, getUnisoundKeySecret, Speaker, TTS_CONFIG } from "./Config";
+import { getUnisoundKeySecret, Speaker, TTS_CONFIG } from "./Config";
 import PCMPlayer from "./PCMPlayer";
 
 export enum TTSStatusEnum {
@@ -73,9 +73,9 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
         }
         const json = await response.json();
         sign = json.sign;
-      } catch (e: Error) {
+      } catch (e: any) {
         console.log(e);
-        alert(e.message || "asr sign error");
+        alert(e?.message || "asr sign error");
         return;
       }
     }

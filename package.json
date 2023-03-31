@@ -1,6 +1,6 @@
 {
   "name": "astro-gpt",
-  "version": "1.5.3",
+  "version": "1.6.0",
   "type": "module",
   "private": true,
   "scripts": {
@@ -14,7 +14,7 @@
     "eslint": "eslint src --quiet --fix --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
-    "@astrojs/netlify": "^2.2.0",
+    "@astrojs/netlify": "2.0.0",
     "@astrojs/node": "^5.1.0",
     "@astrojs/react": "^2.1.0",
     "@astrojs/vercel": "^3.2.1",

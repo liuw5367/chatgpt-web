@@ -12,6 +12,7 @@ export function hasUnisoundConfig(): boolean {
   return config.KEY;
 }
 
+/** 官方 demo 中有这个。应该是区分用户的，可以随便填 */
 export const APP_CONFIG = {
   USER_ID: "abcdefg12345",
   UDID: "abcdefg12345",

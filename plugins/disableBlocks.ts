@@ -7,10 +7,15 @@ export default function plugin(platform?: string) {
       };
     }
     if (platform === "netlify" && id.includes("layouts/Layout.astro")) {
-      return {
-        code: code.replace(/^.*?<!-- netlify-disable-blocks -->([\s\S]+?)<!-- netlify-disable-end -->.*?$/gm, ""),
-        map: null,
-      };
+      let result = code.replace(/^.*?<!-- netlify-disable-blocks -->([\s\S]+?)<!-- netlify-disable-end -->.*?$/gm, "");
+      try {
+        result = result.replace(/^.*?import ReloadPrompt([\s\S]+?).astro";.*?$/gm, "");
+        result = result.replace(/^.*?import LinkTag([\s\S]+?).astro";.*?$/gm, "");
+      } catch (e) {
+        console.log(e);
+      }
+
+      return { code: result, map: null };
     }
   };
 
