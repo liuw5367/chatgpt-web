@@ -165,6 +165,7 @@ export function SystemPromptPanel() {
           value={prompt ?? ""}
           onChange={(e) => setPrompt(e.target.value)}
           className="flex-1 !min-h-[50%] text-[14px] placeholder:text-[14px]"
+          placeholder="place enter prompt"
         />
 
         <div className="flex flex-row items-center justify-between space-x-2">

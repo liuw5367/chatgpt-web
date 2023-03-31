@@ -61,7 +61,7 @@ const chatConfigList: ListItemType[] = [
 ];
 
 const voiceList: ListItemType[] = [
-  { label: "Unisound APPKEY", value: "unisoundAppKey", type: "password", placeholder: "https://ai.unisound.com" },
+  { label: "Unisound APPKEY", value: "unisoundAppKey", placeholder: "https://ai.unisound.com" },
   { label: "Unisound SECRET", value: "unisoundSecret", type: "password", placeholder: "https://ai.unisound.com" },
 ];
 
@@ -104,7 +104,7 @@ export function SettingPanel() {
 
       const json = await response.json();
       if (json.error?.code) {
-        toast({ status: "error", title: json.error.code });
+        // toast({ status: "error", title: json.error.code, description: json.error.message });
       } else {
         const { total_available } = json;
         if (total_available != null && total_available !== "") {
@@ -112,7 +112,7 @@ export function SettingPanel() {
         }
       }
     } catch (e) {
-      toast({ status: "error", title: e.toString() });
+      // toast({ status: "error", title: e.toString() });
     }
   }
 

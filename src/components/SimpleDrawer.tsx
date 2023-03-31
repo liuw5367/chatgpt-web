@@ -26,7 +26,7 @@ export default function SimpleDrawer(props: Props) {
       <DrawerContent>
         <DrawerCloseButton />
         <DrawerHeader>{header}</DrawerHeader>
-        <DrawerBody>{children}</DrawerBody>
+        <DrawerBody className="!overflow-x-hidden">{children}</DrawerBody>
         {footer && <DrawerFooter>{footer}</DrawerFooter>}
       </DrawerContent>
     </Drawer>

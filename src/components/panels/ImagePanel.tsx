@@ -1,11 +1,26 @@
-import { Button, IconButton, SimpleGrid, Textarea, useToast } from "@chakra-ui/react";
+import {
+  Button,
+  IconButton,
+  Popover,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
+  SimpleGrid,
+  useToast,
+} from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
-import { IconEraser } from "@tabler/icons-react";
+import { IconEraser, IconExternalLink, IconHistory, IconInfoSquare } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 
 import { visibleAtom } from "../atom";
+import { AutoResizeTextarea } from "../AutoResizeTextarea";
 import { chatConfigAtom } from "../chat/atom";
 import SimpleDrawer from "../SimpleDrawer";
+
+type ImageItem = { prompt: string; url: string };
+const IMAGE_KEY = "image-create-history";
 
 export function ImagePanel() {
   const toast = useToast({ position: "top", duration: 3000 });
@@ -16,7 +31,8 @@ export function ImagePanel() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [chatAbortController, setAbortController] = useState<AbortController>();
-  const [imageList, setImageList] = useState<string[]>([]);
+  const [historyList, setHistoryList] = useState<ImageItem[]>(JSON.parse(localStorage.getItem(IMAGE_KEY) || "[]"));
+  const [imageList, setImageList] = useState<ImageItem[]>([]);
 
   useEffect(() => {
     return () => {
@@ -50,10 +66,12 @@ export function ImagePanel() {
 
       const json = await response.json();
       if (json.error?.code) {
-        toast({ status: "error", title: json.error.code });
+        toast({ status: "error", title: json.error.code, description: json.error.message });
       } else {
         if (json.data && Array.isArray(json.data)) {
-          setImageList(json.data.map((v) => v.url));
+          const data = json.data.map(({ url }) => ({ prompt, url }));
+          setImageList(data);
+          addToHistory(data);
         }
       }
     } catch (e) {
@@ -63,39 +81,82 @@ export function ImagePanel() {
     setAbortController(undefined);
   }
 
+  function addToHistory(data: ImageItem[]) {
+    const list = [...data, ...historyList];
+    setHistoryList(list);
+    localStorage.setItem(IMAGE_KEY, JSON.stringify(list));
+  }
+
+  let displayList = imageList;
+  if (displayList == null || displayList.length === 0) {
+    displayList = historyList;
+  }
+
   return (
     <SimpleDrawer isOpen={imageVisible} onClose={handleClose} size="lg" header={<>Image Create</>}>
       <div className="w-full h-full flex flex-col space-y-3">
-        <Textarea
+        <AutoResizeTextarea
           className="min-h-[84px]"
-          rows={3}
+          minRows={3}
+          maxRows={10}
           placeholder="please enter prompt"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
         />
-        <div className="flex flex-row space-x-3 justify-end">
+        <div className="flex flex-row space-x-3 justify-between">
           <IconButton
-            aria-label="Eraser"
-            onClick={() => setPrompt("")}
+            aria-label="History"
+            onClick={() => setImageList([])}
             colorScheme="gray"
             variant="solid"
-            icon={<IconEraser stroke={1.5} />}
+            icon={<IconHistory stroke={1.5} />}
           />
-          <Button colorScheme="teal" onClick={handleSend} isLoading={loading}>
-            Generate
-          </Button>
+          <div className="flex flex-row space-x-3">
+            <IconButton
+              aria-label="Eraser"
+              onClick={() => setPrompt("")}
+              colorScheme="gray"
+              variant="solid"
+              icon={<IconEraser stroke={1.5} />}
+            />
+            <Button colorScheme="teal" onClick={handleSend} isLoading={loading} loadingText="Generating">
+              Generate
+            </Button>
+          </div>
         </div>
         <SimpleGrid columns={2} spacing={2} className="pb-4">
-          {imageList?.map((url) => (
-            <img
-              key={url}
-              src={url}
-              alt={url}
-              className="w-full rounded bg-black/20"
-              onClick={() => {
-                window.open(url, "_blank");
-              }}
-            />
+          {displayList?.map(({ url, prompt }) => (
+            <div key={url} className="w-full rounded bg-black/20 relative aspect-square">
+              <img src={url} alt={url} className="w-full rounded aspect-square" />
+              <div className="absolute bottom-1 right-1 space-x-1">
+                {imageList.length === 0 && (
+                  <Popover placement="top">
+                    <PopoverTrigger>
+                      <IconButton
+                        size="sm"
+                        aria-label="Info"
+                        colorScheme="blackAlpha"
+                        icon={<IconInfoSquare stroke={1.5} />}
+                      />
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <PopoverHeader fontWeight="semibold">Prompt</PopoverHeader>
+                      {/* <PopoverArrow /> */}
+                      <PopoverCloseButton />
+                      <PopoverBody className="text-[14px]">{prompt}</PopoverBody>
+                    </PopoverContent>
+                  </Popover>
+                )}
+
+                <IconButton
+                  size="sm"
+                  aria-label="OpenExternal"
+                  icon={<IconExternalLink stroke={1.5} />}
+                  colorScheme="blackAlpha"
+                  onClick={() => window.open(url, "_blank")}
+                />
+              </div>
+            </div>
           ))}
         </SimpleGrid>
       </div>
