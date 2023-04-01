@@ -15,8 +15,7 @@ import { useStore } from "@nanostores/react";
 import { useEffect, useState } from "react";
 
 import { APP_VERSION } from "../../constants";
-import { visibleAtom } from "../atom";
-import { chatConfigAtom } from "../chat/atom";
+import { chatConfigAtom, visibleAtom } from "../atom";
 import { PasswordInput } from "../PasswordInput";
 import SimpleDrawer from "../SimpleDrawer";
 
@@ -163,7 +162,7 @@ export function SettingPanel() {
           <Button variant="outline" mr={3} onClick={handleClose}>
             Cancel
           </Button>
-          <Button colorScheme="blue" onClick={handleSaveClick}>
+          <Button colorScheme="teal" onClick={handleSaveClick}>
             Save
           </Button>
         </>

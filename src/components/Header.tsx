@@ -1,9 +1,9 @@
 import { IconButton, useColorMode } from "@chakra-ui/react";
-import { IconMoonStars, IconPhoto, IconRobot, IconSettings, IconSun } from "@tabler/icons-react";
+import { IconMenu2, IconMoonStars, IconPhoto, IconSettings, IconSun } from "@tabler/icons-react";
 import { Helmet } from "react-helmet";
 
-import { APP_NAME } from "../constants";
 import { visibleAtom } from "./atom";
+import { Logo } from "./Logo";
 
 export function Header() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -14,8 +14,13 @@ export function Header() {
       style={{ backgroundColor: "var(--chakra-colors-chakra-body-bg)" }}
     >
       <div className="flex items-center space-x-2 font-medium">
-        <IconRobot size="2rem" stroke={1.5} className="fill-teal-600" />
-        <div className="tracking-wider font-bold">{APP_NAME}</div>
+        <Logo />
+        <IconButton
+          aria-label="ChatList"
+          variant="ghost"
+          icon={<IconMenu2 stroke={1.5} />}
+          onClick={() => visibleAtom.set({ ...visibleAtom.get(), chatVisible: true })}
+        />
       </div>
 
       <div className="flex flex-row items-center space-x-1">
@@ -26,7 +31,7 @@ export function Header() {
           onClick={() => visibleAtom.set({ ...visibleAtom.get(), settingVisible: true })}
         />
         <IconButton
-          aria-label="Image Create"
+          aria-label="ImageCreate"
           variant="ghost"
           icon={<IconPhoto stroke={1.5} />}
           onClick={() => visibleAtom.set({ ...visibleAtom.get(), imageVisible: true })}

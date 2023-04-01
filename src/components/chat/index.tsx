@@ -14,24 +14,25 @@ import {
   IconPlayerPause,
   IconPlayerPlay,
 } from "@tabler/icons-react";
-import { useDebounceEffect, useUpdateEffect } from "ahooks";
-import React, { useEffect, useRef, useState } from "react";
+import { useDebounceEffect } from "ahooks";
+import React, { useEffect, useState } from "react";
 
-import { visibleAtom } from "../atom";
+import { Cache } from "../../constants";
+import { chatAtom, chatConfigAtom, chatDataAtom, visibleAtom } from "../atom";
 import { AutoResizeTextarea } from "../AutoResizeTextarea";
+import type { ChatMessage } from "../types";
+import { getCurrentTime, removeLn, scrollToElement, uuid } from "../utils";
 import VoiceView, { VoiceRef } from "./ai";
 import { ASRStatusEnum } from "./ai/ASRView";
 import { getUnisoundKeySecret, hasUnisoundConfig } from "./ai/Config";
 import { TTSStatusEnum } from "./ai/TTSView";
-import { chatConfigAtom, chatDataAtom, conversationAtom } from "./atom";
 import ErrorItem from "./ErrorItem";
 import { MessageItem } from "./MessageItem";
 import { estimateTokens } from "./token";
-import type { ChatMessage } from "./type";
-import { getCurrentTime, removeLn, scrollToElement, uuid } from "./utils";
 
 export default function Page() {
-  const { conversationId } = useStore(conversationAtom);
+  const { currentChat } = useStore(chatAtom);
+  const { conversationId } = currentChat;
   const [inputContent, setInputContent] = useState("");
   const [currentAssistantMessage, setCurrentAssistantMessage] = useState("");
 
@@ -45,9 +46,7 @@ export default function Page() {
 
   const chatConfig = useStore(chatConfigAtom);
 
-  const toast = useToast({ position: "top", duration: 2000 });
-  /** 页面第一次加载，因为是从 localStorage 中获取的，导致多触发了一次 */
-  const promptFlag = useRef(true);
+  const toast = useToast({ position: "top", duration: 3000 });
 
   const [errorInfo, setErrorInfo] = useState<{ code: string; message?: string }>();
 
@@ -56,23 +55,12 @@ export default function Page() {
   }, []);
 
   useDebounceEffect(() => {
-    localStorage.setItem("messages", JSON.stringify(messageList));
+    localStorage.setItem(chatAtom.get().currentChat.id, JSON.stringify(messageList));
   }, [messageList]);
 
-  useUpdateEffect(() => {
-    if (promptFlag.current) {
-      promptFlag.current = false;
-      return;
-    }
-    const { conversationId } = conversationAtom.get();
-    if (!promptFlag.current && conversationId) {
-      toast({
-        status: "info",
-        title: "System Prompt 变化，将开启新的对话",
-        description: "若是点击重新生成按钮触发，将延续对应的对话",
-      });
-    }
-  }, [chatConfig.systemMessage]);
+  useEffect(() => {
+    setErrorInfo(undefined);
+  }, [currentChat.id]);
 
   function stopTTS() {
     voiceRef.current?.stopTts();
@@ -102,7 +90,7 @@ export default function Page() {
       stopTTS();
     } else {
       const data = [...messageList].filter((v) => v.role === "assistant").reverse();
-      const content = data?.[0].content;
+      const content = data?.[0]?.content;
       if (content) {
         voiceRef.current?.stopAsr();
         playTTS(content);
@@ -163,7 +151,7 @@ export default function Page() {
     if (conversationId) {
       const conversationList = [...messageList.filter((v) => v.conversationId === conversationId)].reverse();
       conversationList.some((item) => {
-        const token = tokenCount + item.token || 0;
+        const token = tokenCount + (item.token || 0);
         if (token > maxTokens) {
           // 已超出 token 数量限制，跳出
           return true;
@@ -185,7 +173,7 @@ export default function Page() {
     return { messages };
   }
 
-  async function sendMessage(inputValue = inputContent, systemMessage = chatConfig.systemMessage) {
+  async function sendMessage(inputValue = inputContent, systemMessage = currentChat.systemMessage) {
     if (chatLoading) {
       toast({ status: "warning", title: "Generating..." });
       return;
@@ -306,11 +294,6 @@ export default function Page() {
     setInputContent("");
     chatDataAtom.set([]);
   }
-
-  function updateSystemPrompt(prompt?: string) {
-    chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: prompt });
-  }
-
   async function handleRegenerate(item: ChatMessage) {
     const content = item.role === "user" ? item.content : item.question;
     updateConversationId(item.conversationId);
@@ -322,13 +305,24 @@ export default function Page() {
     chatDataAtom.set(chatDataAtom.get().filter((v) => v.id !== item.id));
   }
 
-  function updateConversationId(id?: string) {
-    if (id) {
-      localStorage.setItem("conversationId", id);
-    } else {
-      localStorage.removeItem("conversationId");
-    }
-    conversationAtom.set({ ...conversationAtom.get(), conversationId: id });
+  function updateSystemPrompt(prompt?: string) {
+    const draft = chatAtom.get();
+    const { currentChat, chatList } = draft;
+    const chatItem = chatList.find((v) => v.id === currentChat.id);
+    if (chatItem) chatItem.systemMessage = prompt;
+
+    localStorage.setItem(Cache.CHAT_LIST, JSON.stringify(chatList));
+    chatAtom.set({ ...draft, chatList, currentChat: { ...currentChat, systemMessage: prompt } });
+  }
+
+  function updateConversationId(conversationId?: string) {
+    const draft = chatAtom.get();
+    const { currentChat, chatList } = draft;
+    const chatItem = chatList.find((v) => v.id === currentChat.id);
+    if (chatItem) chatItem.conversationId = conversationId;
+
+    localStorage.setItem(Cache.CHAT_LIST, JSON.stringify(chatList));
+    chatAtom.set({ ...draft, chatList, currentChat: { ...currentChat, conversationId } });
   }
 
   function handleConversationClick() {
@@ -348,7 +342,7 @@ export default function Page() {
       <div className="mb-4 flex flex-row items-center space-x-3">
         <Button
           onClick={() => handleSendClick()}
-          colorScheme={chatLoading ? "red" : "blue"}
+          colorScheme={chatLoading ? "red" : "teal"}
           variant={chatLoading ? "outline" : "solid"}
         >
           {chatLoading ? ( //
@@ -382,29 +376,31 @@ export default function Page() {
                 )
               }
             />
-            <IconButton
-              aria-label="TTS" //
-              onClick={handleTTSClick}
-              colorScheme={ttsState === TTSStatusEnum.PLAYING ? "red" : "gray"}
-              variant={ttsState === TTSStatusEnum.PLAYING ? "outline" : "solid"}
-              icon={
-                ttsState !== TTSStatusEnum.NORMAL ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />
-              }
-            />
+            {ttsState === TTSStatusEnum.PLAYING && (
+              <IconButton
+                aria-label="TTS" //
+                onClick={handleTTSClick}
+                colorScheme={ttsState === TTSStatusEnum.PLAYING ? "red" : "gray"}
+                variant={ttsState === TTSStatusEnum.PLAYING ? "outline" : "solid"}
+                icon={
+                  ttsState !== TTSStatusEnum.NORMAL ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />
+                }
+              />
+            )}
           </>
         )}
         <IconButton
           aria-label="Conversation"
           title="Continuous conversation"
-          colorScheme={conversationId ? "teal" : "gray"}
+          colorScheme={conversationId ? "whatsapp" : "gray"}
           icon={conversationId ? <IconMessages stroke={1.5} /> : <IconMessagesOff stroke={1.5} />}
           onClick={handleConversationClick}
         />
         <IconButton
-          aria-label="Prompt"
-          title={chatConfig.systemMessage}
-          colorScheme={chatConfig.systemMessage ? "whatsapp" : "gray"}
-          icon={chatConfig.systemMessage ? <IconMessagePlus stroke={1.5} /> : <IconMessage stroke={1.5} />}
+          aria-label="SystemPrompt"
+          title={currentChat.systemMessage}
+          colorScheme={currentChat.systemMessage ? "blue" : "gray"}
+          icon={currentChat.systemMessage ? <IconMessagePlus stroke={1.5} /> : <IconMessage stroke={1.5} />}
           onClick={() => visibleAtom.set({ ...visibleAtom.get(), promptVisible: true })}
         />
       </div>
@@ -416,7 +412,7 @@ export default function Page() {
   return (
     <div className="w-full h-full flex flex-col">
       <div className={`w-full flex-1 p-4 pb-0 flex flex-col items-center overflow-y-auto overflow-x-hidden`}>
-        <div className={`flex flex-col ${pageWidth}`}>
+        <div className={`w-full flex flex-col ${pageWidth}`}>
           {messageList?.map((item) => (
             <MessageItem
               key={item.id}

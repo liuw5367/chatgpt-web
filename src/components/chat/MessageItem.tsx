@@ -21,13 +21,13 @@ import {
   IconReload,
   IconRobot,
   IconTrash,
-  IconUser,
+  IconUserHeart,
 } from "@tabler/icons-react";
 
+import type { ChatMessage } from "../types";
 import { hasUnisoundConfig } from "./ai/Config";
 import { renderMarkdown } from "./markdown";
 import { estimateTokens } from "./token";
-import type { ChatMessage } from "./type";
 
 interface Props {
   item: ChatMessage;
@@ -164,7 +164,11 @@ export function MessageItem(props: Props) {
         </div>
 
         {isUser && (
-          <Avatar size="sm" className={`mt-1 ml-2 !bg-blue-800/60 `} icon={<IconUser size="1.3rem" stroke={1.5} />} />
+          <Avatar
+            size="sm"
+            className={`mt-1 ml-2 !bg-blue-800/60 `}
+            icon={<IconUserHeart size="1.2rem" stroke={1.5} />}
+          />
         )}
         {item.id !== "-1" && actions}
       </div>

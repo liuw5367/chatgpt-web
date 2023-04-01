@@ -3,8 +3,8 @@ import { useStore } from "@nanostores/react";
 import { IconEraser } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
-import { visibleAtom } from "../atom";
-import { chatConfigAtom, conversationAtom } from "../chat/atom";
+import { Cache } from "../../constants";
+import { chatAtom, visibleAtom } from "../atom";
 import { estimateTokens } from "../chat/token";
 import promptsEn from "../prompts/en.json";
 import { openPrompts } from "../prompts/openprompts";
@@ -26,7 +26,8 @@ const templateOptions: TemplateType[] = [
 
 export function SystemPromptPanel() {
   const toast = useToast({ position: "top", duration: 2000 });
-  const { systemMessage } = useStore(chatConfigAtom);
+  const { currentChat } = useStore(chatAtom);
+  const { systemMessage = "" } = currentChat;
   const { promptVisible } = useStore(visibleAtom);
 
   const [prompt, setPrompt] = useState(systemMessage);
@@ -39,7 +40,7 @@ export function SystemPromptPanel() {
 
   useEffect(() => {
     if (promptVisible) {
-      setPrompt(chatConfigAtom.get().systemMessage);
+      setPrompt(chatAtom.get().currentChat.systemMessage || "");
     }
   }, [promptVisible]);
 
@@ -68,19 +69,16 @@ export function SystemPromptPanel() {
   }
 
   function updateSystemPrompt(prompt?: string) {
-    if (prompt) {
-      localStorage.setItem("systemMessage", prompt);
-    } else {
-      localStorage.removeItem("systemMessage");
-    }
-    chatConfigAtom.set({ ...chatConfigAtom.get(), systemMessage: prompt });
+    const draft = chatAtom.get();
+    const { currentChat, chatList } = draft;
+    const chatItem = chatList.find((v) => v.id === currentChat.id);
+    if (chatItem) chatItem.systemMessage = prompt;
+
+    localStorage.setItem(Cache.CHAT_LIST, JSON.stringify(chatList));
+    chatAtom.set({ ...draft, chatList, currentChat: { ...currentChat, systemMessage: prompt } });
   }
 
   function handleSaveClick() {
-    const { conversationId } = conversationAtom.get();
-    if (!conversationId) {
-      toast({ status: "success", title: "Save Success" });
-    }
     updateSystemPrompt(prompt);
     if (!prompt) {
       clear();
@@ -89,10 +87,7 @@ export function SystemPromptPanel() {
   }
 
   function handleRemoveClick() {
-    const { conversationId } = conversationAtom.get();
-    if (!conversationId) {
-      toast({ status: "success", title: "Removed" });
-    }
+    toast({ status: "success", title: "Removed" });
     updateSystemPrompt();
     handleClear();
     handleClose();
@@ -113,7 +108,7 @@ export function SystemPromptPanel() {
             <Button variant="outline" mr={3} onClick={handleClose}>
               Cancel
             </Button>
-            <Button colorScheme="blue" onClick={handleSaveClick}>
+            <Button colorScheme="teal" onClick={handleSaveClick}>
               Save
             </Button>
           </div>

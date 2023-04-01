@@ -15,13 +15,12 @@ import { useStore } from "@nanostores/react";
 import { IconEraser, IconExternalLink, IconHistory, IconInfoSquare } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 
-import { visibleAtom } from "../atom";
+import { Cache } from "../../constants";
+import { chatConfigAtom, visibleAtom } from "../atom";
 import { AutoResizeTextarea } from "../AutoResizeTextarea";
-import { chatConfigAtom } from "../chat/atom";
 import SimpleDrawer from "../SimpleDrawer";
 
 type ImageItem = { prompt: string; url: string };
-const IMAGE_KEY = "image-create-history";
 
 export function ImagePanel() {
   const toast = useToast({ position: "top", duration: 3000 });
@@ -32,7 +31,9 @@ export function ImagePanel() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [chatAbortController, setAbortController] = useState<AbortController>();
-  const [historyList, setHistoryList] = useState<ImageItem[]>(JSON.parse(localStorage.getItem(IMAGE_KEY) || "[]"));
+  const [historyList, setHistoryList] = useState<ImageItem[]>(
+    JSON.parse(localStorage.getItem(Cache.IMAGE_LIST) || "[]")
+  );
   const [imageList, setImageList] = useState<ImageItem[]>([]);
 
   useEffect(() => {
@@ -84,7 +85,7 @@ export function ImagePanel() {
 
   function updateHistory(data: ImageItem[]) {
     setHistoryList(data);
-    localStorage.setItem(IMAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(Cache.IMAGE_LIST, JSON.stringify(data));
   }
 
   function addToHistory(data: ImageItem[]) {
