@@ -38,8 +38,8 @@ window.addEventListener("load", () => {
       // showPwaToast(true);
     },
     onNeedRefresh() {
-      pwaToastMessage.innerHTML = "New content available, click on reload button to update";
-      showPwaToast(false);
+      // pwaToastMessage.innerHTML = "New content available, click on reload button to update";
+      // showPwaToast(false);
     },
     onRegisteredSW(swScriptUrl) {
       // eslint-disable-next-line no-console

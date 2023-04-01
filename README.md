@@ -9,6 +9,7 @@
 - 支持图片生成 `/v1/images/generations`
 - 支持查询 apiKey 余额 `/dashboard/billing/credit_grants`
 - 支持设置 System Prompt，提供多个模版供选择
+- 支持多会话
 - 支持连续对话
 - 消息显示 token 使用数量
 - 支持配置模型
@@ -31,11 +32,10 @@
 
 ### System Prompt
 
-- 使用 localstorage 保存，仅保存当前使用的值
 - 如果 prompt 最后一句带有问句，个人建议将该问句从 prompt 删除，将其填入消息内容框内，不然每次对话的时候，该问句都会跟随 system prompt 一起发送
 - 配置 System Prompt 后页面底部的设置按钮会高亮
 - 消息和回复底部会显示`PROMPT`的标签，点击会复制并显示该 prompt
-- 击消息底部的重试按钮，会恢复对应的 System Prompt 并更新 localstorage 的值
+- 击消息底部的重试按钮，会恢复对应的 System Prompt 并更新 localStorage 的值
 - 有 prompt 时未填写消息内容，可点击发送按钮。因内容为空，为便于查看，列表中内容区域会显示为 System Prompt
 
 ### 连续对话
