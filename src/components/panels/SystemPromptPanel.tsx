@@ -81,7 +81,7 @@ export function SystemPromptPanel() {
   function handleSaveClick() {
     updateSystemPrompt(prompt);
     if (!prompt) {
-      clear();
+      handleClear();
     }
     handleClose();
   }
@@ -101,7 +101,7 @@ export function SystemPromptPanel() {
       header={<>System Prompt</>}
       footer={
         <div className="w-full flex flex-row justify-between">
-          <Button colorScheme="teal" onClick={handleRemoveClick}>
+          <Button colorScheme="blue" onClick={handleRemoveClick}>
             Remove
           </Button>
           <div className="flex flex-row">

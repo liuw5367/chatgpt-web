@@ -33,7 +33,6 @@ export default function App() {
     const messagesJson = localStorage.getItem(chatId) || "[]";
     const chatItem = chatList.find((v) => v.id === chatId);
 
-    console.warn(chatList);
     chatAtom.set({ ...chatAtom.get(), chatList, currentChat: chatItem as ChatItem });
     chatDataAtom.set(JSON.parse(messagesJson) || []);
 
@@ -46,7 +45,7 @@ export default function App() {
     });
   }, []);
 
-  const theme = extendTheme({ initialColorMode: "dark", useSystemColorMode: true });
+  const theme = extendTheme({ initialColorMode: "system", useSystemColorMode: true });
 
   return (
     <ChakraProvider theme={theme}>

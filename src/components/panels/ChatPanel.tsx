@@ -52,7 +52,9 @@ export function ChatPanel() {
     } else {
       const list = chatList.filter((chat) => chat.id !== item.id);
       updateChatList(list);
-      updateChatId(list[0]);
+      if (item.id === chatId) {
+        updateChatId(list[0]);
+      }
     }
     handleClose();
   }

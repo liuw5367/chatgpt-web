@@ -392,14 +392,14 @@ export default function Page() {
         <IconButton
           aria-label="Conversation"
           title="Continuous conversation"
-          colorScheme={conversationId ? "whatsapp" : "gray"}
+          colorScheme={conversationId ? "green" : "gray"}
           icon={conversationId ? <IconMessages stroke={1.5} /> : <IconMessagesOff stroke={1.5} />}
           onClick={handleConversationClick}
         />
         <IconButton
           aria-label="SystemPrompt"
           title={currentChat.systemMessage}
-          colorScheme={currentChat.systemMessage ? "blue" : "gray"}
+          colorScheme={currentChat.systemMessage ? "telegram" : "gray"}
           icon={currentChat.systemMessage ? <IconMessagePlus stroke={1.5} /> : <IconMessage stroke={1.5} />}
           onClick={() => visibleAtom.set({ ...visibleAtom.get(), promptVisible: true })}
         />
