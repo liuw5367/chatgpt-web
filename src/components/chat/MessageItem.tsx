@@ -67,24 +67,31 @@ export function MessageItem(props: Props) {
     </Popover>
   );
 
-  const renderConversation = (placement: "top" | "top-start" = "top-start") => (
+  const renderConversation = (conversationId: string) => (
     <Tooltip
-      placement={placement}
-      label={"conversationId: " + item.conversationId}
+      placement="top-start"
+      label={"conversationId: " + conversationId}
       aria-label="tooltip"
       bg="gray.600"
       className="rounded"
     >
-      <Badge variant="ghost" title={"conversationId: " + item.conversationId} className={`text-[14px] cursor-pointer`}>
-        <IconMessages stroke={1.5} size="1rem" className="text-teal" />
+      <Badge
+        colorScheme="teal"
+        title={"conversationId: " + conversationId}
+        className={`text-[14px] cursor-pointer !flex flex-row items-center gap-1`}
+      >
+        <IconMessages size="0.8rem" />
+        {conversationId.substring(conversationId.length - 4, conversationId.length)}
       </Badge>
     </Tooltip>
   );
 
+  console.log("conversationId", item.conversationId);
+
   const actions = (
     <div className={`absolute bottom-0 mt-1 flex ${isUser ? "justify-end right-10" : "left-8"}`}>
       <div className="-mb-8 flex items-center space-x-1">
-        {item.conversationId && renderConversation()}
+        {!item.conversationId ? null : renderConversation(item.conversationId)}
         {item.prompt && renderPrompt(isUser ? "top" : "top-start")}
         <IconButton
           aria-label="Copy"

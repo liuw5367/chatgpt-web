@@ -44,7 +44,7 @@ export function ChatPanel() {
 
   function handleChatAddClick() {
     const id = uuid();
-    const item: ChatItem = { id, name: t("chat.new") + " " + id.substring(0, 5) };
+    const item: ChatItem = { id, name: t("chat.new") + " " + id.substring(0, 6) };
     updateChatList([item, ...chatList]);
   }
 
