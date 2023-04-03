@@ -18,9 +18,9 @@ import { useDebounceEffect } from "ahooks";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Cache } from "../../constants";
 import { chatAtom, chatConfigAtom, chatDataAtom, visibleAtom } from "../atom";
 import { AutoResizeTextarea } from "../AutoResizeTextarea";
+import { saveCurrentChatValue } from "../storage";
 import type { ChatMessage } from "../types";
 import { getCurrentTime, removeLn, scrollToElement, uuid } from "../utils";
 import VoiceView, { VoiceRef } from "./ai";
@@ -55,7 +55,8 @@ export default function Page() {
   }, []);
 
   useDebounceEffect(() => {
-    localStorage.setItem(chatAtom.get().currentChat.id, JSON.stringify(messageList));
+    const chatId = chatAtom.get().currentChat.id;
+    localStorage.setItem(chatId, JSON.stringify(messageList));
   }, [messageList]);
 
   useEffect(() => {
@@ -306,23 +307,11 @@ export default function Page() {
   }
 
   function updateSystemPrompt(prompt?: string) {
-    const draft = chatAtom.get();
-    const { currentChat, chatList } = draft;
-    const chatItem = chatList.find((v) => v.id === currentChat.id);
-    if (chatItem) chatItem.systemMessage = prompt;
-
-    localStorage.setItem(Cache.CHAT_LIST, JSON.stringify(chatList));
-    chatAtom.set({ ...draft, chatList, currentChat: { ...currentChat, systemMessage: prompt } });
+    saveCurrentChatValue("systemMessage", prompt as string);
   }
 
   function updateConversationId(conversationId?: string) {
-    const draft = chatAtom.get();
-    const { currentChat, chatList } = draft;
-    const chatItem = chatList.find((v) => v.id === currentChat.id);
-    if (chatItem) chatItem.conversationId = conversationId;
-
-    localStorage.setItem(Cache.CHAT_LIST, JSON.stringify(chatList));
-    chatAtom.set({ ...draft, chatList, currentChat: { ...currentChat, conversationId } });
+    saveCurrentChatValue("conversationId", conversationId as string);
   }
 
   function handleConversationClick() {
@@ -449,7 +438,7 @@ export default function Page() {
             maxRows={10}
             className="placeholder:text-[14px]"
             value={inputContent}
-            placeholder={t("chat.placeholder")}
+            placeholder={t("chat.placeholder") || ""}
             onChange={(e) => setInputContent(e.target.value)}
             onKeyDown={(e) => {
               if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {

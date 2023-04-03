@@ -4,7 +4,6 @@ import { IconEraser } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Cache } from "../../constants";
 import { chatAtom, visibleAtom } from "../atom";
 import { estimateTokens } from "../chat/token";
 import promptsEn from "../prompts/en.json";
@@ -13,6 +12,7 @@ import promptsOther from "../prompts/other.json";
 import promptsShortcut from "../prompts/shortcuts";
 import promptsZh from "../prompts/zh.json";
 import SimpleDrawer from "../SimpleDrawer";
+import { saveCurrentChatValue } from "../storage";
 
 type OptionType = { act: string; prompt: string; desc?: string; remark?: string };
 type TemplateType = { label: string; value: OptionType[] };
@@ -71,13 +71,7 @@ export function SystemPromptPanel() {
   }
 
   function updateSystemPrompt(prompt?: string) {
-    const draft = chatAtom.get();
-    const { currentChat, chatList } = draft;
-    const chatItem = chatList.find((v) => v.id === currentChat.id);
-    if (chatItem) chatItem.systemMessage = prompt;
-
-    localStorage.setItem(Cache.CHAT_LIST, JSON.stringify(chatList));
-    chatAtom.set({ ...draft, chatList, currentChat: { ...currentChat, systemMessage: prompt } });
+    saveCurrentChatValue("systemMessage", prompt as string);
   }
 
   function handleSaveClick() {

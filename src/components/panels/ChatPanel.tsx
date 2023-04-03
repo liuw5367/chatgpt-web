@@ -13,10 +13,10 @@ import i18next, { changeLanguage } from "i18next";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Cache } from "../../constants";
 import { chatAtom, chatDataAtom, visibleAtom } from "../atom";
 import { Logo } from "../Logo";
 import SimpleDrawer from "../SimpleDrawer";
+import { saveChatAtom } from "../storage";
 import type { ChatItem } from "../types";
 import { uuid } from "../utils";
 
@@ -27,14 +27,13 @@ export function ChatPanel() {
   const { id: chatId } = currentChat;
 
   function updateChatList(chatList: ChatItem[]) {
-    chatAtom.set({ ...chatAtom.get(), chatList });
-    localStorage.setItem(Cache.CHAT_LIST, JSON.stringify(chatList));
+    saveChatAtom({ ...chatAtom.get(), chatList });
   }
 
   function updateChatId(item: ChatItem) {
+    saveChatAtom({ ...chatAtom.get(), currentChat: item });
     const chatId = item.id;
-    chatAtom.set({ ...chatAtom.get(), currentChat: { ...item } });
-    localStorage.setItem(Cache.CHAT_ID, chatId);
+    // 切换对话，更新消息列表
     const messages = JSON.parse(localStorage.getItem(chatId) || "[]");
     chatDataAtom.set(messages);
   }

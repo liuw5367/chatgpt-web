@@ -1,6 +1,6 @@
 import { Alert, AlertDescription, AlertTitle, Box, CloseButton } from "@chakra-ui/react";
 
-import { ResponseError } from "../../pages/api/_utils";
+import type { ResponseError } from "../../pages/api/_utils";
 
 interface Props {
   error?: ResponseError;

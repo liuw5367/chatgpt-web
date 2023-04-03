@@ -2,7 +2,7 @@ import { atom } from "nanostores";
 
 import type { ChatItem, ChatMessage } from "./types";
 
-interface ChatAtomType {
+export interface ChatAtomType {
   currentChat: ChatItem;
   chatList: ChatItem[];
 }
