@@ -1,3 +1,4 @@
+import Clipboard from "clipboard";
 import { v4 as uuidFn } from "uuid";
 
 export function uuid(replace = true) {
@@ -35,4 +36,15 @@ export function removeLn(content?: string): string {
     }
   }
   return result;
+}
+
+export function addCodeCopy() {
+  const clipboard = new Clipboard(".markdown-it-code-copy");
+  clipboard.on("success", function (e) {
+    const element = e.trigger?.getElementsByClassName("code-copy-content")?.[0];
+    if (element) {
+      element.innerHTML = "Copied!";
+      setTimeout(() => (element.innerHTML = ""), 1000);
+    }
+  });
 }

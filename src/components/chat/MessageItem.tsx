@@ -86,8 +86,6 @@ export function MessageItem(props: Props) {
     </Tooltip>
   );
 
-  console.log("conversationId", item.conversationId);
-
   const actions = (
     <div className={`absolute bottom-0 mt-1 flex ${isUser ? "justify-end right-10" : "left-8"}`}>
       <div className="-mb-8 flex items-center space-x-1">

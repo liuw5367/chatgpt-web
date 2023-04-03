@@ -8,6 +8,7 @@ import Chat from "./chat/index";
 import { Header } from "./Header";
 import { ChatPanel, ImagePanel, SettingPanel, SystemPromptPanel } from "./panels";
 import { loadCache } from "./storage";
+import { addCodeCopy } from "./utils";
 
 export default function App() {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ export default function App() {
 
   useEffect(() => {
     loadCache(t("chat.new"));
+    addCodeCopy();
   }, []);
 
   return (

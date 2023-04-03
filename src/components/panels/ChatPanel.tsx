@@ -50,6 +50,9 @@ export function ChatPanel() {
 
   function handleNameChange(item: ChatItem, value: string) {
     item.name = value;
+    if (currentChat.id === item.id) {
+      currentChat.name = value;
+    }
     updateChatList([...chatList]);
   }
 
