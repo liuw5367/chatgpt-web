@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { APP_VERSION } from "../../constants";
 import { chatConfigAtom, visibleAtom } from "../atom";
@@ -34,50 +35,26 @@ const openAIList: ListItemType[] = [
   { label: "OpenAI Model", value: "openAIModel", placeholder: "gpt-3.5-turbo" },
 ];
 
-const chatConfigList: ListItemType[] = [
-  {
-    type: "number",
-    label: "temperature",
-    value: "temperature",
-    max: 2,
-    placeholder: "",
-    desc:
-      "Defaults to 1. What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.\n" +
-      "\n" +
-      "We generally recommend altering this or top_p but not both.",
-  },
-  {
-    type: "number",
-    label: "top_p",
-    value: "top_p",
-    max: 1,
-    placeholder: "",
-    desc:
-      "Defaults to 1. An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.\n" +
-      "\n" +
-      "We generally recommend altering this or temperature but not both.",
-  },
-];
-
 const voiceList: ListItemType[] = [
-  { label: "Unisound APPKEY", value: "unisoundAppKey", placeholder: "https://ai.unisound.com" },
+  { label: "Unisound AppKey", value: "unisoundAppKey", placeholder: "https://ai.unisound.com" },
   { label: "Unisound SECRET", value: "unisoundSecret", type: "password", placeholder: "https://ai.unisound.com" },
 ];
 
 export function SettingPanel() {
-  const toast = useToast({ position: "top", duration: 3000 });
+  const { t } = useTranslation();
+  const toast = useToast({ position: "top", isClosable: true });
   const chatConfig = useStore(chatConfigAtom);
   const { settingVisible } = useStore(visibleAtom);
 
   const [config, setConfig] = useState({ ...chatConfig });
   const [balance, setBalance] = useState("");
-  const [chatAbortController, setAbortController] = useState<AbortController>();
+  const [abortController, setAbortController] = useState<AbortController>();
 
   useEffect(() => {
     return () => {
-      chatAbortController?.abort();
+      abortController?.abort();
     };
-  }, []);
+  }, [abortController]);
 
   useEffect(() => {
     if (settingVisible) {
@@ -89,12 +66,12 @@ export function SettingPanel() {
 
   async function requestBalance() {
     try {
-      const abortController = new AbortController();
-      setAbortController(abortController);
+      const controller = new controller();
+      setAbortController(controller);
 
       const response = await fetch("/api/balance", {
         method: "POST",
-        signal: abortController.signal,
+        signal: controller.signal,
         body: JSON.stringify({
           apiKey: chatConfig.openAIKey,
           config: { prompt },
@@ -131,7 +108,7 @@ export function SettingPanel() {
     });
     chatConfigAtom.set(result);
     handleClose();
-    toast({ status: "success", title: "Success" });
+    toast({ status: "success", title: t("toast.success") });
   }
 
   function renderItem(item: ListItemType) {
@@ -146,6 +123,25 @@ export function SettingPanel() {
     );
   }
 
+  const chatConfigList: ListItemType[] = [
+    {
+      type: "number",
+      label: "temperature",
+      value: "temperature",
+      max: 2,
+      placeholder: "",
+      desc: t("settings.temperature"),
+    },
+    {
+      type: "number",
+      label: "top_p",
+      value: "top_p",
+      max: 1,
+      placeholder: "",
+      desc: t("settings.top_p"),
+    },
+  ];
+
   return (
     <SimpleDrawer
       isOpen={settingVisible}
@@ -153,17 +149,17 @@ export function SettingPanel() {
       size="md"
       header={
         <div className="space-x-4">
-          <span>Settings</span>
+          <span>{t("settings.title")}</span>
           <span className="text-sm font-normal">{APP_VERSION}</span>
         </div>
       }
       footer={
         <>
           <Button variant="outline" mr={3} onClick={handleClose}>
-            Cancel
+            {t("actions.cancel")}
           </Button>
           <Button colorScheme="teal" onClick={handleSaveClick}>
-            Save
+            {t("actions.save")}
           </Button>
         </>
       }

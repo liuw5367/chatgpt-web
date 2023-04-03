@@ -16,6 +16,7 @@ import {
 } from "@tabler/icons-react";
 import { useDebounceEffect } from "ahooks";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Cache } from "../../constants";
 import { chatAtom, chatConfigAtom, chatDataAtom, visibleAtom } from "../atom";
@@ -31,6 +32,10 @@ import { MessageItem } from "./MessageItem";
 import { estimateTokens } from "./token";
 
 export default function Page() {
+  const { t } = useTranslation();
+  const toast = useToast({ position: "top", isClosable: true });
+  const messageList = useStore(chatDataAtom);
+  const chatConfig = useStore(chatConfigAtom);
   const { currentChat } = useStore(chatAtom);
   const { conversationId } = currentChat;
   const [inputContent, setInputContent] = useState("");
@@ -40,13 +45,8 @@ export default function Page() {
   const [ttsState, setTtsState] = useState<TTSStatusEnum>(TTSStatusEnum.NORMAL);
   const voiceRef = React.useRef<VoiceRef | null>();
 
-  const messageList = useStore(chatDataAtom);
   const [chatLoading, setChatLoading] = useState(false);
   const [chatAbortController, setAbortController] = useState<AbortController>();
-
-  const chatConfig = useStore(chatConfigAtom);
-
-  const toast = useToast({ position: "top", duration: 3000 });
 
   const [errorInfo, setErrorInfo] = useState<{ code: string; message?: string }>();
 
@@ -77,7 +77,7 @@ export default function Page() {
   function checkUnisound() {
     const config = getUnisoundKeySecret();
     if (!config.KEY) {
-      toast({ status: "error", title: "please enter unisound APPKEY" });
+      toast({ status: "error", title: t("toast.empty.unisound") });
       return true;
     }
     return false;
@@ -175,12 +175,12 @@ export default function Page() {
 
   async function sendMessage(inputValue = inputContent, systemMessage = currentChat.systemMessage) {
     if (chatLoading) {
-      toast({ status: "warning", title: "Generating..." });
+      toast({ status: "warning", title: t("toast.generating") });
       return;
     }
     const content = removeLn(inputValue);
     if (!systemMessage && !content) {
-      toast({ status: "info", title: "please enter content" });
+      toast({ status: "info", title: t("toast.empty.content") });
       return;
     }
     stopTTS();
@@ -238,13 +238,13 @@ export default function Page() {
           setErrorInfo(json.error as any);
           scrollToPageBottom();
         } else {
-          toast({ status: "error", title: "Request Error" });
+          toast({ status: "error", title: t("toast.error.request") });
         }
         setChatLoading(false);
         return;
       }
       if (!response.body) {
-        toast({ status: "warning", title: "No Data" });
+        toast({ status: "warning", title: t("toast.empty.data") });
         setChatLoading(false);
         return;
       }
@@ -329,11 +329,11 @@ export default function Page() {
     if (conversationId) {
       updateConversationId();
       toast.closeAll();
-      toast({ status: "info", title: "已关闭连续对话" });
+      toast({ status: "info", title: t("conversation.off") });
     } else {
       updateConversationId(uuid());
       toast.closeAll();
-      toast({ status: "success", title: "已开启连续对话", description: "该对话不会和之前的消息关联" });
+      toast({ status: "success", title: t("conversation.on"), description: t("conversation.desc") });
     }
   }
 
@@ -449,7 +449,7 @@ export default function Page() {
             maxRows={10}
             className="placeholder:text-[14px]"
             value={inputContent}
-            placeholder="Shortcuts: ⬆️ / Ctrl + ↩ / ⌘ + ↩"
+            placeholder={t("chat.placeholder")}
             onChange={(e) => setInputContent(e.target.value)}
             onKeyDown={(e) => {
               if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {

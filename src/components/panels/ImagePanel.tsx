@@ -12,8 +12,9 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
-import { IconEraser, IconExternalLink, IconHistory, IconInfoSquare } from "@tabler/icons-react";
+import { IconEraser, IconExternalLink, IconHistory, IconInfoSquare, IconLoader3 } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Cache } from "../../constants";
 import { chatConfigAtom, visibleAtom } from "../atom";
@@ -23,14 +24,15 @@ import SimpleDrawer from "../SimpleDrawer";
 type ImageItem = { prompt: string; url: string };
 
 export function ImagePanel() {
-  const toast = useToast({ position: "top", duration: 3000 });
+  const { t } = useTranslation();
+  const toast = useToast({ position: "top", isClosable: true });
 
   const chatConfig = useStore(chatConfigAtom);
   const { imageVisible } = useStore(visibleAtom);
 
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
-  const [chatAbortController, setAbortController] = useState<AbortController>();
+  const [abortController, setAbortController] = useState<AbortController>();
   const [historyList, setHistoryList] = useState<ImageItem[]>(
     JSON.parse(localStorage.getItem(Cache.IMAGE_LIST) || "[]")
   );
@@ -38,9 +40,9 @@ export function ImagePanel() {
 
   useEffect(() => {
     return () => {
-      chatAbortController?.abort();
+      abortController?.abort();
     };
-  }, []);
+  }, [abortController]);
 
   function handleClose() {
     visibleAtom.set({ ...visibleAtom.get(), imageVisible: false });
@@ -48,17 +50,17 @@ export function ImagePanel() {
 
   async function handleSend() {
     if (!prompt?.trim()) {
-      toast({ status: "info", title: "please enter prompt" });
+      toast({ status: "info", title: t("toast.empty.prompt") });
       return;
     }
     setLoading(true);
     try {
-      const abortController = new AbortController();
-      setAbortController(abortController);
+      const controller = new AbortController();
+      setAbortController(controller);
 
       const response = await fetch("/api/image", {
         method: "POST",
-        signal: abortController.signal,
+        signal: controller.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           apiKey: chatConfig.openAIKey,
@@ -77,7 +79,7 @@ export function ImagePanel() {
         }
       }
     } catch (e) {
-      toast({ status: "error", title: e.toString() });
+      toast({ status: "error", title: e.name, description: e.message });
     }
     setLoading(false);
     setAbortController(undefined);
@@ -102,13 +104,13 @@ export function ImagePanel() {
   }
 
   return (
-    <SimpleDrawer isOpen={imageVisible} onClose={handleClose} size="lg" header={<>Image Create</>}>
+    <SimpleDrawer isOpen={imageVisible} onClose={handleClose} size="lg" header={t("image.title")}>
       <div className="w-full h-full flex flex-col space-y-3">
         <AutoResizeTextarea
           className="min-h-[84px]"
           minRows={3}
           maxRows={10}
-          placeholder="please enter prompt"
+          placeholder={t("image.placeholder")}
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
         />
@@ -128,8 +130,13 @@ export function ImagePanel() {
               variant="solid"
               icon={<IconEraser stroke={1.5} />}
             />
-            <Button colorScheme="teal" onClick={handleSend} isLoading={loading} loadingText="Generating">
-              Generate
+            <Button
+              colorScheme={loading ? "red" : "teal"}
+              variant={loading ? "outline" : "solid"}
+              onClick={handleSend}
+              leftIcon={loading ? <IconLoader3 stroke={1.5} className="rotate-img" /> : undefined}
+            >
+              {loading ? t("image.generating") : t("image.generate")}
             </Button>
           </div>
         </div>

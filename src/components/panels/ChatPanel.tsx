@@ -1,7 +1,17 @@
-import { IconButton, Input } from "@chakra-ui/react";
+import { Button, IconButton, Input } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
-import { IconCheck, IconEdit, IconMessage, IconPlus, IconTrash, IconX } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconEdit,
+  IconLanguageHiragana,
+  IconMessage,
+  IconPlus,
+  IconTrash,
+  IconX,
+} from "@tabler/icons-react";
+import i18next, { changeLanguage } from "i18next";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Cache } from "../../constants";
 import { chatAtom, chatDataAtom, visibleAtom } from "../atom";
@@ -11,6 +21,7 @@ import type { ChatItem } from "../types";
 import { uuid } from "../utils";
 
 export function ChatPanel() {
+  const { t } = useTranslation();
   const { chatVisible } = useStore(visibleAtom);
   const { chatList, currentChat } = useStore(chatAtom);
   const { id: chatId } = currentChat;
@@ -34,7 +45,7 @@ export function ChatPanel() {
 
   function handleChatAddClick() {
     const id = uuid();
-    const item: ChatItem = { id, name: "New Chat " + id.substring(0, 5) };
+    const item: ChatItem = { id, name: t("chat.new") + " " + id.substring(0, 5) };
     updateChatList([item, ...chatList]);
   }
 
@@ -46,17 +57,22 @@ export function ChatPanel() {
   function handleDelete(item: ChatItem) {
     if (chatList.length === 1) {
       const id = uuid();
-      const item: ChatItem = { id, name: "New Chat " + id.substring(0, 5) };
+      const item: ChatItem = { id, name: t("chat.new") };
       updateChatList([item]);
       updateChatId(item);
+      handleClose();
     } else {
       const list = chatList.filter((chat) => chat.id !== item.id);
       updateChatList(list);
       if (item.id === chatId) {
         updateChatId(list[0]);
+        handleClose();
       }
     }
-    handleClose();
+  }
+
+  function handleChangeLanguage() {
+    changeLanguage(i18next.language === "en" ? "zh" : "en");
   }
 
   return (
@@ -71,9 +87,24 @@ export function ChatPanel() {
         </div>
       }
       footer={
-        <div className="w-full flex flex-row items-center p-4 rounded-lg space-x-2 border" onClick={handleChatAddClick}>
-          <IconPlus stroke={1.5} size="1.3rem" />
-          <div>New Chat</div>
+        <div className="w-full flex flex-ro items-center justify-between">
+          <Button
+            aria-label="ChangeLanguage"
+            variant="ghost"
+            leftIcon={<IconLanguageHiragana stroke={1.5} />}
+            onClick={handleChangeLanguage}
+          >
+            {t("language")}
+          </Button>
+
+          <Button
+            aria-label="ChangeLanguage"
+            variant="outline"
+            leftIcon={<IconPlus stroke={1.5} size="1.3rem" />}
+            onClick={handleChatAddClick}
+          >
+            {t("chat.new")}
+          </Button>
         </div>
       }
     >
@@ -107,7 +138,7 @@ interface ItemProps {
 }
 
 function ChatItemView(props: ItemProps) {
-  const { chatId, chat, onClick, onNameChange, onDelete, showDelete } = props;
+  const { chatId, chat, onClick, onNameChange, onDelete } = props;
   const selected = chat.id === chatId;
   const [changed, setChanged] = useState(chat.name);
   const [isEditing, setEditing] = useState(false);

@@ -1,3 +1,5 @@
+import "./i18n";
+
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { useEffect } from "react";
 

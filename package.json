@@ -35,6 +35,9 @@
     "github-markdown-css": "^5.2.0",
     "gpt3-tokenizer": "^1.1.5",
     "highlight.js": "^11.7.0",
+    "i18next": "^22.4.13",
+    "i18next-browser-languagedetector": "^7.0.1",
+    "i18next-http-backend": "^2.2.0",
     "js-sha256": "^0.9.0",
     "katex": "^0.16.4",
     "markdown-it": "^13.0.1",
@@ -45,6 +48,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
+    "react-i18next": "^12.2.0",
     "react-textarea-autosize": "^8.4.1",
     "uuid": "^9.0.0",
     "workbox-window": "^6.5.4"

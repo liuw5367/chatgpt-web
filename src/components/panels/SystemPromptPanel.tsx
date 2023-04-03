@@ -2,6 +2,7 @@ import { Button, IconButton, Select, Textarea, useToast } from "@chakra-ui/react
 import { useStore } from "@nanostores/react";
 import { IconEraser } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Cache } from "../../constants";
 import { chatAtom, visibleAtom } from "../atom";
@@ -25,7 +26,8 @@ const templateOptions: TemplateType[] = [
 ];
 
 export function SystemPromptPanel() {
-  const toast = useToast({ position: "top", duration: 2000 });
+  const { t } = useTranslation();
+  const toast = useToast({ position: "top", isClosable: true });
   const { currentChat } = useStore(chatAtom);
   const { systemMessage = "" } = currentChat;
   const { promptVisible } = useStore(visibleAtom);
@@ -87,7 +89,7 @@ export function SystemPromptPanel() {
   }
 
   function handleRemoveClick() {
-    toast({ status: "success", title: "Removed" });
+    toast({ status: "success", title: t("toast.removed") });
     updateSystemPrompt();
     handleClear();
     handleClose();
@@ -98,18 +100,18 @@ export function SystemPromptPanel() {
       isOpen={promptVisible}
       onClose={handleClose}
       size="lg"
-      header={<>System Prompt</>}
+      header={t("prompt.title")}
       footer={
         <div className="w-full flex flex-row justify-between">
           <Button colorScheme="blue" onClick={handleRemoveClick}>
-            Remove
+            {t("actions.remove")}
           </Button>
           <div className="flex flex-row">
             <Button variant="outline" mr={3} onClick={handleClose}>
-              Cancel
+              {t("actions.cancel")}
             </Button>
             <Button colorScheme="teal" onClick={handleSaveClick}>
-              Save
+              {t("actions.save")}
             </Button>
           </div>
         </div>
@@ -135,7 +137,7 @@ export function SystemPromptPanel() {
           </div>
           <div sm="min-w-60">
             <Select
-              placeholder="Select Prompt"
+              placeholder={t("prompt.select")}
               onChange={(e) => {
                 const prompt = e.target.value;
                 const item = options.find((item) => item.prompt === prompt);
@@ -160,7 +162,7 @@ export function SystemPromptPanel() {
           value={prompt ?? ""}
           onChange={(e) => setPrompt(e.target.value)}
           className="flex-1 !min-h-[50%] text-[14px] placeholder:text-[14px]"
-          placeholder="place enter prompt"
+          placeholder={t("prompt.placeholder")}
         />
 
         <div className="flex flex-row items-center justify-between space-x-2">
@@ -176,8 +178,7 @@ export function SystemPromptPanel() {
               onClick={handleClear}
             />
           </div>
-          {/* <div className='text-[14px]'>After setting the prompt, you can send without entering any content</div> */}
-          <div className="text-[14px]">设置后消息内容为空可直接发送</div>
+          <div className="text-[14px]">{t("prompt.tip")}</div>
         </div>
       </div>
     </SimpleDrawer>
