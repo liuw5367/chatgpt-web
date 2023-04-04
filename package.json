@@ -1,6 +1,6 @@
 {
   "name": "astro-gpt",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "type": "module",
   "private": true,
   "scripts": {
@@ -11,7 +11,8 @@
     "build:vercel": "OUTPUT=vercel astro build",
     "build:netlify": "OUTPUT=netlify astro build",
     "astro": "astro",
-    "eslint": "eslint src --quiet --fix --ext .js,.jsx,.ts,.tsx"
+    "eslint": "eslint src --quiet --fix --ext .js,.jsx,.ts,.tsx",
+    "type-check": "tsc"
   },
   "dependencies": {
     "@astrojs/netlify": "2.0.0",
