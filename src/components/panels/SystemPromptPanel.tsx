@@ -6,24 +6,9 @@ import { useTranslation } from "react-i18next";
 
 import { chatAtom, visibleAtom } from "../atom";
 import { estimateTokens } from "../chat/token";
-import promptsEn from "../prompts/en.json";
-import { openPrompts } from "../prompts/openprompts";
-import promptsOther from "../prompts/other.json";
-import promptsShortcut from "../prompts/shortcuts";
-import promptsZh from "../prompts/zh.json";
+import { templateOptions } from "../prompts";
 import SimpleDrawer from "../SimpleDrawer";
 import { saveCurrentChatValue } from "../storage";
-
-type OptionType = { act: string; prompt: string; desc?: string; remark?: string };
-type TemplateType = { label: string; value: OptionType[] };
-
-const templateOptions: TemplateType[] = [
-  { label: "Shortcut", value: promptsShortcut },
-  { label: "openPrompts", value: openPrompts },
-  { label: "中文", value: promptsZh },
-  { label: "英文", value: promptsEn },
-  { label: "其他", value: promptsOther },
-];
 
 export function SystemPromptPanel() {
   const { t } = useTranslation();
@@ -33,8 +18,8 @@ export function SystemPromptPanel() {
   const { promptVisible } = useStore(visibleAtom);
 
   const [prompt, setPrompt] = useState(systemMessage);
-  const [template, setTemplate] = useState("Shortcut");
-  const [options, setOptions] = useState(promptsShortcut);
+  const [template, setTemplate] = useState(templateOptions[0].label);
+  const [options, setOptions] = useState(templateOptions[0].value);
   const [desc, setDesc] = useState("");
   const [remark, setRemark] = useState("");
 

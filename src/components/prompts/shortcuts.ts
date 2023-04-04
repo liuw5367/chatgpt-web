@@ -3113,11 +3113,16 @@ export type User = {
   tags: TagType[];
 };
 
-const data = Users.map((item) => ({
+const promptsShortcut = Users.map((item) => ({
   act: item.title,
-  prompt: item.description,
-  desc: item.desc_cn,
+  prompt: item.desc_cn,
   remark: item.remark,
 }));
 
-export default data;
+const promptsShortcutEn = Users.map((item) => ({
+  act: item.title_en,
+  prompt: item.desc_en,
+  remark: item.remark_en,
+}));
+
+export { promptsShortcut, promptsShortcutEn };

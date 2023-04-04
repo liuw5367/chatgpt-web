@@ -113,13 +113,6 @@ export function MessageItem(props: Props) {
             onClick={() => onPlay?.(item)}
           />
         )}
-        <IconButton
-          aria-label="Delete"
-          variant="ghost"
-          icon={<IconTrash size="0.90rem" className="opacity-64" />}
-          size="xs"
-          onClick={() => onDelete?.(item)}
-        />
         {(item.role === "user" || (item.role === "assistant" && item.question)) && (
           <IconButton
             aria-label="Retry"
@@ -135,6 +128,13 @@ export function MessageItem(props: Props) {
             }}
           />
         )}
+        <IconButton
+          aria-label="Delete"
+          variant="ghost"
+          icon={<IconTrash size="0.90rem" className="opacity-64" />}
+          size="xs"
+          onClick={() => onDelete?.(item)}
+        />
         {item.token != null && (
           <Button size="xs" aria-label="Token" title="Token">
             {item.token}

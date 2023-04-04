@@ -182,4 +182,4 @@ const openPrompts = data.map((item) => {
   };
 });
 
-export { openPrompts };
+export default openPrompts;

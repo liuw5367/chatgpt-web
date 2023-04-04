@@ -27,6 +27,7 @@ import VoiceView, { VoiceRef } from "./ai";
 import { ASRStatusEnum } from "./ai/ASRView";
 import { getUnisoundKeySecret, hasUnisoundConfig } from "./ai/Config";
 import { TTSStatusEnum } from "./ai/TTSView";
+import { Command } from "./Command";
 import ErrorItem from "./ErrorItem";
 import { MessageItem } from "./MessageItem";
 import { estimateTokens } from "./token";
@@ -295,6 +296,7 @@ export default function Page() {
     setInputContent("");
     chatDataAtom.set([]);
   }
+
   async function handleRegenerate(item: ChatMessage) {
     const content = item.role === "user" ? item.content : item.question;
     updateConversationId(item.conversationId);
@@ -401,7 +403,7 @@ export default function Page() {
   return (
     <div className="w-full h-full flex flex-col">
       <div className={`w-full flex-1 p-4 pb-0 flex flex-col items-center overflow-y-auto overflow-x-hidden`}>
-        <div className={`w-full flex flex-col ${pageWidth}`}>
+        <div className={`relative w-full flex flex-col ${pageWidth}`}>
           {messageList?.map((item) => (
             <MessageItem
               key={item.id}
@@ -428,10 +430,11 @@ export default function Page() {
           )}
           <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
           <div id="chat-bottom" />
+          <Command value={inputContent} width={pageWidth} onPromptClick={(prompt) => setInputContent(prompt)} />
         </div>
       </div>
       {chatLoading && <Progress size="xs" isIndeterminate />}
-      <div className={`px-6 pt-4 border-t flex flex-col items-center`}>
+      <div id="chat-bottom-wrapper" className={`px-6 pt-4 border-t flex flex-col items-center`}>
         <div className={`w-full flex flex-col justify-end space-y-3 ${pageWidth}`}>
           <AutoResizeTextarea
             minRows={2}
@@ -467,6 +470,6 @@ export default function Page() {
   );
 }
 
-function scrollToPageBottom(options: ScrollIntoViewOptions = {}) {
+export function scrollToPageBottom(options: ScrollIntoViewOptions = {}) {
   scrollToElement("chat-bottom", { behavior: "smooth", block: "end", ...options });
 }

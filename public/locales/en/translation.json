@@ -6,7 +6,7 @@
   },
   "prompt": {
     "title": "System Prompt",
-    "placeholder": "please enter system prompt",
+    "placeholder": "please enter system prompt. After setting, it will be sent together with the message every time.",
     "tip": "",
     "select": "Select Prompt"
   },

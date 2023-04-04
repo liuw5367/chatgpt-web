@@ -14,6 +14,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { chatAtom, chatDataAtom, visibleAtom } from "../atom";
+import { scrollToPageBottom } from "../chat";
 import { Logo } from "../Logo";
 import SimpleDrawer from "../SimpleDrawer";
 import { saveChatAtom } from "../storage";
@@ -120,7 +121,12 @@ export function ChatPanel() {
               onNameChange={handleNameChange}
               onDelete={handleDelete}
               onClick={() => {
+                if (chat.id === currentChat.id) {
+                  handleClose();
+                  return;
+                }
                 updateChatId(chat);
+                scrollToPageBottom();
                 handleClose();
               }}
             />

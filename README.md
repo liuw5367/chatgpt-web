@@ -5,10 +5,11 @@
 
 ## 功能
 
+- 页面样式移动端优先
 - 对话使用 OPENAI 官方 API `/v1/chat/completions`
 - 支持图片生成 `/v1/images/generations`
 - 支持查询 apiKey 余额 `/dashboard/billing/credit_grants`
-- 支持设置 System Prompt，提供多个模版供选择
+- 支持设置 System Prompt，提供大量模版供选择
 - 支持多会话
 - 支持连续对话
 - 消息显示 token 使用数量
@@ -16,7 +17,8 @@
 - 支持夜间模式
 - 支持对话内容复制
 - 支持代码复制
-- 页面样式移动端优先
+- 输入 `/` 搜索 Prompt
+- 支持 i18n
 - 支持 ASR 和 TTS，可用但不完善，需申请 key，[申请地址](https://ai.unisound.com)
 
 ![Dark](./screenshot-dark.png)
