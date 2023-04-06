@@ -9,6 +9,7 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  Switch,
   useToast,
 } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
@@ -140,6 +141,12 @@ export function SettingPanel() {
       placeholder: "",
       desc: t("settings.top_p"),
     },
+    {
+      type: "switch",
+      label: t("settings.SearchSuggestions"),
+      value: "searchSuggestions",
+      placeholder: "",
+    },
   ];
 
   return (
@@ -181,9 +188,10 @@ interface ItemProps {
 }
 
 function Item({ item, value, onChange, balance }: ItemProps) {
+  const horizontal = item.type === "switch";
   return (
-    <FormControl>
-      <FormLabel>
+    <FormControl className={`${horizontal && "flex flex-row"}`}>
+      <FormLabel className={`${horizontal && "flex-1"}`}>
         <span>{item.label}</span>
         {item.label === "OpenAI Key" && <span>&nbsp;{balance}</span>}
       </FormLabel>
@@ -202,6 +210,8 @@ function Item({ item, value, onChange, balance }: ItemProps) {
             <NumberDecrementStepper />
           </NumberInputStepper>
         </NumberInput>
+      ) : item.type === "switch" ? (
+        <Switch isChecked={value === "1"} onChange={(e) => onChange(e.target.checked ? "1" : "0")} />
       ) : (
         <Input
           className="flex-1"

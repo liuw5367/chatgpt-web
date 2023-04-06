@@ -30,6 +30,7 @@ import { TTSStatusEnum } from "./ai/TTSView";
 import { Command } from "./Command";
 import ErrorItem from "./ErrorItem";
 import { MessageItem } from "./MessageItem";
+import { SearchSuggestions } from "./SearchSuggestions";
 import { estimateTokens } from "./token";
 
 export default function Page() {
@@ -431,6 +432,13 @@ export default function Page() {
           <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
           <div id="chat-bottom" />
           <Command value={inputContent} width={pageWidth} onPromptClick={(prompt) => setInputContent(prompt)} />
+          {chatConfig.searchSuggestions === "1" && (
+            <SearchSuggestions
+              value={inputContent}
+              width={pageWidth}
+              onPromptClick={(prompt) => setInputContent(prompt)}
+            />
+          )}
         </div>
       </div>
       {chatLoading && <Progress size="xs" isIndeterminate />}

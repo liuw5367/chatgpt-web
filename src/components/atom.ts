@@ -14,6 +14,8 @@ export interface ChatConfigType {
   openAIModel?: string;
   temperature?: string;
   top_p?: string;
+
+  searchSuggestions?: string;
 }
 
 export const chatAtom = atom<ChatAtomType>({

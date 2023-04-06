@@ -37,6 +37,7 @@ export function loadCache(newChatName: string) {
     openAIModel: localStorage.getItem("openAIModel") || undefined,
     temperature: localStorage.getItem("temperature") ?? "0.6",
     top_p: localStorage.getItem("top_p") ?? "1",
+    searchSuggestions: localStorage.getItem("searchSuggestions") ?? "1",
   });
 }
 
