@@ -30,12 +30,6 @@ type ListItemType<T = string> = {
   max?: number;
 };
 
-const openAIList: ListItemType[] = [
-  { label: "OpenAI Host", value: "openAIHost", placeholder: "https://api.openai.com" },
-  { label: "OpenAI Key", value: "openAIKey", type: "password", placeholder: "please enter OPENAI_KEY" },
-  { label: "OpenAI Model", value: "openAIModel", placeholder: "gpt-3.5-turbo" },
-];
-
 const voiceList: ListItemType[] = [
   { label: "Unisound AppKey", value: "unisoundAppKey", placeholder: "https://ai.unisound.com" },
   { label: "Unisound SECRET", value: "unisoundSecret", type: "password", placeholder: "https://ai.unisound.com" },
@@ -67,7 +61,7 @@ export function SettingPanel() {
 
   async function requestBalance() {
     try {
-      const controller = new controller();
+      const controller = new AbortController();
       setAbortController(controller);
 
       const response = await fetch("/api/balance", {
@@ -126,6 +120,15 @@ export function SettingPanel() {
 
   const chatConfigList: ListItemType[] = [
     {
+      type: "switch",
+      label: t("settings.SearchSuggestions"),
+      value: "searchSuggestions",
+      placeholder: "",
+    },
+    { label: "OpenAI Key", value: "openAIKey", type: "password", placeholder: "please enter OPENAI_KEY" },
+    { label: "OpenAI Host", value: "openAIHost", placeholder: "https://api.openai.com" },
+    { label: "OpenAI Model", value: "openAIModel", placeholder: "gpt-3.5-turbo" },
+    {
       type: "number",
       label: "temperature",
       value: "temperature",
@@ -140,12 +143,6 @@ export function SettingPanel() {
       max: 1,
       placeholder: "",
       desc: t("settings.top_p"),
-    },
-    {
-      type: "switch",
-      label: t("settings.SearchSuggestions"),
-      value: "searchSuggestions",
-      placeholder: "",
     },
   ];
 
@@ -172,7 +169,6 @@ export function SettingPanel() {
       }
     >
       <div className="flex flex-col space-y-4">
-        {openAIList.map((item) => renderItem(item))}
         {chatConfigList.map((item) => renderItem(item))}
         {voiceList.map((item) => renderItem(item))}
       </div>
@@ -211,7 +207,7 @@ function Item({ item, value, onChange, balance }: ItemProps) {
           </NumberInputStepper>
         </NumberInput>
       ) : item.type === "switch" ? (
-        <Switch isChecked={value === "1"} onChange={(e) => onChange(e.target.checked ? "1" : "0")} />
+        <Switch colorScheme="teal" isChecked={value === "1"} onChange={(e) => onChange(e.target.checked ? "1" : "0")} />
       ) : (
         <Input
           className="flex-1"

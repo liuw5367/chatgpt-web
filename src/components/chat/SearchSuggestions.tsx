@@ -20,13 +20,18 @@ export function SearchSuggestions(props: Props) {
   const [bottomHeight, setBottomHeight] = useState(146);
   const [promptList, setPromptList] = useState<string[]>([]);
   const lastContentRef = useRef("");
+  const valueRef = useRef(value);
+
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
 
   useDebounceEffect(
     () => {
       search();
     },
     [value],
-    { wait: 300, maxWait: 500 }
+    { wait: 200, maxWait: 300 }
   );
 
   useEffect(() => {
@@ -55,6 +60,11 @@ export function SearchSuggestions(props: Props) {
           content,
         }),
       });
+      if (!valueRef.current?.trim()) {
+        // 可能等接口返回时，输入框无内容，不需要显示
+        setPromptList([]);
+        return;
+      }
       const json = await response.json();
       setPromptList(json);
       scrollToTop();
@@ -74,7 +84,7 @@ export function SearchSuggestions(props: Props) {
       }}
     >
       <div
-        className={`rounded-lg w-full max-h-[50vh] bg-$chakra-colors-chakra-body-bg`}
+        className={`rounded-lg w-full max-h-[35vh] bg-$chakra-colors-chakra-body-bg`}
         border="~ solid $chakra-colors-chakra-border-color"
         overflow="x-hidden y-auto"
         style={{ maxWidth: "calc(100vw - 32px)" }}
