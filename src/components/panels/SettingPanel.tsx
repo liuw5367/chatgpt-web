@@ -128,6 +128,12 @@ export function SettingPanel() {
       value: "searchSuggestions",
       placeholder: "",
     },
+    {
+      type: "switch",
+      label: t("settings.EnterSend"),
+      value: "enterSend",
+      placeholder: "",
+    },
     { label: "OpenAI Key", value: "openAIKey", type: "password", placeholder: "please enter OPENAI_KEY" },
     { label: "OpenAI Host", value: "openAIHost", placeholder: "https://api.openai.com" },
     { label: "OpenAI Model", value: "openAIModel", placeholder: "gpt-3.5-turbo" },

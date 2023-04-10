@@ -38,6 +38,7 @@ export function loadCache(newChatName: string) {
     temperature: localStorage.getItem("temperature") ?? "0.6",
     top_p: localStorage.getItem("top_p") ?? "1",
     searchSuggestions: localStorage.getItem("searchSuggestions") ?? "1",
+    enterSend: localStorage.getItem("searchSuggestions") ?? "",
   });
 }
 

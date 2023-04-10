@@ -16,6 +16,7 @@ export interface ChatConfigType {
   top_p?: string;
 
   searchSuggestions?: string;
+  enterSend?: string;
 }
 
 export const chatAtom = atom<ChatAtomType>({

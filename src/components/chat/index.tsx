@@ -38,6 +38,7 @@ export default function Page() {
   const toast = useToast({ position: "top", isClosable: true });
   const messageList = useStore(chatDataAtom);
   const chatConfig = useStore(chatConfigAtom);
+  const enterSend = chatConfig.enterSend === "1";
   const { currentChat } = useStore(chatAtom);
   const { conversationId } = currentChat;
   const [inputContent, setInputContent] = useState("");
@@ -447,20 +448,30 @@ export default function Page() {
           <AutoResizeTextarea
             minRows={2}
             maxRows={10}
+            enterKeyHint={enterSend ? "send" : undefined}
             className="placeholder:text-[14px]"
-            value={inputContent}
+            value={inputContent === "\n" ? "" : inputContent}
             placeholder={t("chat.placeholder") || ""}
             onChange={(e) => setInputContent(e.target.value)}
             onKeyDown={(e) => {
-              if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-                handleSendClick();
-              } else if (e.key === "ArrowUp") {
+              if (e.key === "ArrowUp") {
                 if (!inputContent?.trim()) {
                   const content = [...messageList].reverse().find((v) => v.role === "user" && v.content)?.content;
                   if (content) {
                     setInputContent(content);
                   }
                 }
+                return;
+              }
+              if (enterSend && e.key === "Enter") {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+                  return;
+                }
+                handleSendClick();
+                return;
+              }
+              if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                handleSendClick();
               }
             }}
           />
