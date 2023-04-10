@@ -394,7 +394,10 @@ export default function Page() {
           title={currentChat.systemMessage}
           colorScheme={currentChat.systemMessage ? "telegram" : "gray"}
           icon={currentChat.systemMessage ? <IconMessagePlus stroke={1.5} /> : <IconMessage stroke={1.5} />}
-          onClick={() => visibleAtom.set({ ...visibleAtom.get(), promptVisible: true })}
+          onClick={() => {
+            const values = visibleAtom.get();
+            visibleAtom.set({ ...values, promptVisible: !values.promptVisible });
+          }}
         />
       </div>
     </div>

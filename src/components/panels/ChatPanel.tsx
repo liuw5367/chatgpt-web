@@ -1,4 +1,4 @@
-import { Button, IconButton, Input } from "@chakra-ui/react";
+import { Button, IconButton, Input, useBreakpointValue } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
 import {
   IconCheck,
@@ -32,6 +32,7 @@ export function ChatPanel(props: Props) {
   const { chatVisible } = useStore(visibleAtom);
   const { chatList, currentChat } = useStore(chatAtom);
   const { id: chatId } = currentChat;
+  const mdChatVisible = useBreakpointValue({ base: false, lg: true }, { fallback: "base" });
 
   function updateChatList(chatList: ChatItem[]) {
     saveChatAtom({ ...chatAtom.get(), chatList });
@@ -46,6 +47,7 @@ export function ChatPanel(props: Props) {
   }
 
   function handleClose() {
+    if (mdChatVisible) return;
     visibleAtom.set({ ...visibleAtom.get(), chatVisible: false });
   }
 
@@ -100,7 +102,7 @@ export function ChatPanel(props: Props) {
         )
       }
       footer={
-        <div className="w-full flex flex-ro items-center justify-between">
+        <div className="w-full flex flex-row items-center justify-between">
           <Button
             aria-label="ChangeLanguage"
             variant="ghost"

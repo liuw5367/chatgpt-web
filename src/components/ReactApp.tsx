@@ -1,9 +1,11 @@
 import "./i18n";
 
 import { ChakraProvider, extendTheme, useBreakpointValue } from "@chakra-ui/react";
+import { useStore } from "@nanostores/react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
+import { visibleAtom } from "./atom";
 import Chat from "./chat/index";
 import { Header } from "./Header";
 import { ChatPanel, ImagePanel, SettingPanel, SystemPromptPanel } from "./panels";
@@ -26,24 +28,25 @@ export default function App() {
         <Header />
         <Content />
 
-        <ChatPanel />
         <ImagePanel />
         <SettingPanel />
-        <SystemPromptPanel />
       </div>
     </ChakraProvider>
   );
 }
 
 function Content() {
-  const chatVisible = useBreakpointValue({ base: false, lg: true }, { fallback: "base" });
+  const mdChatVisible = useBreakpointValue({ base: false, lg: true }, { fallback: "base" });
+  const xlPromptVisible = useBreakpointValue({ base: false, xl: true }, { fallback: "base" });
+  const { chatVisible, promptVisible } = useStore(visibleAtom);
 
   return (
     <div className="w-full flex" style={{ height: "calc(100% - 4rem)" }}>
-      {chatVisible === true && <ChatPanel type="side" />}
+      <ChatPanel type={mdChatVisible && chatVisible ? "side" : "drawer"} />
       <div className="w-full h-full">
         <Chat />
       </div>
+      <SystemPromptPanel sideWidth="min-w-100 max-w-100" type={xlPromptVisible && promptVisible ? "side" : "drawer"} />
     </div>
   );
 }

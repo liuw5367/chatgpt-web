@@ -1,4 +1,4 @@
-import { IconButton, useBreakpointValue, useColorMode } from "@chakra-ui/react";
+import { IconButton, useColorMode } from "@chakra-ui/react";
 import { IconMenu2, IconMoonStars, IconPhoto, IconSettings, IconSun } from "@tabler/icons-react";
 import { Helmet } from "react-helmet";
 
@@ -7,7 +7,6 @@ import { Logo } from "./Logo";
 
 export function Header() {
   const { colorMode, toggleColorMode } = useColorMode();
-  const chatVisible = useBreakpointValue({ base: false, lg: true }, { fallback: "base" });
 
   return (
     <div
@@ -16,14 +15,15 @@ export function Header() {
     >
       <div className="flex items-center space-x-2 font-medium">
         <Logo />
-        {!chatVisible && (
-          <IconButton
-            aria-label="ChatList"
-            variant="ghost"
-            icon={<IconMenu2 stroke={1.5} />}
-            onClick={() => visibleAtom.set({ ...visibleAtom.get(), chatVisible: true })}
-          />
-        )}
+        <IconButton
+          aria-label="ChatList"
+          variant="ghost"
+          icon={<IconMenu2 stroke={1.5} />}
+          onClick={() => {
+            const values = visibleAtom.get();
+            visibleAtom.set({ ...values, chatVisible: !values.chatVisible });
+          }}
+        />
       </div>
 
       <div className="flex flex-row items-center space-x-1">

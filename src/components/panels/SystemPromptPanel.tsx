@@ -1,4 +1,4 @@
-import { Button, IconButton, Select, Textarea, useToast } from "@chakra-ui/react";
+import { Button, IconButton, Select, Textarea, useBreakpointValue, useToast } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
 import { IconEraser } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -10,7 +10,13 @@ import { templateOptions } from "../prompts";
 import SimpleDrawer from "../SimpleDrawer";
 import { saveCurrentChatValue } from "../storage";
 
-export function SystemPromptPanel() {
+interface Props {
+  type?: "side" | "drawer";
+  sideWidth?: string;
+}
+
+export function SystemPromptPanel(props: Props) {
+  const { type, sideWidth } = props;
   const { t } = useTranslation();
   const toast = useToast({ position: "top", isClosable: true });
   const { currentChat } = useStore(chatAtom);
@@ -24,6 +30,8 @@ export function SystemPromptPanel() {
   const [remark, setRemark] = useState("");
 
   const [token, setToken] = useState(0);
+
+  const xlPromptVisible = useBreakpointValue({ base: false, xl: true }, { fallback: "base" });
 
   useEffect(() => {
     if (promptVisible) {
@@ -46,6 +54,7 @@ export function SystemPromptPanel() {
   }, [prompt]);
 
   function handleClose() {
+    if (xlPromptVisible) return;
     visibleAtom.set({ ...visibleAtom.get(), promptVisible: false });
   }
 
@@ -76,6 +85,8 @@ export function SystemPromptPanel() {
 
   return (
     <SimpleDrawer
+      type={type}
+      sideWidth={sideWidth}
       isOpen={promptVisible}
       onClose={handleClose}
       size="lg"
@@ -86,9 +97,11 @@ export function SystemPromptPanel() {
             {t("actions.remove")}
           </Button>
           <div className="flex flex-row">
-            <Button variant="outline" mr={3} onClick={handleClose}>
-              {t("actions.cancel")}
-            </Button>
+            {type !== "side" && (
+              <Button variant="outline" mr={3} onClick={handleClose}>
+                {t("actions.cancel")}
+              </Button>
+            )}
             <Button colorScheme="teal" onClick={handleSaveClick}>
               {t("actions.save")}
             </Button>
@@ -96,8 +109,11 @@ export function SystemPromptPanel() {
         </div>
       }
     >
-      <div className="w-full h-full flex flex-col space-y-2 ">
-        <div className="flex flex-col space-y-2" sm="flex-row items-center space-x-4 space-y-0">
+      <div className={`w-full h-full flex flex-col space-y-2`}>
+        <div
+          className="flex flex-col space-y-2"
+          sm={type === "side" ? "" : "flex-row items-center space-x-4 space-y-0"}
+        >
           <div>
             <Select
               value={template}
