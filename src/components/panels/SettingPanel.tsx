@@ -55,10 +55,13 @@ export function SettingPanel() {
     if (settingVisible) {
       const data = chatConfigAtom.get();
       setConfig({ ...data });
-      requestBalance();
+      // requestBalance();
     }
   }, [settingVisible]);
 
+  /**
+   * @deprecated 接口已无法使用
+   */
   async function requestBalance() {
     try {
       const controller = new AbortController();
@@ -185,6 +188,7 @@ interface ItemProps {
 
 function Item({ item, value, onChange, balance }: ItemProps) {
   const horizontal = item.type === "switch";
+
   return (
     <FormControl className={`${horizontal && "flex flex-row"}`}>
       <FormLabel className={`${horizontal && "flex-1"}`}>
