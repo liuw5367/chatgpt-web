@@ -1,6 +1,6 @@
 import "./i18n";
 
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme, useBreakpointValue } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -24,9 +24,7 @@ export default function App() {
       {loadIcons()}
       <div className={`v-screen h-screen flex flex-col overflow-hidden`}>
         <Header />
-        <div className="w-full" style={{ height: "calc(100% - 4rem)" }}>
-          <Chat />
-        </div>
+        <Content />
 
         <ChatPanel />
         <ImagePanel />
@@ -34,6 +32,19 @@ export default function App() {
         <SystemPromptPanel />
       </div>
     </ChakraProvider>
+  );
+}
+
+function Content() {
+  const chatVisible = useBreakpointValue({ base: false, lg: true }, { fallback: "base" });
+
+  return (
+    <div className="w-full flex" style={{ height: "calc(100% - 4rem)" }}>
+      {chatVisible === true && <ChatPanel type="side" />}
+      <div className="w-full h-full">
+        <Chat />
+      </div>
+    </div>
   );
 }
 

@@ -21,7 +21,13 @@ import { saveChatAtom } from "../storage";
 import type { ChatItem } from "../types";
 import { uuid } from "../utils";
 
-export function ChatPanel() {
+interface Props {
+  type?: "side" | "drawer";
+  sideWidth?: string;
+}
+
+export function ChatPanel(props: Props) {
+  const { type, sideWidth } = props;
   const { t } = useTranslation();
   const { chatVisible } = useStore(visibleAtom);
   const { chatList, currentChat } = useStore(chatAtom);
@@ -80,14 +86,18 @@ export function ChatPanel() {
 
   return (
     <SimpleDrawer
+      type={type}
+      sideWidth={sideWidth}
       isOpen={chatVisible}
       size="sm"
       placement="left"
       onClose={handleClose}
       header={
-        <div className="flex items-center space-x-2 font-medium">
-          <Logo />
-        </div>
+        type === "side" ? null : (
+          <div className="flex items-center space-x-2 font-medium">
+            <Logo />
+          </div>
+        )
       }
       footer={
         <div className="w-full flex flex-ro items-center justify-between">
@@ -155,7 +165,7 @@ function ChatItemView(props: ItemProps) {
     <div
       key={chat.id}
       onClick={isEditing ? undefined : onClick}
-      className={`w-full flex flex-row items-center min-h-16 pl-4 pr-2 rounded-lg space-x-2 border ${
+      className={`w-full flex flex-row items-center min-h-16 pl-4 pr-2 rounded-lg space-x-2 border cursor-pointer ${
         selected && "bg-teal-600 text-white border-[teal-600]"
       }`}
     >
@@ -179,6 +189,7 @@ function ChatItemView(props: ItemProps) {
           <IconButton
             aria-label="Save"
             variant="ghost"
+            colorScheme="black"
             icon={<IconCheck size="1.0rem" className="opacity-64 hover:text-black" />}
             size="xs"
             onClick={(e) => {
@@ -193,6 +204,7 @@ function ChatItemView(props: ItemProps) {
           <IconButton
             aria-label="close"
             variant="ghost"
+            colorScheme="black"
             icon={<IconX size="1.0rem" className="opacity-64 hover:text-black" />}
             size="xs"
             onClick={(e) => {
@@ -207,6 +219,7 @@ function ChatItemView(props: ItemProps) {
           <IconButton
             aria-label="Edit"
             variant="ghost"
+            colorScheme="black"
             icon={<IconEdit size="0.90rem" className="opacity-64  hover:text-black" />}
             size="xs"
             onClick={(e) => {
@@ -220,6 +233,7 @@ function ChatItemView(props: ItemProps) {
           <IconButton
             aria-label="Delete"
             variant="ghost"
+            colorScheme="black"
             icon={<IconTrash size="0.90rem" className="opacity-64  hover:text-black" />}
             size="xs"
             onClick={(e) => {
