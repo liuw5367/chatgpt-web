@@ -28,7 +28,7 @@ export default function SimpleDrawer(props: Props) {
   const { isOpen = false, onClose, size = "sm", placement = "right", type = "drawer", sideWidth } = props;
   const { header, footer, children } = props;
 
-  if (type === "side") {
+  if (isOpen && type === "side") {
     return (
       <div
         className={`${sideWidth || "min-w-80 max-w-80"} h-full flex flex-col`}

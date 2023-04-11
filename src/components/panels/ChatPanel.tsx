@@ -1,4 +1,4 @@
-import { Button, IconButton, Input, useBreakpointValue } from "@chakra-ui/react";
+import { Button, IconButton, Input } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
 import {
   IconCheck,
@@ -24,15 +24,14 @@ import { uuid } from "../utils";
 interface Props {
   type?: "side" | "drawer";
   sideWidth?: string;
+  chatVisible: boolean;
 }
 
 export function ChatPanel(props: Props) {
-  const { type, sideWidth } = props;
+  const { chatVisible, type, sideWidth } = props;
   const { t } = useTranslation();
-  const { chatVisible } = useStore(visibleAtom);
   const { chatList, currentChat } = useStore(chatAtom);
   const { id: chatId } = currentChat;
-  const mdChatVisible = useBreakpointValue({ base: false, lg: true }, { fallback: "base" });
 
   function updateChatList(chatList: ChatItem[]) {
     saveChatAtom({ ...chatAtom.get(), chatList });
@@ -47,7 +46,7 @@ export function ChatPanel(props: Props) {
   }
 
   function handleClose() {
-    if (mdChatVisible) return;
+    if (type === "side") return;
     visibleAtom.set({ ...visibleAtom.get(), chatVisible: false });
   }
 

@@ -1,4 +1,4 @@
-import { Button, IconButton, Select, Textarea, useBreakpointValue, useToast } from "@chakra-ui/react";
+import { Button, IconButton, Select, Textarea, useToast } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
 import { IconEraser } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -13,15 +13,15 @@ import { saveCurrentChatValue } from "../storage";
 interface Props {
   type?: "side" | "drawer";
   sideWidth?: string;
+  promptVisible: boolean;
 }
 
 export function SystemPromptPanel(props: Props) {
-  const { type, sideWidth } = props;
+  const { promptVisible, type, sideWidth } = props;
   const { t } = useTranslation();
   const toast = useToast({ position: "top", isClosable: true });
   const { currentChat } = useStore(chatAtom);
   const { systemMessage = "" } = currentChat;
-  const { promptVisible } = useStore(visibleAtom);
 
   const [prompt, setPrompt] = useState(systemMessage);
   const [template, setTemplate] = useState(templateOptions[0].label);
@@ -30,8 +30,6 @@ export function SystemPromptPanel(props: Props) {
   const [remark, setRemark] = useState("");
 
   const [token, setToken] = useState(0);
-
-  const xlPromptVisible = useBreakpointValue({ base: false, xl: true }, { fallback: "base" });
 
   useEffect(() => {
     if (promptVisible) {
@@ -54,7 +52,7 @@ export function SystemPromptPanel(props: Props) {
   }, [prompt]);
 
   function handleClose() {
-    if (xlPromptVisible) return;
+    if (type === "side") return;
     visibleAtom.set({ ...visibleAtom.get(), promptVisible: false });
   }
 
@@ -89,7 +87,7 @@ export function SystemPromptPanel(props: Props) {
       sideWidth={sideWidth}
       isOpen={promptVisible}
       onClose={handleClose}
-      size="lg"
+      size="md"
       header={t("prompt.title")}
       footer={
         <div className="w-full flex flex-row justify-between">

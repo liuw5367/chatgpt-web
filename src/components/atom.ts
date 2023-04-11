@@ -30,7 +30,7 @@ export const chatConfigAtom = atom<ChatConfigType>({});
 
 export const visibleAtom = atom({
   chatVisible: false,
-  settingVisible: false,
   promptVisible: false,
+  settingVisible: false,
   imageVisible: false,
 });

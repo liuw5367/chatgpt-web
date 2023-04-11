@@ -2,7 +2,7 @@ import "./i18n";
 
 import { ChakraProvider, extendTheme, useBreakpointValue } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { visibleAtom } from "./atom";
@@ -36,17 +36,43 @@ export default function App() {
 }
 
 function Content() {
-  const mdChatVisible = useBreakpointValue({ base: false, lg: true }, { fallback: "base" });
-  const xlPromptVisible = useBreakpointValue({ base: false, xl: true }, { fallback: "base" });
+  const lg = useBreakpointValue({ base: false, lg: true }, { fallback: "base" });
+  const xl = useBreakpointValue({ base: false, xl: true }, { fallback: "base" });
   const { chatVisible, promptVisible } = useStore(visibleAtom);
+
+  const [chatVisibleState, setChatVisibleState] = useState(chatVisible);
+  const [promptVisibleState, setPromptVisibleState] = useState(promptVisible);
+
+  const [showChatSide, setShowChatSide] = useState(false);
+  const [showPromptSide, setShowPromptSide] = useState(false);
+
+  const showChatSideRef = useRef(showChatSide);
+  const showPromptSideRef = useRef(showPromptSide);
+
+  useEffect(() => {
+    const showChat = !showPromptSideRef.current && chatVisible;
+    const showPrompt = !showChatSideRef.current && promptVisible;
+    showChatSideRef.current = showChat;
+    setShowChatSide(showChat);
+    showPromptSideRef.current = showPrompt;
+    setShowPromptSide(showPrompt);
+
+    // 因为drawer的阴影会闪一下，所以保证 showChatSide，chatVisible 两个 state 是同时变化的
+    setChatVisibleState(chatVisible);
+    setPromptVisibleState(promptVisible);
+  }, [xl, lg, chatVisible, promptVisible, setShowChatSide, setShowPromptSide]);
 
   return (
     <div className="w-full flex" style={{ height: "calc(100% - 4rem)" }}>
-      <ChatPanel type={mdChatVisible && chatVisible ? "side" : "drawer"} />
+      <ChatPanel chatVisible={chatVisibleState} type={xl || (lg && showChatSide) ? "side" : "drawer"} />
       <div className="w-full h-full">
         <Chat />
       </div>
-      <SystemPromptPanel sideWidth="min-w-100 max-w-100" type={xlPromptVisible && promptVisible ? "side" : "drawer"} />
+      <SystemPromptPanel
+        promptVisible={promptVisibleState}
+        sideWidth="min-w-100 max-w-100"
+        type={xl || (lg && showPromptSide) ? "side" : "drawer"}
+      />
     </div>
   );
 }
