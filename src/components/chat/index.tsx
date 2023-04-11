@@ -406,10 +406,10 @@ export default function Page() {
 
   const pageWidth =
     chatVisible && promptVisible
-      ? "md:max-w-160 lg:max-w-176 xl:max-w-160 2xl:max-w-200"
+      ? "lg:max-w-176 xl:max-w-160 2xl:max-w-240"
       : chatVisible || promptVisible
-      ? "md:max-w-160 lg:max-w-176 xl:max-w-240"
-      : "md:max-w-160 lg:max-w-200 xl:max-w-240";
+      ? "lg:max-w-176 xl:max-w-240"
+      : "lg:max-w-200 xl:max-w-240";
 
   return (
     <div className="w-full h-full flex flex-col">
