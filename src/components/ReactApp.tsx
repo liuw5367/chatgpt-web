@@ -1,6 +1,6 @@
 import "./i18n";
 
-import { ChakraProvider, extendTheme, useBreakpointValue } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme, useMediaQuery } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -36,8 +36,9 @@ export default function App() {
 }
 
 function Content() {
-  const lg = useBreakpointValue({ base: false, lg: true }, { fallback: "base" });
-  const xl = useBreakpointValue({ base: false, xl: true }, { fallback: "base" });
+  // 和 tailwind 保持一致
+  const [lg] = useMediaQuery("(min-width: 1023.9px)");
+  const [xl] = useMediaQuery("(min-width: 1279.9px)");
   const { chatVisible, promptVisible } = useStore(visibleAtom);
 
   const [chatVisibleState, setChatVisibleState] = useState(chatVisible);

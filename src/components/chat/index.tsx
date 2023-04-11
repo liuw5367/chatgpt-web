@@ -38,6 +38,7 @@ export default function Page() {
   const toast = useToast({ position: "top", isClosable: true });
   const messageList = useStore(chatDataAtom);
   const chatConfig = useStore(chatConfigAtom);
+  const { chatVisible, promptVisible } = useStore(visibleAtom);
   const enterSend = chatConfig.enterSend === "1";
   const { currentChat } = useStore(chatAtom);
   const { conversationId } = currentChat;
@@ -403,7 +404,10 @@ export default function Page() {
     </div>
   );
 
-  const pageWidth = "md:max-w-160 lg:max-w-200 xl:max-w-240";
+  const pageWidth =
+    chatVisible && promptVisible
+      ? "md:max-w-160 lg:max-w-176 xl:max-w-160 2xl:max-w-200"
+      : "md:max-w-160 lg:max-w-176 xl:max-w-240";
 
   return (
     <div className="w-full h-full flex flex-col">
