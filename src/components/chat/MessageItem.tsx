@@ -183,7 +183,7 @@ export function MessageItem(props: Props) {
               ${isUser && 'whitespace-pre-wrap'}`}
         >
           {isUser || showOriginContent ? (
-            <div dangerouslySetInnerHTML={{ __html: item.content || item.prompt || '' }} />
+            <>{item.content || item.prompt}</>
           ) : (
             <div className="markdown-body" dangerouslySetInnerHTML={{ __html: item.markdown || '' }} />
           )}

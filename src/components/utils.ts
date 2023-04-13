@@ -39,7 +39,11 @@ export function removeLn(content?: string): string {
 }
 
 export function addCodeCopy() {
-  const clipboard = new Clipboard('.markdown-it-code-copy');
+  const clipboard = new Clipboard('.markdown-it-code-copy', {
+    text: function (trigger) {
+      return decodeURIComponent(trigger.getAttribute('data-clipboard-text') || '');
+    },
+  });
   clipboard.on('success', function (e) {
     const element = e.trigger?.getElementsByClassName('code-copy-content')?.[0];
     if (element) {
