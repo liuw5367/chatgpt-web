@@ -1,28 +1,25 @@
-import "./i18n";
+import { useMediaQuery } from '@chakra-ui/react';
+import { useStore } from '@nanostores/react';
+import { useTranslation } from 'next-i18next';
+import { useEffect, useRef, useState } from 'react';
 
-import { ChakraProvider, extendTheme, useMediaQuery } from "@chakra-ui/react";
-import { useStore } from "@nanostores/react";
-import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-
-import { visibleAtom } from "./atom";
-import Chat from "./chat/index";
-import { Header } from "./Header";
-import { ChatPanel, ImagePanel, SettingPanel, SystemPromptPanel } from "./panels";
-import { loadCache } from "./storage";
-import { addCodeCopy } from "./utils";
+import { visibleAtom } from './atom';
+import Chat from './chat/index';
+import { Header } from './Header';
+import { ChatPanel, ImagePanel, SettingPanel, SystemPromptPanel } from './panels';
+import { loadCache } from './storage';
+import { addCodeCopy } from './utils';
 
 export default function App() {
   const { t } = useTranslation();
-  const theme = extendTheme({ initialColorMode: "system", useSystemColorMode: true });
 
   useEffect(() => {
-    loadCache(t("chat.new"));
+    loadCache(t('chat.new'));
     addCodeCopy();
   }, []);
 
   return (
-    <ChakraProvider theme={theme}>
+    <>
       {loadIcons()}
       <div className={`v-screen h-screen flex flex-col overflow-hidden`}>
         <Header />
@@ -31,14 +28,14 @@ export default function App() {
         <ImagePanel />
         <SettingPanel />
       </div>
-    </ChakraProvider>
+    </>
   );
 }
 
 function Content() {
   // 和 tailwind 保持一致
-  const [lg] = useMediaQuery("(min-width: 1023.9px)");
-  const [xl] = useMediaQuery("(min-width: 1279.9px)");
+  const [lg] = useMediaQuery('(min-width: 1023.9px)');
+  const [xl] = useMediaQuery('(min-width: 1279.9px)');
   const { chatVisible, promptVisible } = useStore(visibleAtom);
 
   const [chatVisibleState, setChatVisibleState] = useState(chatVisible);
@@ -64,15 +61,15 @@ function Content() {
   }, [xl, lg, chatVisible, promptVisible, setShowChatSide, setShowPromptSide]);
 
   return (
-    <div className="w-full flex" style={{ height: "calc(100% - 4rem)" }}>
-      <ChatPanel chatVisible={chatVisibleState} type={xl || (lg && showChatSide) ? "side" : "drawer"} />
+    <div className="w-full flex" style={{ height: 'calc(100% - 4rem)' }}>
+      <ChatPanel chatVisible={chatVisibleState} type={xl || (lg && showChatSide) ? 'side' : 'drawer'} />
       <div className="w-full h-full">
         <Chat />
       </div>
       <SystemPromptPanel
         promptVisible={promptVisibleState}
         sideWidth="min-w-100 max-w-100"
-        type={xl || (lg && showPromptSide) ? "side" : "drawer"}
+        type={xl || (lg && showPromptSide) ? 'side' : 'drawer'}
       />
     </div>
   );

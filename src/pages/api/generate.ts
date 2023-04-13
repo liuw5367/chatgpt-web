@@ -1,10 +1,12 @@
-import type { APIRoute } from "astro";
-import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
+import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
+import { NextRequest } from 'next/server';
 
-import { buildError, getEnv } from "./_utils";
+import { buildError, getEnv } from '@/utils';
 
-export const post: APIRoute = async (context) => {
-  const body = await context.request.json();
+export const config = { runtime: 'edge' };
+
+export default async function handler(req: NextRequest) {
+  const body = await req.json();
   const env = getEnv();
   const host = body.host || env.HOST;
   const apiKey = body.apiKey || env.KEY;
@@ -13,17 +15,17 @@ export const post: APIRoute = async (context) => {
   const config = body.config || {};
 
   if (!apiKey) {
-    return buildError({ code: "No Api Key" }, 401);
+    return buildError({ code: 'No Api Key' }, 401);
   }
 
   if (!messages) {
-    return buildError({ code: "No Prompt" });
+    return buildError({ code: 'No Prompt' });
   }
 
-  const response = await fetch(host + "/v1/chat/completions", {
-    method: "POST",
+  const response = await fetch(host + '/v1/chat/completions', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
@@ -33,12 +35,12 @@ export const post: APIRoute = async (context) => {
       ...config,
     }),
   }).catch((e: Error) => {
-    console.error("chat completions error: ", e);
+    console.error('chat completions error: ', e);
     return buildError({ code: e.name, message: e.message }, 500);
   });
 
   return parseOpenAIStream(response);
-};
+}
 
 const parseOpenAIStream = (rawResponse: Response) => {
   const encoder = new TextEncoder();
@@ -53,9 +55,9 @@ const parseOpenAIStream = (rawResponse: Response) => {
   const stream = new ReadableStream({
     async start(controller) {
       const streamParser = (event: ParsedEvent | ReconnectInterval) => {
-        if (event.type === "event") {
+        if (event.type === 'event') {
           const data = event.data;
-          if (data === "[DONE]") {
+          if (data === '[DONE]') {
             controller.close();
             return;
           }
@@ -70,7 +72,7 @@ const parseOpenAIStream = (rawResponse: Response) => {
             //   ],
             // }
             const json = JSON.parse(data);
-            const text = json.choices[0].delta?.content || "";
+            const text = json.choices[0].delta?.content || '';
             const queue = encoder.encode(text);
             controller.enqueue(queue);
           } catch (e) {

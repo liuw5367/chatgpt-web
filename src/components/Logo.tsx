@@ -1,6 +1,6 @@
-import { IconRobot } from "@tabler/icons-react";
+import { IconRobot } from '@tabler/icons-react';
 
-import { APP_NAME } from "../constants";
+import { APP_NAME } from '../constants';
 
 export function Logo() {
   return (

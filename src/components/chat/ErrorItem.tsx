@@ -1,6 +1,6 @@
-import { Alert, AlertDescription, AlertTitle, Box, CloseButton } from "@chakra-ui/react";
+import { Alert, AlertDescription, AlertTitle, Box, CloseButton } from '@chakra-ui/react';
 
-import type { ResponseError } from "../../pages/api/_utils";
+import type { ResponseError } from '@/utils';
 
 interface Props {
   error?: ResponseError;
@@ -17,14 +17,14 @@ export default function ErrorItem(props: Props) {
       {error?.message ? (
         <>
           <Box>
-            <AlertTitle>{error?.code || ""}</AlertTitle>
+            <AlertTitle>{error?.code || ''}</AlertTitle>
             <AlertDescription>{error?.message}</AlertDescription>
           </Box>
           <CloseButton onClick={onClose} className="absolute !top-2 !right-2" />
         </>
       ) : (
         <>
-          {error?.code || ""}
+          {error?.code || ''}
           <CloseButton onClick={onClose} className="absolute !right-2" />
         </>
       )}

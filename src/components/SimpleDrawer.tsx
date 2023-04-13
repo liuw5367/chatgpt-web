@@ -6,18 +6,18 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-} from "@chakra-ui/react";
-import type React from "react";
+} from '@chakra-ui/react';
+import type React from 'react';
 
 interface Props {
-  type?: "side" | "drawer";
+  type?: 'side' | 'drawer';
   sideWidth?: string;
 
   isOpen?: boolean;
   onClose: () => void;
 
   size?: string;
-  placement?: "left" | "right";
+  placement?: 'left' | 'right';
 
   header?: React.ReactNode;
   footer?: React.ReactNode;
@@ -25,22 +25,22 @@ interface Props {
 }
 
 export default function SimpleDrawer(props: Props) {
-  const { isOpen = false, onClose, size = "sm", placement = "right", type = "drawer", sideWidth } = props;
+  const { isOpen = false, onClose, size = 'sm', placement = 'right', type = 'drawer', sideWidth } = props;
   const { header, footer, children } = props;
 
-  if (isOpen && type === "side") {
+  if (isOpen && type === 'side') {
     return (
       <div
-        className={`${sideWidth || "min-w-80 max-w-80"} h-full flex flex-col`}
+        className={`${sideWidth || 'min-w-80 max-w-80'} h-full flex flex-col`}
         border={
-          placement === "left"
-            ? "r r-solid r-$chakra-colors-chakra-border-color"
-            : "l l-solid l-$chakra-colors-chakra-border-color"
+          placement === 'left'
+            ? 'r r-solid r-$chakra-colors-chakra-border-color'
+            : 'l l-solid l-$chakra-colors-chakra-border-color'
         }
       >
-        {header && <div className={"px-6 py-4"}>{header}</div>}
-        <div className={"px-6 py-4 w-full flex-1 overflow-y-auto overflow-x-hidden"}>{children}</div>
-        {footer && <div className={"px-6 py-4"}>{footer}</div>}
+        {header && <div className={'px-6 py-4'}>{header}</div>}
+        <div className={'px-6 py-4 w-full flex-1 overflow-y-auto overflow-x-hidden'}>{children}</div>
+        {footer && <div className={'px-6 py-4'}>{footer}</div>}
       </div>
     );
   }

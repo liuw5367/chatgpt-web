@@ -1,24 +1,26 @@
-import type { APIRoute } from "astro";
-import { sha256 } from "js-sha256";
+import sha256 from 'crypto-js/sha256';
+import { NextRequest } from 'next/server';
 
-import { buildError } from "./_utils";
+import { buildError } from '@/utils';
 
-const KEY = import.meta.env.PUBLIC_UNISOUND_AI_KEY;
-const SECRET = import.meta.env.UNISOUND_AI_SECRET || import.meta.env.PUBLIC_UNISOUND_AI_SECRET;
+const KEY = process.env.NEXT_PUBLIC_UNISOUND_AI_KEY;
+const SECRET = process.env.UNISOUND_AI_SECRET;
 
-export const post: APIRoute = async (context) => {
-  const body = await context.request.json();
+export const config = { runtime: 'edge' };
+
+export default async function handler(req: NextRequest) {
+  const body = await req.json();
   const apiKey = body.key || KEY;
   const time = body.time;
 
   if (!apiKey) {
-    return buildError({ code: "No Unisound Key" }, 401);
+    return buildError({ code: 'No Unisound Key' }, 401);
   }
   if (!SECRET) {
-    return buildError({ code: "No Unisound Secret" }, 401);
+    return buildError({ code: 'No Unisound Secret' }, 401);
   }
 
-  const sign = sha256(`${apiKey}${time}${SECRET}`).toUpperCase();
+  const sign = sha256(`${apiKey}${time}${SECRET}`).toString().toUpperCase();
 
   return new Response(JSON.stringify({ sign }));
-};
+}

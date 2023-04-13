@@ -11,18 +11,18 @@ import {
   NumberInputStepper,
   Switch,
   useToast,
-} from "@chakra-ui/react";
-import { useStore } from "@nanostores/react";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+} from '@chakra-ui/react';
+import { useStore } from '@nanostores/react';
+import getConfig from 'next/config';
+import { useTranslation } from 'next-i18next';
+import { useEffect, useState } from 'react';
 
-import { APP_VERSION } from "../../constants";
-import { chatConfigAtom, visibleAtom } from "../atom";
-import { PasswordInput } from "../PasswordInput";
-import SimpleDrawer from "../SimpleDrawer";
+import { chatConfigAtom, visibleAtom } from '../atom';
+import { PasswordInput } from '../PasswordInput';
+import SimpleDrawer from '../SimpleDrawer';
 
 type ListItemType<T = string> = {
-  type?: "password" | "number";
+  type?: 'password' | 'number';
   label: string;
   value: T;
   placeholder: string;
@@ -31,18 +31,18 @@ type ListItemType<T = string> = {
 };
 
 const voiceList: ListItemType[] = [
-  { label: "Unisound AppKey", value: "unisoundAppKey", placeholder: "https://ai.unisound.com" },
-  { label: "Unisound SECRET", value: "unisoundSecret", type: "password", placeholder: "https://ai.unisound.com" },
+  { label: 'Unisound AppKey', value: 'unisoundAppKey', placeholder: 'https://ai.unisound.com' },
+  { label: 'Unisound SECRET', value: 'unisoundSecret', type: 'password', placeholder: 'https://ai.unisound.com' },
 ];
 
 export function SettingPanel() {
   const { t } = useTranslation();
-  const toast = useToast({ position: "top", isClosable: true });
+  const toast = useToast({ position: 'top', isClosable: true });
   const chatConfig = useStore(chatConfigAtom);
   const { settingVisible } = useStore(visibleAtom);
 
   const [config, setConfig] = useState({ ...chatConfig });
-  const [balance, setBalance] = useState("");
+  const [balance, setBalance] = useState('');
   const [abortController, setAbortController] = useState<AbortController>();
 
   useEffect(() => {
@@ -67,8 +67,9 @@ export function SettingPanel() {
       const controller = new AbortController();
       setAbortController(controller);
 
-      const response = await fetch("/api/balance", {
-        method: "POST",
+      const response = await fetch('/api/balance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
         body: JSON.stringify({
           apiKey: chatConfig.openAIKey,
@@ -81,8 +82,8 @@ export function SettingPanel() {
         // toast({ status: "error", title: json.error.code, description: json.error.message });
       } else {
         const { total_available } = json;
-        if (total_available != null && total_available !== "") {
-          setBalance("$" + total_available);
+        if (total_available != null && total_available !== '') {
+          setBalance('$' + total_available);
         }
       }
     } catch (e) {
@@ -98,7 +99,7 @@ export function SettingPanel() {
     const draft = chatConfigAtom.get();
     const result = { ...draft, ...config };
     Object.entries(result).forEach(([key, value]) => {
-      if (value == null || value.trim() === "") {
+      if (value == null || value.trim() === '') {
         localStorage.removeItem(key);
       } else {
         localStorage.setItem(key, value.trim());
@@ -106,7 +107,7 @@ export function SettingPanel() {
     });
     chatConfigAtom.set(result);
     handleClose();
-    toast({ status: "success", title: t("toast.success") });
+    toast({ status: 'success', title: t('toast.success') });
   }
 
   function renderItem(item: ListItemType) {
@@ -115,7 +116,7 @@ export function SettingPanel() {
         key={item.value}
         item={item}
         balance={balance}
-        value={config[item.value] || ""}
+        value={config[item.value] || ''}
         onChange={(value) => setConfig((draft) => ({ ...draft, [item.value]: value }))}
       />
     );
@@ -123,35 +124,35 @@ export function SettingPanel() {
 
   const chatConfigList: ListItemType[] = [
     {
-      type: "switch",
-      label: t("settings.SearchSuggestions"),
-      value: "searchSuggestions",
-      placeholder: "",
+      type: 'switch',
+      label: t('settings.SearchSuggestions'),
+      value: 'searchSuggestions',
+      placeholder: '',
     },
     {
-      type: "switch",
-      label: t("settings.EnterSend"),
-      value: "enterSend",
-      placeholder: "",
+      type: 'switch',
+      label: t('settings.EnterSend'),
+      value: 'enterSend',
+      placeholder: '',
     },
-    { label: "OpenAI Key", value: "openAIKey", type: "password", placeholder: "please enter OPENAI_KEY" },
-    { label: "OpenAI Host", value: "openAIHost", placeholder: "https://api.openai.com" },
-    { label: "OpenAI Model", value: "openAIModel", placeholder: "gpt-3.5-turbo" },
+    { label: 'OpenAI Key', value: 'openAIKey', type: 'password', placeholder: 'please enter OPENAI_KEY' },
+    { label: 'OpenAI Host', value: 'openAIHost', placeholder: 'https://api.openai.com' },
+    { label: 'OpenAI Model', value: 'openAIModel', placeholder: 'gpt-3.5-turbo' },
     {
-      type: "number",
-      label: "temperature",
-      value: "temperature",
+      type: 'number',
+      label: 'temperature',
+      value: 'temperature',
       max: 2,
-      placeholder: "",
-      desc: t("settings.temperature"),
+      placeholder: '',
+      desc: t('settings.temperature'),
     },
     {
-      type: "number",
-      label: "top_p",
-      value: "top_p",
+      type: 'number',
+      label: 'top_p',
+      value: 'top_p',
       max: 1,
-      placeholder: "",
-      desc: t("settings.top_p"),
+      placeholder: '',
+      desc: t('settings.top_p'),
     },
   ];
 
@@ -162,17 +163,17 @@ export function SettingPanel() {
       size="md"
       header={
         <div className="space-x-4">
-          <span>{t("settings.title")}</span>
-          <span className="text-sm font-normal">{APP_VERSION}</span>
+          <span>{t('settings.title')}</span>
+          <span className="text-sm font-normal">v{getConfig().publicRuntimeConfig?.version}</span>
         </div>
       }
       footer={
         <>
           <Button variant="outline" mr={3} onClick={handleClose}>
-            {t("actions.cancel")}
+            {t('actions.cancel')}
           </Button>
           <Button colorScheme="teal" onClick={handleSaveClick}>
-            {t("actions.save")}
+            {t('actions.save')}
           </Button>
         </>
       }
@@ -193,22 +194,22 @@ interface ItemProps {
 }
 
 function Item({ item, value, onChange, balance }: ItemProps) {
-  const horizontal = item.type === "switch";
+  const horizontal = item.type === 'switch';
 
   return (
-    <FormControl className={`${horizontal && "flex flex-row"}`}>
-      <FormLabel className={`${horizontal && "flex-1"}`}>
+    <FormControl className={`${horizontal && 'flex flex-row'}`}>
+      <FormLabel className={`${horizontal && 'flex-1'}`}>
         <span>{item.label}</span>
-        {item.label === "OpenAI Key" && <span>&nbsp;{balance}</span>}
+        {item.label === 'OpenAI Key' && <span>&nbsp;{balance}</span>}
       </FormLabel>
-      {item.type === "password" ? (
+      {item.type === 'password' ? (
         <PasswordInput
           className="flex-1"
           placeholder={item.placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
-      ) : item.type === "number" ? (
+      ) : item.type === 'number' ? (
         <NumberInput className="flex-1" min={0} max={item.max} step={0.1} value={value} onChange={(v) => onChange(v)}>
           <NumberInputField placeholder={item.placeholder} />
           <NumberInputStepper>
@@ -216,8 +217,8 @@ function Item({ item, value, onChange, balance }: ItemProps) {
             <NumberDecrementStepper />
           </NumberInputStepper>
         </NumberInput>
-      ) : item.type === "switch" ? (
-        <Switch colorScheme="teal" isChecked={value === "1"} onChange={(e) => onChange(e.target.checked ? "1" : "0")} />
+      ) : item.type === 'switch' ? (
+        <Switch colorScheme="teal" isChecked={value === '1'} onChange={(e) => onChange(e.target.checked ? '1' : '0')} />
       ) : (
         <Input
           className="flex-1"

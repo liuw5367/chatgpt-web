@@ -1,9 +1,9 @@
-import { useMemoizedFn } from "ahooks";
-import { sha256 } from "js-sha256";
-import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useMemoizedFn } from 'ahooks';
+import sha256 from 'crypto-js/sha256';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
-import { getUnisoundKeySecret, Speaker, TTS_CONFIG } from "./Config";
-import PCMPlayer from "./PCMPlayer";
+import { getUnisoundKeySecret, Speaker, TTS_CONFIG } from './Config';
+import PCMPlayer from './PCMPlayer';
 
 export enum TTSStatusEnum {
   NORMAL,
@@ -38,7 +38,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     () => {
       return { start, stop };
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -60,11 +60,12 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     const time: number = +new Date();
     let sign: string;
     if (secret) {
-      sign = sha256(`${appKey}${time}${secret}`).toUpperCase();
+      sign = sha256(`${appKey}${time}${secret}`).toString().toUpperCase();
     } else {
       try {
-        const response = await fetch("/api/unisound", {
-          method: "POST",
+        const response = await fetch('/api/unisound', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: appKey, time }),
         });
         if (!response.ok) {
@@ -75,7 +76,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
         sign = json.sign;
       } catch (e: any) {
         console.log(e);
-        alert(e?.message || "asr sign error");
+        alert(e?.message || 'asr sign error');
         return;
       }
     }
@@ -83,17 +84,17 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     try {
       new window.AudioContext();
     } catch (e) {
-      alert("您当前的浏览器不支持 Web Audio API");
+      alert('您当前的浏览器不支持 Web Audio API');
       return;
     }
     onStatusChange?.(TTSStatusEnum.PLAYING);
 
     const socket = new WebSocket(`${TTS_CONFIG.SOCKET_URL}?appkey=${appKey}&time=${time}&sign=${sign}`);
     socketRef.current = socket;
-    socket.binaryType = "arraybuffer";
+    socket.binaryType = 'arraybuffer';
 
     const player = new PCMPlayer({
-      inputCodec: "Int16",
+      inputCodec: 'Int16',
       channels: 1,
       sampleRate: 16000,
       flushTime: 100,
@@ -105,7 +106,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     socket.onopen = () => {
       socket.send(
         JSON.stringify({
-          format: "pcm",
+          format: 'pcm',
           vcn: speaker.code,
           text: content,
           sample: 16000,
@@ -114,7 +115,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
           pitch: 50,
           bright: 50,
           ...config,
-        })
+        }),
       );
     };
     socket.onmessage = (res) => {
@@ -122,7 +123,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
         const result = JSON.parse(res.data);
         socket.close();
         if (result.code !== 0) {
-          alert("合成遇到点问题，请稍后再试~");
+          alert('合成遇到点问题，请稍后再试~');
           onStatusChange?.(TTSStatusEnum.NORMAL);
           player && player.destroy();
         }
@@ -133,11 +134,11 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     };
     socket.onclose = (e) => {
       player.inputFinished = true;
-      console.log("tts socket onclose", e);
+      console.log('tts socket onclose', e);
     };
     socket.onerror = (e) => {
       player.inputFinished = true;
-      console.log("tts socket onerror", e);
+      console.log('tts socket onerror', e);
     };
   });
 

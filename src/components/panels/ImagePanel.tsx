@@ -10,33 +10,38 @@ import {
   PopoverTrigger,
   SimpleGrid,
   useToast,
-} from "@chakra-ui/react";
-import { useStore } from "@nanostores/react";
-import { IconEraser, IconExternalLink, IconHistory, IconInfoSquare, IconLoader3 } from "@tabler/icons-react";
-import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+} from '@chakra-ui/react';
+import { useStore } from '@nanostores/react';
+import { IconEraser, IconExternalLink, IconHistory, IconInfoSquare, IconLoader3 } from '@tabler/icons-react';
+import Image from 'next/image';
+import { useTranslation } from 'next-i18next';
+import React, { useEffect, useState } from 'react';
 
-import { Cache } from "../../constants";
-import { chatConfigAtom, visibleAtom } from "../atom";
-import { AutoResizeTextarea } from "../AutoResizeTextarea";
-import SimpleDrawer from "../SimpleDrawer";
+import { Cache } from '../../constants';
+import { chatConfigAtom, visibleAtom } from '../atom';
+import { AutoResizeTextarea } from '../AutoResizeTextarea';
+import SimpleDrawer from '../SimpleDrawer';
 
 type ImageItem = { prompt: string; url: string };
 
 export function ImagePanel() {
   const { t } = useTranslation();
-  const toast = useToast({ position: "top", isClosable: true });
+  const toast = useToast({ position: 'top', isClosable: true });
 
   const chatConfig = useStore(chatConfigAtom);
   const { imageVisible } = useStore(visibleAtom);
 
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [abortController, setAbortController] = useState<AbortController>();
-  const [historyList, setHistoryList] = useState<ImageItem[]>(
-    JSON.parse(localStorage.getItem(Cache.IMAGE_LIST) || "[]")
-  );
+  const [historyList, setHistoryList] = useState<ImageItem[]>([]);
   const [imageList, setImageList] = useState<ImageItem[]>([]);
+
+  useEffect(() => {
+    if (imageVisible) {
+      setHistoryList(JSON.parse(localStorage.getItem(Cache.IMAGE_LIST) || '[]'));
+    }
+  }, [imageVisible]);
 
   useEffect(() => {
     return () => {
@@ -50,7 +55,7 @@ export function ImagePanel() {
 
   async function handleSend() {
     if (!prompt?.trim()) {
-      toast({ status: "info", title: t("toast.empty.prompt") });
+      toast({ status: 'info', title: t('toast.empty.prompt') });
       return;
     }
     setLoading(true);
@@ -58,10 +63,11 @@ export function ImagePanel() {
       const controller = new AbortController();
       setAbortController(controller);
 
-      const response = await fetch("/api/image", {
-        method: "POST",
+      const response = await fetch('/api/image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           apiKey: chatConfig.openAIKey,
           config: { prompt },
@@ -70,7 +76,7 @@ export function ImagePanel() {
 
       const json = await response.json();
       if (json.error?.code) {
-        toast({ status: "error", title: json.error.code, description: json.error.message });
+        toast({ status: 'error', title: json.error.code, description: json.error.message });
       } else {
         if (json.data && Array.isArray(json.data)) {
           const data = json.data.map(({ url }) => ({ prompt, url }));
@@ -79,7 +85,7 @@ export function ImagePanel() {
         }
       }
     } catch (e) {
-      toast({ status: "error", title: e.name, description: e.message });
+      toast({ status: 'error', title: e.name, description: e.message });
     }
     setLoading(false);
     setAbortController(undefined);
@@ -104,13 +110,13 @@ export function ImagePanel() {
   }
 
   return (
-    <SimpleDrawer isOpen={imageVisible} onClose={handleClose} size="lg" header={t("image.title")}>
+    <SimpleDrawer isOpen={imageVisible} onClose={handleClose} size="lg" header={t('image.title')}>
       <div className="w-full h-full flex flex-col space-y-3">
         <AutoResizeTextarea
           className="min-h-[84px]"
           minRows={3}
           maxRows={10}
-          placeholder={t("image.placeholder")}
+          placeholder={t('image.placeholder')}
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
         />
@@ -125,25 +131,25 @@ export function ImagePanel() {
           <div className="flex flex-row space-x-3">
             <IconButton
               aria-label="Eraser"
-              onClick={() => setPrompt("")}
+              onClick={() => setPrompt('')}
               colorScheme="gray"
               variant="solid"
               icon={<IconEraser stroke={1.5} />}
             />
             <Button
-              colorScheme={loading ? "red" : "teal"}
-              variant={loading ? "outline" : "solid"}
+              colorScheme={loading ? 'red' : 'teal'}
+              variant={loading ? 'outline' : 'solid'}
               onClick={handleSend}
               leftIcon={loading ? <IconLoader3 stroke={1.5} className="rotate-img" /> : undefined}
             >
-              {loading ? t("image.generating") : t("image.generate")}
+              {loading ? t('image.generating') : t('image.generate')}
             </Button>
           </div>
         </div>
         <SimpleGrid columns={2} spacing={2} className="pb-4">
           {displayList?.map(({ url, prompt }) => (
             <div key={url} className="w-full rounded bg-black/20 relative aspect-square">
-              <img src={url} alt={url} className="w-full rounded aspect-square" />
+              <Image src={url} alt={url} className="w-full rounded aspect-square" />
               <div className="absolute top-1 right-1">
                 <CloseButton size="sm" onClick={() => deleteImage(url)} />
               </div>
@@ -172,7 +178,7 @@ export function ImagePanel() {
                   aria-label="OpenExternal"
                   icon={<IconExternalLink stroke={1.5} />}
                   colorScheme="blackAlpha"
-                  onClick={() => window.open(url, "_blank")}
+                  onClick={() => window.open(url, '_blank')}
                 />
               </div>
             </div>

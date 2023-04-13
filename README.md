@@ -1,5 +1,7 @@
 # ChatGPT
 
+> 1.0 版本使用 astro 框架，但使用体验不好，2.0 开始改用 next 框架。如之前已使用部署 astro 版本，需在管理页面将框架从 astro 切换成 next
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fliuw5367%2Fchatgpt-asr-tts)
 [![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/liuw5367/chatgpt-asr-tts)
 
@@ -8,7 +10,7 @@
 - 页面样式移动端优先
 - 对话使用 OPENAI 官方 API `/v1/chat/completions`
 - 支持图片生成 `/v1/images/generations`
-- 支持查询 apiKey 余额 `/dashboard/billing/credit_grants`
+- （废弃）支持查询 apiKey 余额 `/dashboard/billing/credit_grants`
 - 支持设置 System Prompt，提供大量模版供选择
 - 支持多会话
 - 支持连续对话
@@ -59,19 +61,8 @@
 - `OPENAI_API_HOST`
 - `OPENAI_API_MODEL`
 
-- `PUBLIC_UNISOUND_AI_KEY`
+- `NEXT_PUBLIC_UNISOUND_AI_KEY`
 - `UNISOUND_AI_SECRET`
-
-已知问题：部署在 Vercel 中非 `PUBLIC_` 开头的环境变量在 `/api` 服务端中无法读取。
-
-当前使用的是 `@astrojs/vercel/edge`，但是测试发现 `@astrojs/vercel/serverless` 是正常的，应该是 astrojs 的 bug
-
-临时添加以下环境变量，客户端页面中未读取这些环境变量可放心使用
-
-- `PUBLIC_OPENAI_API_KEY`
-- `PUBLIC_OPENAI_API_HOST`
-- `PUBLIC_OPENAI_API_MODEL`
-- `PUBLIC_UNISOUND_AI_SECRET`
 
 ## 感谢
 
@@ -89,7 +80,7 @@ prompt 模版来自：
 
 依赖库
 
-- astro
+- nextjs
 - react
 - chakra-ui
 - tabler icon

@@ -1,9 +1,9 @@
-import { useMemoizedFn } from "ahooks";
-import { sha256 } from "js-sha256";
-import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useMemoizedFn } from 'ahooks';
+import sha256 from 'crypto-js/sha256';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
-import { APP_CONFIG, ASR_CONFIG, getUnisoundKeySecret } from "./Config";
-import Recorder from "./Recorder";
+import { APP_CONFIG, ASR_CONFIG, getUnisoundKeySecret } from './Config';
+import Recorder from './Recorder';
 
 export enum ASRStatusEnum {
   NORMAL,
@@ -22,7 +22,7 @@ interface Props {
   config?: Record<string, any>;
 }
 
-const langArr = ["cn", "sichuanese", "cantonese", "en"];
+const langArr = ['cn', 'sichuanese', 'cantonese', 'en'];
 
 interface AsrResult {
   fixed: string[];
@@ -34,8 +34,8 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
 
   const [currentLang, setCurrentLang] = useState(0);
 
-  const [simpleResult, setSimpleResult] = useState({ content: "", changing: false });
-  const [asrResult, setAsrResult] = useState<AsrResult>({ fixed: [], changing: "" });
+  const [simpleResult, setSimpleResult] = useState({ content: '', changing: false });
+  const [asrResult, setAsrResult] = useState<AsrResult>({ fixed: [], changing: '' });
   const recorderRef = React.useRef<Recorder | null>();
   const socketRef = React.useRef<WebSocket | null>();
 
@@ -47,7 +47,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     () => {
       return { start, stop };
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -65,8 +65,8 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   });
 
   const clearResult = useMemoizedFn(() => {
-    setAsrResult({ fixed: [], changing: "" });
-    setSimpleResult({ content: "", changing: false });
+    setAsrResult({ fixed: [], changing: '' });
+    setSimpleResult({ content: '', changing: false });
   });
 
   function startRecording() {
@@ -87,15 +87,15 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     recorderRef.current = recorder;
     recorder.ready().then(
       () => {
-        console.log("recorder ready ...");
+        console.log('recorder ready ...');
         recorder.start();
         createSocket();
       },
       () => {
-        alert("录音启动失败！");
+        alert('录音启动失败！');
         socketRef.current?.close();
         onStatusChange?.(ASRStatusEnum.NORMAL);
-      }
+      },
     );
   }
 
@@ -109,11 +109,12 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     const time: number = +new Date();
     let sign: string;
     if (secret) {
-      sign = sha256(`${appKey}${time}${secret}`).toUpperCase();
+      sign = sha256(`${appKey}${time}${secret}`).toString().toUpperCase();
     } else {
       try {
-        const response = await fetch("/api/unisound", {
-          method: "POST",
+        const response = await fetch('/api/unisound', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: appKey, time }),
         });
         if (!response.ok) {
@@ -124,7 +125,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
         sign = json.sign;
       } catch (e: any) {
         console.log(e);
-        alert(e?.message || "asr sign error");
+        alert(e?.message || 'asr sign error');
         return;
       }
     }
@@ -132,19 +133,19 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     const socket = new WebSocket(`${path}?appkey=${appKey}&time=${time}&sign=${sign}`);
     socketRef.current = socket;
     socket.onopen = () => {
-      console.log("!!! socket open !!!");
+      console.log('!!! socket open !!!');
       errorCountRef.current = 0;
       socket.send(
         JSON.stringify({
-          type: "start",
-          sha: "256",
+          type: 'start',
+          sha: '256',
           data: {
             lang: langArr[currentLang],
             appkey: appKey,
             userId: APP_CONFIG.USER_ID,
             udid: APP_CONFIG.UDID,
           },
-        })
+        }),
       );
     };
 
@@ -153,38 +154,38 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
       if (res.code === 0 && res.text) {
         sid = res.sid;
         const { text } = res;
-        if (res.type === "fixed") {
+        if (res.type === 'fixed') {
           setAsrResult((draft) => {
-            const result = { fixed: [...draft.fixed, text], changing: "" };
-            const value = result.fixed.join("") + result.changing;
+            const result = { fixed: [...draft.fixed, text], changing: '' };
+            const value = result.fixed.join('') + result.changing;
             onResultChange?.(value, !!result.changing);
-            return { fixed: [], changing: "" };
+            return { fixed: [], changing: '' };
           });
         } else {
           setAsrResult((draft) => {
             const result = { ...draft, changing: text };
-            const value = result.fixed.join("") + result.changing;
+            const value = result.fixed.join('') + result.changing;
             onResultChange?.(value, !!result.changing);
             return result;
           });
         }
         // onResultChange?.(text, res.type === "variable");
-        setSimpleResult({ content: text, changing: res.type === "variable" });
+        setSimpleResult({ content: text, changing: res.type === 'variable' });
       } else {
-        console.log("asr record end !", [new Date().toLocaleTimeString()], res);
+        console.log('asr record end !', [new Date().toLocaleTimeString()], res);
         doStartRecording();
       }
     };
 
     socket.onerror = function (e: Event) {
-      console.log("asr ws error", sid, [new Date().toLocaleTimeString()]);
+      console.log('asr ws error', sid, [new Date().toLocaleTimeString()]);
       console.log(e);
       socketRef.current = null;
       retry();
     };
 
     socket.onclose = (e: CloseEvent) => {
-      console.log("asr ws close", sid, [new Date().toLocaleTimeString()]);
+      console.log('asr ws close', sid, [new Date().toLocaleTimeString()]);
       console.log(e);
       socketRef.current = null;
       if (e.code !== 1000) {
@@ -220,7 +221,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     recorderRef.current?.stop();
     const socket = socketRef.current;
     if (socket && socket.readyState === 1) {
-      socket.send(JSON.stringify({ type: "end" }));
+      socket.send(JSON.stringify({ type: 'end' }));
       socket.close();
     }
   }

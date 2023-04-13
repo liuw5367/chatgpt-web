@@ -1,9 +1,9 @@
-import { IconButton, useColorMode } from "@chakra-ui/react";
-import { IconMenu2, IconMoonStars, IconPhoto, IconSettings, IconSun } from "@tabler/icons-react";
-import { Helmet } from "react-helmet";
+import { IconButton, useColorMode } from '@chakra-ui/react';
+import { IconMenu2, IconMoonStars, IconPhoto, IconSettings, IconSun } from '@tabler/icons-react';
+import Head from 'next/head';
 
-import { visibleAtom } from "./atom";
-import { Logo } from "./Logo";
+import { visibleAtom } from './atom';
+import { Logo } from './Logo';
 
 export function Header() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -11,7 +11,7 @@ export function Header() {
   return (
     <div
       className="w-full min-h-16 flex flex-row items-center justify-between px-4 border-b"
-      style={{ backgroundColor: "var(--chakra-colors-chakra-body-bg)" }}
+      style={{ backgroundColor: 'var(--chakra-colors-chakra-body-bg)' }}
     >
       <div className="flex items-center space-x-2 font-medium">
         <Logo />
@@ -43,20 +43,20 @@ export function Header() {
           aria-label="ColorMode"
           variant="ghost"
           onClick={toggleColorMode}
-          icon={colorMode === "light" ? <IconMoonStars stroke={1.5} /> : <IconSun stroke={1.5} />}
+          icon={colorMode === 'light' ? <IconMoonStars stroke={1.5} /> : <IconSun stroke={1.5} />}
         />
       </div>
 
-      {colorMode === "light" ? (
-        <Helmet>
+      {colorMode === 'light' ? (
+        <Head>
           <meta name="apple-mobile-web-app-status-bar-style" content="#FFFFFF" />
           <meta name="theme-color" content="#FFFFFF" />
-        </Helmet>
+        </Head>
       ) : (
-        <Helmet>
+        <Head>
           <meta name="apple-mobile-web-app-status-bar-style" content="#1A202C" />
           <meta name="theme-color" content="#1A202C" />
-        </Helmet>
+        </Head>
       )}
     </div>
   );
