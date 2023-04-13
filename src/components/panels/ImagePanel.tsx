@@ -13,7 +13,6 @@ import {
 } from '@chakra-ui/react';
 import { useStore } from '@nanostores/react';
 import { IconEraser, IconExternalLink, IconHistory, IconInfoSquare, IconLoader3 } from '@tabler/icons-react';
-import Image from 'next/image';
 import { useTranslation } from 'next-i18next';
 import React, { useEffect, useState } from 'react';
 
@@ -149,7 +148,7 @@ export function ImagePanel() {
         <SimpleGrid columns={2} spacing={2} className="pb-4">
           {displayList?.map(({ url, prompt }) => (
             <div key={url} className="w-full rounded bg-black/20 relative aspect-square">
-              <Image src={url} alt={url} className="w-full rounded aspect-square" />
+              <img src={url} alt={url} className="w-full rounded aspect-square" />
               <div className="absolute top-1 right-1">
                 <CloseButton size="sm" onClick={() => deleteImage(url)} />
               </div>

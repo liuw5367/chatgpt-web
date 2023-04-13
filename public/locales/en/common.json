@@ -2,7 +2,8 @@
   "language": "English",
   "chat": {
     "new": "New Chat",
-    "placeholder": "Shortcuts: ⬆️ / Ctrl + ↩ / ⌘ + ↩"
+    "placeholder": "Shortcuts: ⬆️ / Ctrl + ↩ / ⌘ + ↩",
+    "enterPlaceholder": "Shortcuts: ⬆️ / ↩ / shift + ↩"
   },
   "prompt": {
     "title": "System Prompt",

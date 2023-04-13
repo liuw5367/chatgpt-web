@@ -4,7 +4,7 @@ import { NextRequest } from 'next/server';
 import { buildError } from '@/utils';
 
 const KEY = process.env.NEXT_PUBLIC_UNISOUND_AI_KEY;
-const SECRET = process.env.UNISOUND_AI_SECRET;
+const SECRET = process.env.UNISOUND_AI_SECRET || process.env.PUBLIC_UNISOUND_AI_SECRET;
 
 export const config = { runtime: 'edge' };
 
