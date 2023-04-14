@@ -32,7 +32,7 @@ const nextConfig = {
         ],
       }),
     );
-    if (context.buildId === 'development') {
+    if (context.buildId !== 'development') {
       config.cache = false;
     }
     return config;
