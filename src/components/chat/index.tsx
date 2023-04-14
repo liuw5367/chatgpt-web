@@ -461,7 +461,7 @@ export default function Page() {
   function renderLayout(children: React.ReactNode) {
     return (
       <div className={`h-full flex flex-col justify-end items-center`}>
-        <div className={`w-full p-4 ${pageWidth}`}>{children}</div>
+        <div className={`w-full pl-4 ${pageWidth}`}>{children}</div>
       </div>
     );
   }
