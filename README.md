@@ -1,6 +1,6 @@
 # ChatGPT
 
-> 1.0 版本使用 astro 框架，但使用体验不好，2.0 开始改用 next 框架。如之前已使用部署 astro 版本，需在管理页面将框架从 astro 切换成 next
+> 1.0 版本使用 astro 框架，2.0 开始改用 next 框架。如之前已使用部署 astro 版本，需在管理页面将框架从 astro 切换成 next，并使用默认的 build 命令
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fliuw5367%2Fchatgpt-asr-tts)
 [![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/liuw5367/chatgpt-asr-tts)

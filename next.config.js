@@ -32,8 +32,9 @@ const nextConfig = {
         ],
       }),
     );
-
-    config.cache = false;
+    if (context.buildId === 'development') {
+      config.cache = false;
+    }
     return config;
   },
 };

@@ -415,8 +415,17 @@ export default function Page() {
     </div>
   );
 
+  const renderTips = (
+    <>
+      <Command value={inputContent} width={pageWidth} onPromptClick={(prompt) => setInputContent(prompt)} />
+      {chatConfig.searchSuggestions === '1' && (
+        <SearchSuggestions value={inputContent} width={pageWidth} onPromptClick={(prompt) => setInputContent(prompt)} />
+      )}
+    </>
+  );
+
   const renderMessageList = (
-    <div className={`w-full flex-1 p-4 pb-0 flex flex-col items-center overflow-y-auto overflow-x-hidden`}>
+    <div className={`w-full flex-1 p-4 flex flex-col items-center overflow-y-auto overflow-x-hidden`}>
       <div className={`relative w-full flex flex-col ${pageWidth}`}>
         {messageList?.map((item) => (
           <MessageItem
@@ -442,35 +451,36 @@ export default function Page() {
             }}
           />
         )}
+        {renderTips}
         <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
         <div id="chat-bottom" />
-        <Command value={inputContent} width={pageWidth} onPromptClick={(prompt) => setInputContent(prompt)} />
-        {chatConfig.searchSuggestions === '1' && (
-          <SearchSuggestions
-            value={inputContent}
-            width={pageWidth}
-            onPromptClick={(prompt) => setInputContent(prompt)}
-          />
-        )}
       </div>
     </div>
   );
 
+  function renderLayout(children: React.ReactNode) {
+    return (
+      <div className={`h-full flex flex-col justify-end items-center`}>
+        <div className={`w-full ${pageWidth}`}>{children}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-full flex flex-col">
       {messageList && messageList.length > 0 ? (
-        <>
-          {renderMessageList}
-          {chatLoading && <Progress size="xs" isIndeterminate />}
-        </>
+        <>{renderMessageList}</>
       ) : (
-        <div className={`flex-1 h-full flex flex-col justify-end items-center`}>
-          <div className={`w-full ${pageWidth}`}>
-            <UsageTips />
-          </div>
-        </div>
+        <>
+          {renderLayout(
+            <>
+              <UsageTips />
+              {renderTips}
+            </>,
+          )}
+        </>
       )}
-
+      {chatLoading && <Progress size="xs" isIndeterminate />}
       <div id="chat-bottom-wrapper" className={`px-6 pt-4 border-t flex flex-col items-center`}>
         <div className={`w-full flex flex-col justify-end space-y-3 ${pageWidth}`}>
           <AutoResizeTextarea

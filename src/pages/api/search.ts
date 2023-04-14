@@ -12,7 +12,8 @@ export default async function handler(req: NextRequest) {
   }
 
   try {
-    const response = await fetch('https://www.baidu.com/sugrec?json=1&prod=pc&wd=' + content, { method: 'GET' });
+    const url = 'https://www.baidu.com/sugrec?json=1&prod=pc&wd=' + encodeURIComponent(content);
+    const response = await fetch(url, { method: 'GET' });
     const json = await response.json();
     return new Response(JSON.stringify(json.g?.map((v: any) => v.q) || []));
   } catch (e: any) {
