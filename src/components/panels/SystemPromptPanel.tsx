@@ -1,17 +1,17 @@
-import { Button, IconButton, Select, Textarea, useToast } from "@chakra-ui/react";
-import { useStore } from "@nanostores/react";
-import { IconEraser } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Button, IconButton, Select, Textarea, useToast } from '@chakra-ui/react';
+import { useStore } from '@nanostores/react';
+import { IconEraser } from '@tabler/icons-react';
+import { useTranslation } from 'next-i18next';
+import { useEffect, useState } from 'react';
 
-import { chatAtom, visibleAtom } from "../atom";
-import { estimateTokens } from "../chat/token";
-import { templateOptions } from "../prompts";
-import SimpleDrawer from "../SimpleDrawer";
-import { saveCurrentChatValue } from "../storage";
+import { chatAtom, visibleAtom } from '../atom';
+import { estimateTokens } from '../chat/token';
+import { templateOptions } from '../prompts';
+import SimpleDrawer from '../SimpleDrawer';
+import { saveCurrentChatValue } from '../storage';
 
 interface Props {
-  type?: "side" | "drawer";
+  type?: 'side' | 'drawer';
   sideWidth?: string;
   promptVisible: boolean;
 }
@@ -19,21 +19,21 @@ interface Props {
 export function SystemPromptPanel(props: Props) {
   const { promptVisible, type, sideWidth } = props;
   const { t } = useTranslation();
-  const toast = useToast({ position: "top", isClosable: true });
+  const toast = useToast({ position: 'top', isClosable: true });
   const { currentChat } = useStore(chatAtom);
-  const { systemMessage = "" } = currentChat;
+  const { systemMessage = '' } = currentChat;
 
   const [prompt, setPrompt] = useState(systemMessage);
   const [template, setTemplate] = useState(templateOptions[0].label);
   const [options, setOptions] = useState(templateOptions[0].value);
-  const [desc, setDesc] = useState("");
-  const [remark, setRemark] = useState("");
+  const [desc, setDesc] = useState('');
+  const [remark, setRemark] = useState('');
 
   const [token, setToken] = useState(0);
 
   useEffect(() => {
     if (promptVisible) {
-      setPrompt(chatAtom.get().currentChat.systemMessage || "");
+      setPrompt(chatAtom.get().currentChat.systemMessage || '');
     }
   }, [promptVisible]);
 
@@ -52,18 +52,18 @@ export function SystemPromptPanel(props: Props) {
   }, [prompt]);
 
   function handleClose() {
-    if (type === "side") return;
+    if (type === 'side') return;
     visibleAtom.set({ ...visibleAtom.get(), promptVisible: false });
   }
 
   function handleClear() {
-    setPrompt("");
-    setDesc("");
-    setRemark("");
+    setPrompt('');
+    setDesc('');
+    setRemark('');
   }
 
   function updateSystemPrompt(prompt?: string) {
-    saveCurrentChatValue("systemMessage", prompt as string);
+    saveCurrentChatValue('systemMessage', prompt as string);
   }
 
   function handleSaveClick() {
@@ -75,7 +75,7 @@ export function SystemPromptPanel(props: Props) {
   }
 
   function handleRemoveClick() {
-    toast({ status: "success", title: t("toast.removed") });
+    toast({ status: 'success', title: t('toast.removed') });
     updateSystemPrompt();
     handleClear();
     handleClose();
@@ -88,20 +88,20 @@ export function SystemPromptPanel(props: Props) {
       isOpen={promptVisible}
       onClose={handleClose}
       size="md"
-      header={t("prompt.title")}
+      header={t('prompt.title')}
       footer={
         <div className="w-full flex flex-row justify-between">
           <Button colorScheme="blue" onClick={handleRemoveClick}>
-            {t("actions.remove")}
+            {t('actions.remove')}
           </Button>
           <div className="flex flex-row">
-            {type !== "side" && (
+            {type !== 'side' && (
               <Button variant="outline" mr={3} onClick={handleClose}>
-                {t("actions.cancel")}
+                {t('actions.cancel')}
               </Button>
             )}
             <Button colorScheme="teal" onClick={handleSaveClick}>
-              {t("actions.save")}
+              {t('actions.save')}
             </Button>
           </div>
         </div>
@@ -110,7 +110,7 @@ export function SystemPromptPanel(props: Props) {
       <div className={`w-full h-full flex flex-col space-y-2`}>
         <div
           className="flex flex-col space-y-2"
-          sm={type === "side" ? "" : "flex-row items-center space-x-4 space-y-0"}
+          sm={type === 'side' ? '' : 'flex-row items-center space-x-4 space-y-0'}
         >
           <div>
             <Select
@@ -130,17 +130,17 @@ export function SystemPromptPanel(props: Props) {
           </div>
           <div sm="min-w-60">
             <Select
-              placeholder={t("prompt.select")}
+              placeholder={t('prompt.select')}
               onChange={(e) => {
                 const prompt = e.target.value;
                 const item = options.find((item) => item.prompt === prompt);
                 setPrompt(prompt);
-                setRemark(item?.remark || "");
-                setDesc(item?.desc === prompt ? "" : item?.desc || "");
+                setRemark(item?.remark || '');
+                setDesc(item?.desc === prompt ? '' : item?.desc || '');
               }}
             >
               {options.map((item) => (
-                <option key={template + "-" + item.act} value={item.prompt}>
+                <option key={template + '-' + item.act} value={item.prompt}>
                   {item.act}
                 </option>
               ))}
@@ -152,10 +152,10 @@ export function SystemPromptPanel(props: Props) {
         {desc && <div className="px-4 py-2 text-[15px] whitespace-pre-wrap rounded bg-black/10">{desc}</div>}
 
         <Textarea
-          value={prompt ?? ""}
+          value={prompt ?? ''}
           onChange={(e) => setPrompt(e.target.value)}
           className="flex-1 !min-h-[50%] text-[14px] placeholder:text-[14px]"
-          placeholder={t("prompt.placeholder")}
+          placeholder={t('prompt.placeholder')}
         />
 
         <div className="flex flex-row items-center justify-between space-x-2">
@@ -171,7 +171,7 @@ export function SystemPromptPanel(props: Props) {
               onClick={handleClear}
             />
           </div>
-          <div className="text-[14px]">{t("prompt.tip")}</div>
+          <div className="text-[14px]">{t('prompt.tip')}</div>
         </div>
       </div>
     </SimpleDrawer>

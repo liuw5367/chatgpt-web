@@ -2,7 +2,8 @@
   "language": "简体中文",
   "chat": {
     "new": "新的聊天",
-    "placeholder": "快捷键: ⬆️ / Ctrl + ↩ / ⌘ + ↩"
+    "placeholder": "快捷键: ⬆️ / Ctrl + ↩ / ⌘ + ↩",
+    "enterPlaceholder": "快捷键: ⬆️ / ↩ / shift + ↩"
   },
   "prompt": {
     "title": "AI 设定",

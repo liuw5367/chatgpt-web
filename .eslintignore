@@ -1,9 +1,0 @@
-.DS_Store
-node_modules
-*.local
-*.lock
-.vercel
-dist
-dist-ssr
-dev-dist
-public

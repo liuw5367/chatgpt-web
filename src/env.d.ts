@@ -1,28 +1,28 @@
-/// <reference types="astro/client" />
-/// <reference types="vite-plugin-pwa/info" />
-/// <reference types="vite-plugin-pwa/client" />
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      readonly OPENAI_API_KEY: string;
+      readonly OPENAI_API_HOST: string;
+      readonly OPENAI_API_MODEL: string;
 
-interface ImportMetaEnv {
-  readonly OPENAI_API_KEY: string;
-  readonly OPENAI_API_HOST: string;
-  readonly OPENAI_API_MODEL: string;
+      readonly NEXT_PUBLIC_UNISOUND_AI_KEY: string;
+      readonly UNISOUND_AI_SECRET: string;
 
-  readonly PUBLIC_OPENAI_API_KEY: string;
-  readonly PUBLIC_OPENAI_API_HOST: string;
-  readonly PUBLIC_OPENAI_API_MODEL: string;
-
-  readonly PUBLIC_UNISOUND_AI_KEY: string;
-  readonly UNISOUND_AI_SECRET: string;
-  readonly PUBLIC_UNISOUND_AI_SECRET: string;
+      /** @deprecated */
+      readonly PUBLIC_OPENAI_API_KEY: string;
+      /** @deprecated */
+      readonly PUBLIC_OPENAI_API_HOST: string;
+      /** @deprecated */
+      readonly PUBLIC_OPENAI_API_MODEL: string;
+      /** @deprecated */
+      readonly PUBLIC_UNISOUND_AI_SECRET: string;
+    }
+  }
 }
 
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
+import type { AttributifyAttributes, AttributifyNames } from '@unocss/preset-attributify';
 
-import type { AttributifyAttributes, AttributifyNames } from "@unocss/preset-attributify";
-
-declare module "react" {
+declare module 'react' {
   // Unocss Attributify with Prefix
-  interface HTMLAttributes<T> extends AttributifyAttributes, Partial<Record<AttributifyNames<"un-">, string>> {}
+  interface HTMLAttributes<T> extends AttributifyAttributes, Partial<Record<AttributifyNames<'un-'>, string>> {}
 }

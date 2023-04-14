@@ -1,6 +1,6 @@
-import { atom } from "nanostores";
+import { atom } from 'nanostores';
 
-import type { ChatItem, ChatMessage } from "./types";
+import type { ChatItem, ChatMessage } from './types';
 
 export interface ChatAtomType {
   currentChat: ChatItem;
@@ -17,10 +17,13 @@ export interface ChatConfigType {
 
   searchSuggestions?: string;
   enterSend?: string;
+
+  unisoundAppKey?: string;
+  unisoundSecret?: string;
 }
 
 export const chatAtom = atom<ChatAtomType>({
-  currentChat: { id: "-1", name: "" },
+  currentChat: { id: '-1', name: '' },
   chatList: [],
 });
 

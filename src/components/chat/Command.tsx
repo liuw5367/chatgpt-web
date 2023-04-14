@@ -1,9 +1,9 @@
-import { useDebounceEffect } from "ahooks";
-import { useEffect, useState } from "react";
+import { useDebounceEffect } from 'ahooks';
+import { useEffect, useState } from 'react';
 
-import type { OptionType } from "../prompts";
-import { allPrompts } from "../prompts";
-import { scrollToElement } from "../utils";
+import type { OptionType } from '../prompts';
+import { allPrompts } from '../prompts';
+import { scrollToElement } from '../utils';
 
 interface Props {
   width: string;
@@ -11,10 +11,10 @@ interface Props {
   onPromptClick?: (prompt: string) => void;
 }
 
-const TOP_ID = "command-list-top";
+const TOP_ID = 'command-list-top';
 const defaultPrompts = allPrompts.slice(0, 50);
 function scrollToTop() {
-  scrollToElement(TOP_ID, { behavior: "auto" });
+  scrollToElement(TOP_ID, { behavior: 'auto' });
 }
 
 export function Command(props: Props) {
@@ -25,13 +25,13 @@ export function Command(props: Props) {
   useDebounceEffect(
     () => {
       let command = value?.trim();
-      if (command === "/") {
+      if (command === '/') {
         setPromptList(defaultPrompts);
         scrollToTop();
         return;
       }
       if (!command || command.length <= 1) return;
-      if (!command.startsWith("/")) return;
+      if (!command.startsWith('/')) return;
       command = command.substring(1).toLowerCase();
 
       const prompts = allPrompts.filter((item) => {
@@ -41,11 +41,11 @@ export function Command(props: Props) {
       scrollToTop();
     },
     [value],
-    { wait: 500 }
+    { wait: 500 },
   );
 
   useEffect(() => {
-    const bottom = document.getElementById("chat-bottom-wrapper");
+    const bottom = document.getElementById('chat-bottom-wrapper');
     if (bottom) {
       setBottomHeight(bottom.clientHeight);
     }
@@ -58,14 +58,14 @@ export function Command(props: Props) {
       className={`fixed bottom-0 w-full ${width} flex flex-col justify-end`}
       style={{
         paddingBottom: bottomHeight + 16,
-        display: value.startsWith("/") ? "flex" : "none",
+        display: value.startsWith('/') ? 'flex' : 'none',
       }}
     >
       <div
         className={`rounded-lg w-full max-h-[50vh] bg-$chakra-colors-chakra-body-bg`}
         border="~ solid $chakra-colors-chakra-border-color"
         overflow="x-hidden y-auto"
-        style={{ maxWidth: "calc(100vw - 32px)" }}
+        style={{ maxWidth: 'calc(100vw - 32px)' }}
       >
         <div id={TOP_ID} />
         {promptList.map((item) => (

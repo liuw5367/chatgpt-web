@@ -1,5 +1,5 @@
-import { Button, IconButton, Input } from "@chakra-ui/react";
-import { useStore } from "@nanostores/react";
+import { Button, IconButton, Input } from '@chakra-ui/react';
+import { useStore } from '@nanostores/react';
 import {
   IconCheck,
   IconEdit,
@@ -8,28 +8,27 @@ import {
   IconPlus,
   IconTrash,
   IconX,
-} from "@tabler/icons-react";
-import i18next, { changeLanguage } from "i18next";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+} from '@tabler/icons-react';
+import { useTranslation } from 'next-i18next';
+import { useState } from 'react';
 
-import { chatAtom, chatDataAtom, visibleAtom } from "../atom";
-import { scrollToPageBottom } from "../chat";
-import { Logo } from "../Logo";
-import SimpleDrawer from "../SimpleDrawer";
-import { saveChatAtom } from "../storage";
-import type { ChatItem } from "../types";
-import { uuid } from "../utils";
+import { chatAtom, chatDataAtom, visibleAtom } from '../atom';
+import { scrollToPageBottom } from '../chat';
+import { Logo } from '../Logo';
+import SimpleDrawer from '../SimpleDrawer';
+import { saveChatAtom } from '../storage';
+import type { ChatItem } from '../types';
+import { uuid } from '../utils';
 
 interface Props {
-  type?: "side" | "drawer";
+  type?: 'side' | 'drawer';
   sideWidth?: string;
   chatVisible: boolean;
 }
 
 export function ChatPanel(props: Props) {
   const { chatVisible, type, sideWidth } = props;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { chatList, currentChat } = useStore(chatAtom);
   const { id: chatId } = currentChat;
 
@@ -41,18 +40,18 @@ export function ChatPanel(props: Props) {
     saveChatAtom({ ...chatAtom.get(), currentChat: item });
     const chatId = item.id;
     // 切换对话，更新消息列表
-    const messages = JSON.parse(localStorage.getItem(chatId) || "[]");
+    const messages = JSON.parse(localStorage.getItem(chatId) || '[]');
     chatDataAtom.set(messages);
   }
 
   function handleClose() {
-    if (type === "side") return;
+    if (type === 'side') return;
     visibleAtom.set({ ...visibleAtom.get(), chatVisible: false });
   }
 
   function handleChatAddClick() {
     const id = uuid();
-    const item: ChatItem = { id, name: t("chat.new") + " " + id.substring(0, 6) };
+    const item: ChatItem = { id, name: t('chat.new') + ' ' + id.substring(0, 6) };
     updateChatList([item, ...chatList]);
   }
 
@@ -67,7 +66,7 @@ export function ChatPanel(props: Props) {
   function handleDelete(item: ChatItem) {
     if (chatList.length === 1) {
       const id = uuid();
-      const item: ChatItem = { id, name: t("chat.new") };
+      const item: ChatItem = { id, name: t('chat.new') };
       updateChatList([item]);
       updateChatId(item);
       handleClose();
@@ -82,7 +81,7 @@ export function ChatPanel(props: Props) {
   }
 
   function handleChangeLanguage() {
-    changeLanguage(i18next.language === "en" ? "zh" : "en");
+    i18n.changeLanguage(i18n.language === 'en' ? 'zh' : 'en');
   }
 
   return (
@@ -94,7 +93,7 @@ export function ChatPanel(props: Props) {
       placement="left"
       onClose={handleClose}
       header={
-        type === "side" ? null : (
+        type === 'side' ? null : (
           <div className="flex items-center space-x-2 font-medium">
             <Logo />
           </div>
@@ -108,7 +107,7 @@ export function ChatPanel(props: Props) {
             leftIcon={<IconLanguageHiragana stroke={1.5} />}
             onClick={handleChangeLanguage}
           >
-            {t("language")}
+            {t('language')}
           </Button>
 
           <Button
@@ -117,7 +116,7 @@ export function ChatPanel(props: Props) {
             leftIcon={<IconPlus stroke={1.5} size="1.3rem" />}
             onClick={handleChatAddClick}
           >
-            {t("chat.new")}
+            {t('chat.new')}
           </Button>
         </div>
       }
@@ -167,11 +166,11 @@ function ChatItemView(props: ItemProps) {
       key={chat.id}
       onClick={isEditing ? undefined : onClick}
       className={`w-full flex flex-row items-center min-h-16 pl-4 pr-2 rounded-lg space-x-2 border cursor-pointer ${
-        selected && "bg-teal-600 text-white border-[teal-600]"
+        selected && 'bg-teal-600 text-white border-[teal-600]'
       }`}
     >
       <IconMessage stroke={1.5} className="min-w-6" />
-      <div className="flex-1" style={{ maxWidth: "calc(100% - 95px)" }}>
+      <div className="flex-1" style={{ maxWidth: 'calc(100% - 95px)' }}>
         {isEditing ? (
           <Input
             value={changed}

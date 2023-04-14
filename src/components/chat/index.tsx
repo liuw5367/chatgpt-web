@@ -1,5 +1,5 @@
-import { Button, IconButton, Progress, useToast } from "@chakra-ui/react";
-import { useStore } from "@nanostores/react";
+import { Button, IconButton, Progress, useToast } from '@chakra-ui/react';
+import { useStore } from '@nanostores/react';
 import {
   IconBrandTelegram,
   IconClearAll,
@@ -13,37 +13,40 @@ import {
   IconMicrophoneOff,
   IconPlayerPause,
   IconPlayerPlay,
-} from "@tabler/icons-react";
-import { useDebounceEffect } from "ahooks";
-import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+} from '@tabler/icons-react';
+import { useDebounceEffect } from 'ahooks';
+import { useTranslation } from 'next-i18next';
+import React, { useEffect, useState } from 'react';
 
-import { chatAtom, chatConfigAtom, chatDataAtom, visibleAtom } from "../atom";
-import { AutoResizeTextarea } from "../AutoResizeTextarea";
-import { saveCurrentChatValue } from "../storage";
-import type { ChatMessage } from "../types";
-import { getCurrentTime, removeLn, scrollToElement, uuid } from "../utils";
-import VoiceView, { VoiceRef } from "./ai";
-import { ASRStatusEnum } from "./ai/ASRView";
-import { getUnisoundKeySecret, hasUnisoundConfig } from "./ai/Config";
-import { TTSStatusEnum } from "./ai/TTSView";
-import { Command } from "./Command";
-import ErrorItem from "./ErrorItem";
-import { MessageItem } from "./MessageItem";
-import { SearchSuggestions } from "./SearchSuggestions";
-import { estimateTokens } from "./token";
+import VoiceView, { VoiceRef } from '@/components/ai';
+import { ASRStatusEnum } from '@/components/ai/ASRView';
+import { getUnisoundKeySecret, hasUnisoundConfig } from '@/components/ai/Config';
+import { TTSStatusEnum } from '@/components/ai/TTSView';
+import { UsageTips } from '@/components/chat/UsageTips';
+
+import { chatAtom, chatConfigAtom, chatDataAtom, visibleAtom } from '../atom';
+import { AutoResizeTextarea } from '../AutoResizeTextarea';
+import { saveCurrentChatValue } from '../storage';
+import type { ChatMessage } from '../types';
+import { getCurrentTime, removeLn, scrollToElement, uuid } from '../utils';
+import { Command } from './Command';
+import ErrorItem from './ErrorItem';
+import { MessageItem } from './MessageItem';
+import { SearchSuggestions } from './SearchSuggestions';
+import { estimateTokens } from './token';
 
 export default function Page() {
   const { t } = useTranslation();
-  const toast = useToast({ position: "top", isClosable: true });
+  const toast = useToast({ position: 'top', isClosable: true });
   const messageList = useStore(chatDataAtom);
   const chatConfig = useStore(chatConfigAtom);
   const { chatVisible, promptVisible } = useStore(visibleAtom);
-  const enterSend = chatConfig.enterSend === "1";
+  const enterSend = chatConfig.enterSend === '1';
   const { currentChat } = useStore(chatAtom);
   const { conversationId } = currentChat;
-  const [inputContent, setInputContent] = useState("");
-  const [currentAssistantMessage, setCurrentAssistantMessage] = useState("");
+  const [inputContent, setInputContent] = useState('');
+  const [isComposing, setComposing] = useState(false);
+  const [currentAssistantMessage, setCurrentAssistantMessage] = useState('');
 
   const [asrState, setAsrState] = useState<ASRStatusEnum>(ASRStatusEnum.NORMAL);
   const [ttsState, setTtsState] = useState<TTSStatusEnum>(TTSStatusEnum.NORMAL);
@@ -54,8 +57,15 @@ export default function Page() {
 
   const [errorInfo, setErrorInfo] = useState<{ code: string; message?: string }>();
 
+  const pageWidth =
+    chatVisible && promptVisible
+      ? 'lg:max-w-176 xl:max-w-160 2xl:max-w-240'
+      : chatVisible || promptVisible
+      ? 'lg:max-w-176 xl:max-w-240'
+      : 'lg:max-w-200 xl:max-w-240';
+
   useEffect(() => {
-    scrollToPageBottom({ behavior: "auto" });
+    scrollToPageBottom({ behavior: 'auto' });
   }, []);
 
   useDebounceEffect(() => {
@@ -71,7 +81,7 @@ export default function Page() {
     voiceRef.current?.stopTts();
   }
 
-  function playTTS(content: string = "") {
+  function playTTS(content: string = '') {
     voiceRef.current?.tts(content);
   }
 
@@ -82,7 +92,7 @@ export default function Page() {
   function checkUnisound() {
     const config = getUnisoundKeySecret();
     if (!config.KEY) {
-      toast({ status: "error", title: t("toast.empty.unisound") });
+      toast({ status: 'error', title: t('toast.empty.unisound') });
       return true;
     }
     return false;
@@ -94,7 +104,7 @@ export default function Page() {
     if (ttsState !== TTSStatusEnum.NORMAL) {
       stopTTS();
     } else {
-      const data = [...messageList].filter((v) => v.role === "assistant").reverse();
+      const data = [...messageList].filter((v) => v.role === 'assistant').reverse();
       const content = data?.[0]?.content;
       if (content) {
         voiceRef.current?.stopAsr();
@@ -132,15 +142,15 @@ export default function Page() {
     messageList: ChatMessage[],
     question: ChatMessage,
     conversationId: string | undefined,
-    systemMessage?: string
+    systemMessage?: string,
   ) {
     let maxModelTokens = 4095;
     /** 发送出去的内容最多可使用的 token */
     let maxTokens = 3000;
 
-    const model = chatConfig.openAIModel || "";
-    if (model.toLowerCase().includes("gpt-4")) {
-      if (model.toLowerCase().includes("32k")) {
+    const model = chatConfig.openAIModel || '';
+    if (model.toLowerCase().includes('gpt-4')) {
+      if (model.toLowerCase().includes('32k')) {
         const maxResponseTokens = 8192;
         maxModelTokens = 32768;
         maxTokens = maxModelTokens - maxResponseTokens;
@@ -168,24 +178,24 @@ export default function Page() {
     }
     list.reverse();
 
-    console.log("messages token：", [tokenCount]);
+    console.log('messages token：', [tokenCount]);
 
     list.push(question);
     const messages = list.map(({ role, content }) => ({ role, content }));
     if (systemMessage) {
-      messages.unshift({ role: "system", content: systemMessage });
+      messages.unshift({ role: 'system', content: systemMessage });
     }
     return { messages };
   }
 
   async function sendMessage(inputValue = inputContent, systemMessage = currentChat.systemMessage) {
     if (chatLoading) {
-      toast({ status: "warning", title: t("toast.generating") });
+      toast({ status: 'warning', title: t('toast.generating') });
       return;
     }
     const content = removeLn(inputValue);
     if (!systemMessage && !content) {
-      toast({ status: "info", title: t("toast.empty.content") });
+      toast({ status: 'info', title: t('toast.empty.content') });
       return;
     }
     stopTTS();
@@ -193,7 +203,7 @@ export default function Page() {
 
     const question: ChatMessage = {
       id: uuid(),
-      role: "user",
+      role: 'user',
       content,
       time: getCurrentTime(),
       token: estimateTokens(content),
@@ -201,7 +211,7 @@ export default function Page() {
       conversationId,
     };
     chatDataAtom.set([...messageList, question]);
-    setInputContent("");
+    setInputContent('');
     scrollToPageBottom();
 
     setChatLoading(true);
@@ -209,10 +219,10 @@ export default function Page() {
     const abortController = new AbortController();
     setAbortController(abortController);
 
-    let assistantMessage = "";
+    let assistantMessage = '';
 
     function onProgress(content: string) {
-      if (!content || (content === "\n" && assistantMessage.endsWith("\n"))) return;
+      if (!content || (content === '\n' && assistantMessage.endsWith('\n'))) return;
       setCurrentAssistantMessage((draft) => {
         assistantMessage = draft + content;
         return assistantMessage;
@@ -222,8 +232,9 @@ export default function Page() {
 
     try {
       const { messages } = buildRequestMessages(messageList, question, conversationId, systemMessage);
-      const response = await fetch("/api/generate", {
-        method: "POST",
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         signal: abortController.signal,
         body: JSON.stringify({
           messages,
@@ -243,19 +254,19 @@ export default function Page() {
           setErrorInfo(json.error as any);
           scrollToPageBottom();
         } else {
-          toast({ status: "error", title: t("toast.error.request") });
+          toast({ status: 'error', title: t('toast.error.request') });
         }
         setChatLoading(false);
         return;
       }
       if (!response.body) {
-        toast({ status: "warning", title: t("toast.empty.data") });
+        toast({ status: 'warning', title: t('toast.empty.data') });
         setChatLoading(false);
         return;
       }
       // 等待接口完全返回
       const reader = response.body.getReader();
-      const decoder = new TextDecoder("utf-8");
+      const decoder = new TextDecoder('utf-8');
       let done = false;
 
       while (!done) {
@@ -270,7 +281,7 @@ export default function Page() {
     }
   }
 
-  function addResultItem(content: string, assistantMessage: string, prompt: string = "", conversationId?: string) {
+  function addResultItem(content: string, assistantMessage: string, prompt: string = '', conversationId?: string) {
     // 完整的返回值
     console.log([assistantMessage]);
     if (!assistantMessage) return;
@@ -279,7 +290,7 @@ export default function Page() {
       ...chatDataAtom.get(),
       {
         id: uuid(),
-        role: "assistant",
+        role: 'assistant',
         content: assistantMessage,
         token: estimateTokens(assistantMessage),
         question: content,
@@ -288,7 +299,7 @@ export default function Page() {
       },
     ]);
     setChatLoading(false);
-    setCurrentAssistantMessage("");
+    setCurrentAssistantMessage('');
     scrollToPageBottom();
   }
 
@@ -296,12 +307,12 @@ export default function Page() {
     stopTTS();
     voiceRef.current?.stopAsr();
     stopGenerate();
-    setInputContent("");
+    setInputContent('');
     chatDataAtom.set([]);
   }
 
   async function handleRegenerate(item: ChatMessage) {
-    const content = item.role === "user" ? item.content : item.question;
+    const content = item.role === 'user' ? item.content : item.question;
     updateConversationId(item.conversationId);
     updateSystemPrompt(item.prompt);
     await sendMessage(content, item.prompt);
@@ -312,22 +323,22 @@ export default function Page() {
   }
 
   function updateSystemPrompt(prompt?: string) {
-    saveCurrentChatValue("systemMessage", prompt as string);
+    saveCurrentChatValue('systemMessage', prompt as string);
   }
 
   function updateConversationId(conversationId?: string) {
-    saveCurrentChatValue("conversationId", conversationId as string);
+    saveCurrentChatValue('conversationId', conversationId as string);
   }
 
   function handleConversationClick() {
     if (conversationId) {
       updateConversationId();
       toast.closeAll();
-      toast({ status: "info", title: t("conversation.off") });
+      toast({ status: 'info', title: t('conversation.off') });
     } else {
       updateConversationId(uuid());
       toast.closeAll();
-      toast({ status: "success", title: t("conversation.on"), description: t("conversation.desc") });
+      toast({ status: 'success', title: t('conversation.on'), description: t('conversation.desc') });
     }
   }
 
@@ -336,8 +347,8 @@ export default function Page() {
       <div className="mb-4 flex flex-row items-center space-x-3">
         <Button
           onClick={() => handleSendClick()}
-          colorScheme={chatLoading ? "red" : "teal"}
-          variant={chatLoading ? "outline" : "solid"}
+          colorScheme={chatLoading ? 'red' : 'teal'}
+          variant={chatLoading ? 'outline' : 'solid'}
         >
           {chatLoading ? ( //
             <IconLoader3 stroke={1.5} className="rotate-img" />
@@ -347,7 +358,7 @@ export default function Page() {
         </Button>
         <IconButton
           aria-label="Eraser"
-          onClick={() => setInputContent("")}
+          onClick={() => setInputContent('')}
           colorScheme="gray"
           variant="solid"
           icon={<IconEraser stroke={1.5} />}
@@ -360,8 +371,8 @@ export default function Page() {
             <IconButton
               aria-label="ASR" //
               onClick={handleASRClick}
-              colorScheme={asrState === ASRStatusEnum.RECORDING ? "red" : "gray"}
-              variant={asrState === ASRStatusEnum.RECORDING ? "outline" : "solid"}
+              colorScheme={asrState === ASRStatusEnum.RECORDING ? 'red' : 'gray'}
+              variant={asrState === ASRStatusEnum.RECORDING ? 'outline' : 'solid'}
               icon={
                 asrState === ASRStatusEnum.RECORDING ? (
                   <IconMicrophoneOff stroke={1.5} />
@@ -374,8 +385,8 @@ export default function Page() {
               <IconButton
                 aria-label="TTS" //
                 onClick={handleTTSClick}
-                colorScheme={ttsState === TTSStatusEnum.PLAYING ? "red" : "gray"}
-                variant={ttsState === TTSStatusEnum.PLAYING ? "outline" : "solid"}
+                colorScheme={ttsState === TTSStatusEnum.PLAYING ? 'red' : 'gray'}
+                variant={ttsState === TTSStatusEnum.PLAYING ? 'outline' : 'solid'}
                 icon={
                   ttsState !== TTSStatusEnum.NORMAL ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />
                 }
@@ -386,14 +397,14 @@ export default function Page() {
         <IconButton
           aria-label="Conversation"
           title="Continuous conversation"
-          colorScheme={conversationId ? "green" : "gray"}
+          colorScheme={conversationId ? 'green' : 'gray'}
           icon={conversationId ? <IconMessages stroke={1.5} /> : <IconMessagesOff stroke={1.5} />}
           onClick={handleConversationClick}
         />
         <IconButton
           aria-label="SystemPrompt"
           title={currentChat.systemMessage}
-          colorScheme={currentChat.systemMessage ? "telegram" : "gray"}
+          colorScheme={currentChat.systemMessage ? 'telegram' : 'gray'}
           icon={currentChat.systemMessage ? <IconMessagePlus stroke={1.5} /> : <IconMessage stroke={1.5} />}
           onClick={() => {
             const values = visibleAtom.get();
@@ -404,82 +415,102 @@ export default function Page() {
     </div>
   );
 
-  const pageWidth =
-    chatVisible && promptVisible
-      ? "lg:max-w-176 xl:max-w-160 2xl:max-w-240"
-      : chatVisible || promptVisible
-      ? "lg:max-w-176 xl:max-w-240"
-      : "lg:max-w-200 xl:max-w-240";
+  const renderTips = (
+    <>
+      <Command value={inputContent} width={pageWidth} onPromptClick={(prompt) => setInputContent(prompt)} />
+      {chatConfig.searchSuggestions === '1' && (
+        <SearchSuggestions value={inputContent} width={pageWidth} onPromptClick={(prompt) => setInputContent(prompt)} />
+      )}
+    </>
+  );
+
+  const renderMessageList = (
+    <div className={`w-full flex-1 p-4 flex flex-col items-center overflow-y-auto overflow-x-hidden`}>
+      <div className={`relative w-full flex flex-col ${pageWidth}`}>
+        {messageList?.map((item) => (
+          <MessageItem
+            key={item.id}
+            item={item}
+            onDelete={handleMessageDelete}
+            onPlay={(item) => playTTS(item.content)}
+            onRegenerate={handleRegenerate}
+            onRetry={(item) => {
+              setInputContent(item.content);
+              updateConversationId(item.conversationId);
+              updateSystemPrompt(item.prompt);
+            }}
+          />
+        ))}
+        {currentAssistantMessage && (
+          <MessageItem
+            key={'-1'}
+            item={{
+              id: '-1',
+              role: 'assistant',
+              content: currentAssistantMessage,
+            }}
+          />
+        )}
+        {renderTips}
+        <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
+        <div id="chat-bottom" />
+      </div>
+    </div>
+  );
+
+  function renderLayout(children: React.ReactNode) {
+    return (
+      <div className={`h-full flex flex-col justify-end items-center`}>
+        <div className={`w-full ${pageWidth}`}>{children}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className={`w-full flex-1 p-4 pb-0 flex flex-col items-center overflow-y-auto overflow-x-hidden`}>
-        <div className={`relative w-full flex flex-col ${pageWidth}`}>
-          {messageList?.map((item) => (
-            <MessageItem
-              key={item.id}
-              item={item}
-              onDelete={handleMessageDelete}
-              onPlay={(item) => playTTS(item.content)}
-              onRegenerate={handleRegenerate}
-              onRetry={(item) => {
-                setInputContent(item.content);
-                updateConversationId(item.conversationId);
-                updateSystemPrompt(item.prompt);
-              }}
-            />
-          ))}
-          {currentAssistantMessage && (
-            <MessageItem
-              key={"-1"}
-              item={{
-                id: "-1",
-                role: "assistant",
-                content: currentAssistantMessage,
-              }}
-            />
+      {messageList && messageList.length > 0 ? (
+        <>{renderMessageList}</>
+      ) : (
+        <>
+          {renderLayout(
+            <>
+              <UsageTips />
+              {renderTips}
+            </>,
           )}
-          <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
-          <div id="chat-bottom" />
-          <Command value={inputContent} width={pageWidth} onPromptClick={(prompt) => setInputContent(prompt)} />
-          {chatConfig.searchSuggestions === "1" && (
-            <SearchSuggestions
-              value={inputContent}
-              width={pageWidth}
-              onPromptClick={(prompt) => setInputContent(prompt)}
-            />
-          )}
-        </div>
-      </div>
+        </>
+      )}
       {chatLoading && <Progress size="xs" isIndeterminate />}
       <div id="chat-bottom-wrapper" className={`px-6 pt-4 border-t flex flex-col items-center`}>
         <div className={`w-full flex flex-col justify-end space-y-3 ${pageWidth}`}>
           <AutoResizeTextarea
             minRows={2}
             maxRows={10}
-            enterKeyHint={enterSend ? "send" : undefined}
+            enterKeyHint={enterSend ? 'send' : undefined}
             className="placeholder:text-[14px]"
-            value={inputContent === "\n" ? "" : inputContent}
-            placeholder={t("chat.placeholder") || ""}
+            value={inputContent === '\n' ? '' : inputContent}
+            onCompositionStart={() => setComposing(true)}
+            onCompositionEnd={() => setComposing(false)}
+            placeholder={enterSend ? t('chat.enterPlaceholder') || '' : t('chat.placeholder') || ''}
             onChange={(e) => setInputContent(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "ArrowUp") {
+              if (e.key === 'ArrowUp') {
                 if (!inputContent?.trim()) {
-                  const content = [...messageList].reverse().find((v) => v.role === "user" && v.content)?.content;
+                  const content = [...messageList].reverse().find((v) => v.role === 'user' && v.content)?.content;
                   if (content) {
                     setInputContent(content);
                   }
                 }
                 return;
               }
-              if (enterSend && e.key === "Enter") {
+              if (enterSend && !isComposing && e.key === 'Enter') {
                 if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
                   return;
                 }
                 handleSendClick();
                 return;
               }
-              if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+              if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                 handleSendClick();
               }
             }}
@@ -499,5 +530,5 @@ export default function Page() {
 }
 
 export function scrollToPageBottom(options: ScrollIntoViewOptions = {}) {
-  scrollToElement("chat-bottom", { behavior: "smooth", block: "end", ...options });
+  scrollToElement('chat-bottom', { behavior: 'smooth', block: 'end', ...options });
 }

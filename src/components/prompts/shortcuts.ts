@@ -1,32 +1,32 @@
 export type TagType =
   // DO NOT USE THIS TAG: we choose sites to add to favorites
-  | "favorite"
-  | "mind"
-  | "write"
-  | "article"
-  | "text"
-  | "seo"
-  | "comments"
-  | "code"
-  | "ai"
-  | "life"
-  | "living"
-  | "interesting"
-  | "speech"
-  | "social"
-  | "philosophy"
-  | "teacher"
-  | "interpreter"
-  | "games"
-  | "tool"
-  | "language"
-  | "company"
-  | "doctor"
-  | "finance"
-  | "music"
-  | "professional"
-  | "contribute"
-  | "personal";
+  | 'favorite'
+  | 'mind'
+  | 'write'
+  | 'article'
+  | 'text'
+  | 'seo'
+  | 'comments'
+  | 'code'
+  | 'ai'
+  | 'life'
+  | 'living'
+  | 'interesting'
+  | 'speech'
+  | 'social'
+  | 'philosophy'
+  | 'teacher'
+  | 'interpreter'
+  | 'games'
+  | 'tool'
+  | 'language'
+  | 'company'
+  | 'doctor'
+  | 'finance'
+  | 'music'
+  | 'professional'
+  | 'contribute'
+  | 'personal';
 
 // Add prompts to this list
 // prettier-ignore

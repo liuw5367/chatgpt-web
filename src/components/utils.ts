@@ -1,21 +1,21 @@
-import Clipboard from "clipboard";
-import { v4 as uuidFn } from "uuid";
+import Clipboard from 'clipboard';
+import { v4 as uuidFn } from 'uuid';
 
 export function uuid(replace = true) {
   if (!replace) return uuidFn();
-  return uuidFn().replaceAll("-", "");
+  return uuidFn().replaceAll('-', '');
 }
 
 export function scrollToElement(value: string | HTMLElement, option?: ScrollIntoViewOptions) {
   setTimeout(() => {
     let element;
-    if (typeof value === "string") {
+    if (typeof value === 'string') {
       element = document.getElementById(value);
     } else if (value) {
       element = value;
     }
     if (element && element.scrollIntoView) {
-      element.scrollIntoView({ behavior: "smooth", block: "center", ...option });
+      element.scrollIntoView({ behavior: 'smooth', block: 'center', ...option });
     }
   }, 40);
 }
@@ -26,12 +26,12 @@ export function getCurrentTime() {
 
 export function removeLn(content?: string): string {
   let result = content?.trim();
-  if (!result) return "";
-  while (result.startsWith("\n") || result.endsWith("\n")) {
-    if (result.startsWith("\n")) {
+  if (!result) return '';
+  while (result.startsWith('\n') || result.endsWith('\n')) {
+    if (result.startsWith('\n')) {
       result = result.substring(2);
     }
-    if (result.endsWith("\n")) {
+    if (result.endsWith('\n')) {
       result = result.substring(0, result.length - 2);
     }
   }
@@ -39,12 +39,16 @@ export function removeLn(content?: string): string {
 }
 
 export function addCodeCopy() {
-  const clipboard = new Clipboard(".markdown-it-code-copy");
-  clipboard.on("success", function (e) {
-    const element = e.trigger?.getElementsByClassName("code-copy-content")?.[0];
+  const clipboard = new Clipboard('.markdown-it-code-copy', {
+    text: function (trigger) {
+      return decodeURIComponent(trigger.getAttribute('data-clipboard-text') || '');
+    },
+  });
+  clipboard.on('success', function (e) {
+    const element = e.trigger?.getElementsByClassName('code-copy-content')?.[0];
     if (element) {
-      element.innerHTML = "Copied!";
-      setTimeout(() => (element.innerHTML = ""), 1000);
+      element.innerHTML = 'Copied!';
+      setTimeout(() => (element.innerHTML = ''), 1000);
     }
   });
 }

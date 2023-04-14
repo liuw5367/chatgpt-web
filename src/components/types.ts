@@ -1,4 +1,4 @@
-import type { ChatCompletionResponseMessage } from "openai";
+import type { ChatCompletionResponseMessage } from 'openai';
 
 export interface ChatItem {
   id: string;
