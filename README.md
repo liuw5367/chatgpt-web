@@ -5,6 +5,8 @@
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fliuw5367%2Fchatgpt-asr-tts)
 [![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/liuw5367/chatgpt-asr-tts)
 
+[Astro分支](./tree/astro)和主分支代码同步，只是框架不同。个人感觉 Astro 因为使用 Vite 开发体验好一点，但是 astro 服务端渲染不能完整支持 Emotion，所以使用的是客户端渲染。而 Next 服务端渲染支持的比较好，所以首次加载速度会好一些，但因为 Next 使用 Webpack 对 Unocss 支持的不好，导致开发体验不太好。
+
 ## 功能
 
 - 页面样式移动端优先
@@ -60,6 +62,7 @@
 - `OPENAI_API_KEY`
 - `OPENAI_API_HOST`
 - `OPENAI_API_MODEL`
+
 
 - `NEXT_PUBLIC_UNISOUND_AI_KEY`
 - `UNISOUND_AI_SECRET`

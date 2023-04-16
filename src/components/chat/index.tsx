@@ -22,7 +22,6 @@ import VoiceView, { VoiceRef } from '@/components/ai';
 import { ASRStatusEnum } from '@/components/ai/ASRView';
 import { getUnisoundKeySecret, hasUnisoundConfig } from '@/components/ai/Config';
 import { TTSStatusEnum } from '@/components/ai/TTSView';
-import { UsageTips } from '@/components/chat/UsageTips';
 
 import { chatAtom, chatConfigAtom, chatDataAtom, visibleAtom } from '../atom';
 import { AutoResizeTextarea } from '../AutoResizeTextarea';
@@ -34,6 +33,7 @@ import ErrorItem from './ErrorItem';
 import { MessageItem } from './MessageItem';
 import { SearchSuggestions } from './SearchSuggestions';
 import { estimateTokens } from './token';
+import { UsageTips } from './UsageTips';
 
 export default function Page() {
   const { t } = useTranslation();
@@ -234,8 +234,8 @@ export default function Page() {
       const { messages } = buildRequestMessages(messageList, question, conversationId, systemMessage);
       const response = await fetch('/api/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         signal: abortController.signal,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages,
           apiKey: chatConfig.openAIKey,
@@ -461,7 +461,7 @@ export default function Page() {
   function renderLayout(children: React.ReactNode) {
     return (
       <div className={`h-full flex flex-col justify-end items-center`}>
-        <div className={`w-full pl-4 ${pageWidth}`}>{children}</div>
+        <div className={`w-full pl-4 lg:pl-0 ${pageWidth}`}>{children}</div>
       </div>
     );
   }
