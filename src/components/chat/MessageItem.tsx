@@ -16,6 +16,8 @@ import {
 import {
   IconClipboard,
   IconClipboardCheck,
+  IconCode,
+  IconMarkdown,
   IconMessages,
   IconPlayerPlay,
   IconReload,
@@ -23,9 +25,10 @@ import {
   IconTrash,
   IconUserHeart,
 } from "@tabler/icons-react";
+import { useState } from "react";
 
+import { hasUnisoundConfig } from "../ai/Config";
 import type { ChatMessage } from "../types";
-import { hasUnisoundConfig } from "./ai/Config";
 import { renderMarkdown } from "./markdown";
 import { estimateTokens } from "./token";
 
@@ -43,6 +46,8 @@ export function MessageItem(props: Props) {
   const { colorMode } = useColorMode();
   const { onCopy: onContentCopy, hasCopied: hasContentCopied } = useClipboard(item.content || item.prompt || "");
   const { onCopy: onPromptCopy, hasCopied: hasPromptCopied } = useClipboard(item.prompt || "");
+
+  const [showOriginContent, setShowOriginContent] = useState(false);
 
   const isUser = item.role === "user";
   if (!isUser && !item.markdown) {
@@ -91,9 +96,26 @@ export function MessageItem(props: Props) {
       <div className="-mb-8 flex items-center space-x-1">
         {!item.conversationId ? null : renderConversation(item.conversationId)}
         {item.prompt && renderPrompt(isUser ? "top" : "top-start")}
+        {!isUser && (
+          <IconButton
+            aria-label="OriginContent"
+            variant="ghost"
+            size="xs"
+            onClick={() => setShowOriginContent(!showOriginContent)}
+            icon={
+              showOriginContent ? (
+                <IconMarkdown size="1rem" className="opacity-64" />
+              ) : (
+                <IconCode size="1rem" className="opacity-64" />
+              )
+            }
+          />
+        )}
         <IconButton
           aria-label="Copy"
           variant="ghost"
+          size="xs"
+          onClick={onContentCopy}
           icon={
             hasContentCopied || hasPromptCopied ? (
               <IconClipboardCheck size="1rem" className="opacity-64" />
@@ -101,8 +123,6 @@ export function MessageItem(props: Props) {
               <IconClipboard size="1rem" className="opacity-64" />
             )
           }
-          size="xs"
-          onClick={onContentCopy}
         />
         {hasUnisoundConfig() && (
           <IconButton
@@ -161,8 +181,8 @@ export function MessageItem(props: Props) {
               ${colorMode === "light" ? "bg-[#EDF2F7]" : "bg-[#021627]"}
               ${isUser && "whitespace-pre-wrap"}`}
         >
-          {isUser ? (
-            <div dangerouslySetInnerHTML={{ __html: item.content || item.prompt || "" }} />
+          {isUser || showOriginContent ? (
+            <>{item.content || item.prompt}</>
           ) : (
             <div className="markdown-body" dangerouslySetInnerHTML={{ __html: item.markdown || "" }} />
           )}

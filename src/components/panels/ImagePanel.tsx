@@ -33,10 +33,14 @@ export function ImagePanel() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [abortController, setAbortController] = useState<AbortController>();
-  const [historyList, setHistoryList] = useState<ImageItem[]>(
-    JSON.parse(localStorage.getItem(Cache.IMAGE_LIST) || "[]")
-  );
+  const [historyList, setHistoryList] = useState<ImageItem[]>([]);
   const [imageList, setImageList] = useState<ImageItem[]>([]);
+
+  useEffect(() => {
+    if (imageVisible) {
+      setHistoryList(JSON.parse(localStorage.getItem(Cache.IMAGE_LIST) || "[]"));
+    }
+  }, [imageVisible]);
 
   useEffect(() => {
     return () => {

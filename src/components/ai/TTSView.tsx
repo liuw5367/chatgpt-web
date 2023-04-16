@@ -1,5 +1,5 @@
 import { useMemoizedFn } from "ahooks";
-import { sha256 } from "js-sha256";
+import sha256 from "crypto-js/sha256";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import { getUnisoundKeySecret, Speaker, TTS_CONFIG } from "./Config";
@@ -60,11 +60,12 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     const time: number = +new Date();
     let sign: string;
     if (secret) {
-      sign = sha256(`${appKey}${time}${secret}`).toUpperCase();
+      sign = sha256(`${appKey}${time}${secret}`).toString().toUpperCase();
     } else {
       try {
         const response = await fetch("/api/unisound", {
           method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ key: appKey, time }),
         });
         if (!response.ok) {

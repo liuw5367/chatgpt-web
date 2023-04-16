@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 
-import { buildError, getEnv } from "./_utils";
+import { buildError, getEnv } from "../../utils";
 
 export const post: APIRoute = async (context) => {
   const body = await context.request.json();
@@ -26,7 +26,7 @@ export const post: APIRoute = async (context) => {
         ...config,
       }),
     });
-  } catch (e: Error) {
+  } catch (e: any) {
     console.log("images generations error:", e);
     return buildError({ code: e.name, message: e.message }, 500);
   }

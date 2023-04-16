@@ -62,17 +62,6 @@
 - `PUBLIC_UNISOUND_AI_KEY`
 - `UNISOUND_AI_SECRET`
 
-已知问题：部署在 Vercel 中非 `PUBLIC_` 开头的环境变量在 `/api` 服务端中无法读取。
-
-当前使用的是 `@astrojs/vercel/edge`，但是测试发现 `@astrojs/vercel/serverless` 是正常的，应该是 astrojs 的 bug
-
-临时添加以下环境变量，客户端页面中未读取这些环境变量可放心使用
-
-- `PUBLIC_OPENAI_API_KEY`
-- `PUBLIC_OPENAI_API_HOST`
-- `PUBLIC_OPENAI_API_MODEL`
-- `PUBLIC_UNISOUND_AI_SECRET`
-
 ## 感谢
 
 项目创建参考

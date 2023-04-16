@@ -17,6 +17,9 @@ export interface ChatConfigType {
 
   searchSuggestions?: string;
   enterSend?: string;
+
+  unisoundAppKey?: string;
+  unisoundSecret?: string;
 }
 
 export const chatAtom = atom<ChatAtomType>({

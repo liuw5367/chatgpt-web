@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
-import { sha256 } from "js-sha256";
+import sha256 from "crypto-js/sha256";
 
-import { buildError } from "./_utils";
+import { buildError } from "../../utils";
 
 const KEY = import.meta.env.PUBLIC_UNISOUND_AI_KEY;
 const SECRET = import.meta.env.UNISOUND_AI_SECRET || import.meta.env.PUBLIC_UNISOUND_AI_SECRET;
@@ -18,7 +18,7 @@ export const post: APIRoute = async (context) => {
     return buildError({ code: "No Unisound Secret" }, 401);
   }
 
-  const sign = sha256(`${apiKey}${time}${SECRET}`).toUpperCase();
+  const sign = sha256(`${apiKey}${time}${SECRET}`).toString().toUpperCase();
 
   return new Response(JSON.stringify({ sign }));
 };

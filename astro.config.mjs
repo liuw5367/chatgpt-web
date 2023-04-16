@@ -3,13 +3,9 @@ import node from "@astrojs/node";
 import react from "@astrojs/react";
 import vercel from "@astrojs/vercel/edge";
 import tabler from "@iconify-json/tabler/icons.json";
-import AstroPWA from "@vite-pwa/astro";
 import { defineConfig } from "astro/config";
 import { presetAttributify, presetIcons, presetUno, transformerVariantGroup } from "unocss";
 import unocss from "unocss/astro";
-
-import disableBlocks from "./plugins/disableBlocks";
-import { APP_NAME } from "./src/constants";
 
 const envAdapter = () => {
   if (process.env.OUTPUT === "vercel") {
@@ -42,10 +38,6 @@ export default defineConfig({
         },
       },
     },
-    plugins: [
-      process.env.OUTPUT === "vercel" && disableBlocks(),
-      process.env.OUTPUT === "netlify" && disableBlocks("netlify"),
-    ],
   },
   output: "server",
   adapter: envAdapter(),
@@ -74,43 +66,5 @@ export default defineConfig({
       ],
     }),
     react(),
-    process.env.OUTPUT !== "netlify" &&
-      AstroPWA({
-        mode: "development",
-        base: "/",
-        scope: "/",
-        includeAssets: ["favicon.svg"],
-        manifest: {
-          name: APP_NAME,
-          short_name: APP_NAME,
-          theme_color: "#ffffff",
-          icons: [
-            {
-              src: "favicon-192x192.png",
-              sizes: "192x192",
-              type: "image/png",
-            },
-            {
-              src: "favicon-512x512.png",
-              sizes: "512x512",
-              type: "image/png",
-            },
-            {
-              src: "favicon-512x512.png",
-              sizes: "512x512",
-              type: "image/png",
-              purpose: "any maskable",
-            },
-          ],
-        },
-        workbox: {
-          navigateFallback: "/404",
-          globPatterns: ["**/*.{css,js,html,svg,png,ico,txt}"],
-        },
-        devOptions: {
-          enabled: false,
-          navigateFallbackAllowlist: [/^\/404$/],
-        },
-      }),
   ],
 });

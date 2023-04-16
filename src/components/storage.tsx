@@ -39,6 +39,9 @@ export function loadCache(newChatName: string) {
     top_p: localStorage.getItem("top_p") ?? "1",
     searchSuggestions: localStorage.getItem("searchSuggestions") ?? "1",
     enterSend: localStorage.getItem("searchSuggestions") ?? "",
+
+    unisoundAppKey: localStorage.getItem("unisoundAppKey") || undefined,
+    unisoundSecret: localStorage.getItem("unisoundSecret") || undefined,
   });
 }
 

@@ -18,20 +18,21 @@ import { useDebounceEffect } from "ahooks";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import VoiceView, { VoiceRef } from "../ai";
+import { ASRStatusEnum } from "../ai/ASRView";
+import { getUnisoundKeySecret, hasUnisoundConfig } from "../ai/Config";
+import { TTSStatusEnum } from "../ai/TTSView";
 import { chatAtom, chatConfigAtom, chatDataAtom, visibleAtom } from "../atom";
 import { AutoResizeTextarea } from "../AutoResizeTextarea";
 import { saveCurrentChatValue } from "../storage";
 import type { ChatMessage } from "../types";
 import { getCurrentTime, removeLn, scrollToElement, uuid } from "../utils";
-import VoiceView, { VoiceRef } from "./ai";
-import { ASRStatusEnum } from "./ai/ASRView";
-import { getUnisoundKeySecret, hasUnisoundConfig } from "./ai/Config";
-import { TTSStatusEnum } from "./ai/TTSView";
 import { Command } from "./Command";
 import ErrorItem from "./ErrorItem";
 import { MessageItem } from "./MessageItem";
 import { SearchSuggestions } from "./SearchSuggestions";
 import { estimateTokens } from "./token";
+import { UsageTips } from "./UsageTips";
 
 export default function Page() {
   const { t } = useTranslation();
@@ -43,6 +44,7 @@ export default function Page() {
   const { currentChat } = useStore(chatAtom);
   const { conversationId } = currentChat;
   const [inputContent, setInputContent] = useState("");
+  const [isComposing, setComposing] = useState(false);
   const [currentAssistantMessage, setCurrentAssistantMessage] = useState("");
 
   const [asrState, setAsrState] = useState<ASRStatusEnum>(ASRStatusEnum.NORMAL);
@@ -53,6 +55,13 @@ export default function Page() {
   const [chatAbortController, setAbortController] = useState<AbortController>();
 
   const [errorInfo, setErrorInfo] = useState<{ code: string; message?: string }>();
+
+  const pageWidth =
+    chatVisible && promptVisible
+      ? "lg:max-w-176 xl:max-w-160 2xl:max-w-240"
+      : chatVisible || promptVisible
+      ? "lg:max-w-176 xl:max-w-240"
+      : "lg:max-w-200 xl:max-w-240";
 
   useEffect(() => {
     scrollToPageBottom({ behavior: "auto" });
@@ -225,6 +234,7 @@ export default function Page() {
       const response = await fetch("/api/generate", {
         method: "POST",
         signal: abortController.signal,
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages,
           apiKey: chatConfig.openAIKey,
@@ -404,53 +414,71 @@ export default function Page() {
     </div>
   );
 
-  const pageWidth =
-    chatVisible && promptVisible
-      ? "lg:max-w-176 xl:max-w-160 2xl:max-w-240"
-      : chatVisible || promptVisible
-      ? "lg:max-w-176 xl:max-w-240"
-      : "lg:max-w-200 xl:max-w-240";
+  const renderTips = (
+    <>
+      <Command value={inputContent} width={pageWidth} onPromptClick={(prompt) => setInputContent(prompt)} />
+      {chatConfig.searchSuggestions === "1" && (
+        <SearchSuggestions value={inputContent} width={pageWidth} onPromptClick={(prompt) => setInputContent(prompt)} />
+      )}
+    </>
+  );
+
+  const renderMessageList = (
+    <div className={`w-full flex-1 p-4 flex flex-col items-center overflow-y-auto overflow-x-hidden`}>
+      <div className={`relative w-full flex flex-col ${pageWidth}`}>
+        {messageList?.map((item) => (
+          <MessageItem
+            key={item.id}
+            item={item}
+            onDelete={handleMessageDelete}
+            onPlay={(item) => playTTS(item.content)}
+            onRegenerate={handleRegenerate}
+            onRetry={(item) => {
+              setInputContent(item.content);
+              updateConversationId(item.conversationId);
+              updateSystemPrompt(item.prompt);
+            }}
+          />
+        ))}
+        {currentAssistantMessage && (
+          <MessageItem
+            key={"-1"}
+            item={{
+              id: "-1",
+              role: "assistant",
+              content: currentAssistantMessage,
+            }}
+          />
+        )}
+        {renderTips}
+        <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
+        <div id="chat-bottom" />
+      </div>
+    </div>
+  );
+
+  function renderLayout(children: React.ReactNode) {
+    return (
+      <div className={`h-full flex flex-col justify-end items-center`}>
+        <div className={`w-full pl-4 lg:pl-0 ${pageWidth}`}>{children}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className={`w-full flex-1 p-4 pb-0 flex flex-col items-center overflow-y-auto overflow-x-hidden`}>
-        <div className={`relative w-full flex flex-col ${pageWidth}`}>
-          {messageList?.map((item) => (
-            <MessageItem
-              key={item.id}
-              item={item}
-              onDelete={handleMessageDelete}
-              onPlay={(item) => playTTS(item.content)}
-              onRegenerate={handleRegenerate}
-              onRetry={(item) => {
-                setInputContent(item.content);
-                updateConversationId(item.conversationId);
-                updateSystemPrompt(item.prompt);
-              }}
-            />
-          ))}
-          {currentAssistantMessage && (
-            <MessageItem
-              key={"-1"}
-              item={{
-                id: "-1",
-                role: "assistant",
-                content: currentAssistantMessage,
-              }}
-            />
+      {messageList && messageList.length > 0 ? (
+        <>{renderMessageList}</>
+      ) : (
+        <>
+          {renderLayout(
+            <>
+              <UsageTips />
+              {renderTips}
+            </>
           )}
-          <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
-          <div id="chat-bottom" />
-          <Command value={inputContent} width={pageWidth} onPromptClick={(prompt) => setInputContent(prompt)} />
-          {chatConfig.searchSuggestions === "1" && (
-            <SearchSuggestions
-              value={inputContent}
-              width={pageWidth}
-              onPromptClick={(prompt) => setInputContent(prompt)}
-            />
-          )}
-        </div>
-      </div>
+        </>
+      )}
       {chatLoading && <Progress size="xs" isIndeterminate />}
       <div id="chat-bottom-wrapper" className={`px-6 pt-4 border-t flex flex-col items-center`}>
         <div className={`w-full flex flex-col justify-end space-y-3 ${pageWidth}`}>
@@ -460,7 +488,9 @@ export default function Page() {
             enterKeyHint={enterSend ? "send" : undefined}
             className="placeholder:text-[14px]"
             value={inputContent === "\n" ? "" : inputContent}
-            placeholder={t("chat.placeholder") || ""}
+            onCompositionStart={() => setComposing(true)}
+            onCompositionEnd={() => setComposing(false)}
+            placeholder={enterSend ? t("chat.enterPlaceholder") || "" : t("chat.placeholder") || ""}
             onChange={(e) => setInputContent(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "ArrowUp") {
@@ -472,7 +502,7 @@ export default function Page() {
                 }
                 return;
               }
-              if (enterSend && e.key === "Enter") {
+              if (enterSend && !isComposing && e.key === "Enter") {
                 if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
                   return;
                 }

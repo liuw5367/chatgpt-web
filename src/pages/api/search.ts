@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 
-import { buildError } from "./_utils";
+import { buildError } from "../../utils";
 
 export const post: APIRoute = async (context) => {
   const body = await context.request.json();
@@ -11,10 +11,11 @@ export const post: APIRoute = async (context) => {
   }
 
   try {
-    const response = await fetch("https://www.baidu.com/sugrec?json=1&prod=pc&wd=" + content, { method: "GET" });
+    const url = "https://www.baidu.com/sugrec?json=1&prod=pc&wd=" + encodeURIComponent(content);
+    const response = await fetch(url, { method: "GET" });
     const json = await response.json();
-    return new Response(JSON.stringify(json.g?.map((v) => v.q) || []));
-  } catch (e: Error) {
+    return new Response(JSON.stringify(json.g?.map((v: any) => v.q) || []));
+  } catch (e: any) {
     console.log("images generations error:", e);
     return buildError({ code: e.name, message: e.message }, 500);
   }

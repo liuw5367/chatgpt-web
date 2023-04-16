@@ -12,7 +12,7 @@ export function renderMarkdown(content: string) {
     const token = tokens[idx];
     const rawCode = fence?.(...args);
 
-    const copyCode = token.content.replaceAll('"', "&quot;").replaceAll("'", "&lt;");
+    const copyCode = encodeURIComponent(token.content);
 
     return `<div style="position: relative">
               ${rawCode}

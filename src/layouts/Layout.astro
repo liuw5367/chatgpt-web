@@ -1,9 +1,4 @@
 ---
-// <!-- netlify-disable-blocks -->
-import ReloadPrompt from "../components/pwa/ReloadPrompt.astro";
-import LinkTag from "../components/pwa/LinkTag.astro";
-// <!-- netlify-disable-end -->
-
 export interface Props {
   title: string;
 }
@@ -22,14 +17,10 @@ const { title } = Astro.props;
     <meta name="msapplication-TileColor" content="#FFFFFF" />
     <title>{title}</title>
     <meta name="description" content={title} />
-    <!-- netlify-disable-blocks -->
-    <LinkTag />
-    <!-- netlify-disable-end -->
+    <link rel="manifest" href="/manifest.json" />
+    <script src="/swRegister.js" defer />
   </head>
   <body>
     <slot />
-    <!-- netlify-disable-blocks -->
-    <ReloadPrompt />
-    <!-- netlify-disable-end -->
   </body>
 </html>

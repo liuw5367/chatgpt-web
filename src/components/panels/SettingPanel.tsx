@@ -69,6 +69,7 @@ export function SettingPanel() {
 
       const response = await fetch("/api/balance", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         signal: controller.signal,
         body: JSON.stringify({
           apiKey: chatConfig.openAIKey,

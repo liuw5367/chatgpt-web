@@ -1,3 +1,4 @@
+import { CloseButton } from "@chakra-ui/react";
 import { useDebounceEffect } from "ahooks";
 import { useEffect, useRef, useState } from "react";
 
@@ -56,6 +57,7 @@ export function SearchSuggestions(props: Props) {
     try {
       const response = await fetch("/api/search", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content,
         }),
@@ -65,9 +67,11 @@ export function SearchSuggestions(props: Props) {
         setPromptList([]);
         return;
       }
-      const json = await response.json();
-      setPromptList(json);
-      scrollToTop();
+      if (response.ok) {
+        const json = await response.json();
+        setPromptList(json);
+        scrollToTop();
+      }
     } catch (e) {
       console.log(e);
     }
@@ -84,26 +88,35 @@ export function SearchSuggestions(props: Props) {
       }}
     >
       <div
-        className={`rounded-lg w-full max-h-[35vh] bg-$chakra-colors-chakra-body-bg`}
+        className={`relative rounded-lg w-full max-h-[35vh] flex flex-col items-end bg-$chakra-colors-chakra-body-bg`}
         border="~ solid $chakra-colors-chakra-border-color"
         overflow="x-hidden y-auto"
         style={{ maxWidth: "calc(100vw - 32px)" }}
       >
+        <CloseButton
+          className="sticky top-0 right-0"
+          size="md"
+          onClick={() => {
+            setPromptList([]);
+          }}
+        />
         <div id={TOP_ID} />
-        {promptList.map((item) => (
-          <div
-            key={item}
-            className="px-4 py-3 flex flex-col space-y-1 last:border-b-none hover:bg-black/15"
-            border="b b-solid b-$chakra-colors-chakra-border-color"
-            onClick={() => {
-              onPromptClick?.(item);
-              setPromptList([]);
-              lastContentRef.current = item;
-            }}
-          >
-            <div className="">{item}</div>
-          </div>
-        ))}
+        <div className="w-full -mt-8">
+          {promptList.map((item) => (
+            <div
+              key={item}
+              className="px-4 py-3 flex flex-col space-y-1 last:border-b-none hover:bg-black/15"
+              border="b b-solid b-$chakra-colors-chakra-border-color"
+              onClick={() => {
+                onPromptClick?.(item);
+                setPromptList([]);
+                lastContentRef.current = item;
+              }}
+            >
+              <div className="">{item}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
