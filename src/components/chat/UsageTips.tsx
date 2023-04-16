@@ -7,7 +7,7 @@ export function UsageTips() {
 
   useEffect(() => {
     setTips(
-      i18n.language === "zh"
+      i18n.language.includes("zh")
         ? [
             "输入 / 可激活 Prompt 搜索窗口",
             "输入框为空时，按上箭头将填充上一条消息内容",
