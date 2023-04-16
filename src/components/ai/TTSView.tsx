@@ -1,5 +1,5 @@
 import { useMemoizedFn } from "ahooks";
-import sha256 from "crypto-js/sha256";
+import { sha256 } from "js-sha256";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import { getUnisoundKeySecret, Speaker, TTS_CONFIG } from "./Config";

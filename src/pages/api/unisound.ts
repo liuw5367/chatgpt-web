@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import sha256 from "crypto-js/sha256";
+import { sha256 } from "js-sha256";
 
 import { buildError } from "../../utils";
 
