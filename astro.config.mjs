@@ -21,8 +21,7 @@ const envAdapter = () => {
 export default defineConfig({
   vite: {
     define: {
-      // conflict highlight.js
-      // __DATE__: `'${new Date().toISOString()}'`,
+      "import.meta.env.PUBLIC_PACKAGE_VERSION": JSON.stringify(process.env.npm_package_version),
     },
     build: {
       chunkSizeWarningLimit: 1300,
