@@ -7,6 +7,8 @@ import { defineConfig } from "astro/config";
 import { presetAttributify, presetIcons, presetUno, transformerVariantGroup } from "unocss";
 import unocss from "unocss/astro";
 
+import app from "./package.json" assert { type: "json" };
+
 const envAdapter = () => {
   if (process.env.OUTPUT === "vercel") {
     return vercel();
@@ -21,7 +23,7 @@ const envAdapter = () => {
 export default defineConfig({
   vite: {
     define: {
-      "import.meta.env.PUBLIC_PACKAGE_VERSION": JSON.stringify(process.env.npm_package_version),
+      __APP_VERSION__: JSON.stringify(app.version),
     },
     build: {
       chunkSizeWarningLimit: 1300,

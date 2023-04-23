@@ -1,5 +1,5 @@
 export const APP_NAME = "ChatGPT";
-export const APP_VERSION = "v" + import.meta.env.PUBLIC_PACKAGE_VERSION;
+export const APP_VERSION = "v" + __APP_VERSION__;
 
 export const Cache = {
   CHAT_LIST: "chat-list",
