@@ -166,8 +166,8 @@ function ChatItemView(props: ItemProps) {
     <div
       key={chat.id}
       onClick={isEditing ? undefined : onClick}
-      className={`w-full flex flex-row items-center min-h-16 pl-4 pr-2 rounded-lg space-x-2 border cursor-pointer ${
-        selected && "bg-teal-600 text-white border-[teal-600]"
+      className={`w-full flex flex-row items-center min-h-16 pl-3 pr-1 rounded-lg space-x-2 border cursor-pointer ${
+        selected && "border-teal-700 text-teal-700 border-2"
       }`}
     >
       <IconMessage stroke={1.5} className="min-w-6" />
@@ -175,6 +175,7 @@ function ChatItemView(props: ItemProps) {
         {isEditing ? (
           <Input
             value={changed}
+            focusBorderColor="teal"
             onChange={(e) => setChanged(e.target.value)}
             onClick={(e) => {
               e.stopPropagation();
@@ -190,8 +191,7 @@ function ChatItemView(props: ItemProps) {
           <IconButton
             aria-label="Save"
             variant="ghost"
-            colorScheme="black"
-            icon={<IconCheck size="1.0rem" className="opacity-64 hover:text-black" />}
+            icon={<IconCheck size="1.0rem" className="opacity-64" />}
             size="xs"
             onClick={(e) => {
               e.stopPropagation();
@@ -205,8 +205,7 @@ function ChatItemView(props: ItemProps) {
           <IconButton
             aria-label="close"
             variant="ghost"
-            colorScheme="black"
-            icon={<IconX size="1.0rem" className="opacity-64 hover:text-black" />}
+            icon={<IconX size="1.0rem" className="opacity-64" />}
             size="xs"
             onClick={(e) => {
               e.preventDefault();
@@ -220,8 +219,7 @@ function ChatItemView(props: ItemProps) {
           <IconButton
             aria-label="Edit"
             variant="ghost"
-            colorScheme="black"
-            icon={<IconEdit size="0.90rem" className="opacity-64  hover:text-black" />}
+            icon={<IconEdit size="0.90rem" className="opacity-64" />}
             size="xs"
             onClick={(e) => {
               e.preventDefault();
@@ -234,8 +232,7 @@ function ChatItemView(props: ItemProps) {
           <IconButton
             aria-label="Delete"
             variant="ghost"
-            colorScheme="black"
-            icon={<IconTrash size="0.90rem" className="opacity-64  hover:text-black" />}
+            icon={<IconTrash size="0.90rem" className="opacity-64" />}
             size="xs"
             onClick={(e) => {
               e.preventDefault();
