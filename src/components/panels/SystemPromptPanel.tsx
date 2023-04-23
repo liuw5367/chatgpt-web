@@ -1,6 +1,7 @@
 import { Button, IconButton, Select, Textarea, useToast } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
 import { IconEraser } from "@tabler/icons-react";
+import { ChakraStylesConfig, Select as SearchSelect } from "chakra-react-select";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -81,6 +82,15 @@ export function SystemPromptPanel(props: Props) {
     handleClose();
   }
 
+  const chakraStyles: ChakraStylesConfig = {
+    dropdownIndicator: (provided) => ({
+      ...provided,
+      background: "transparent",
+      p: 0,
+      w: "40px",
+    }),
+  };
+
   return (
     <SimpleDrawer
       type={type}
@@ -129,22 +139,17 @@ export function SystemPromptPanel(props: Props) {
             </Select>
           </div>
           <div sm="min-w-60">
-            <Select
+            <SearchSelect
               placeholder={t("prompt.select")}
-              onChange={(e) => {
-                const prompt = e.target.value;
+              chakraStyles={chakraStyles}
+              options={options.map(({ act, prompt }) => ({ label: act, value: prompt }))}
+              onChange={({ prompt }) => {
                 const item = options.find((item) => item.prompt === prompt);
                 setPrompt(prompt);
                 setRemark(item?.remark || "");
                 setDesc(item?.desc === prompt ? "" : item?.desc || "");
               }}
-            >
-              {options.map((item) => (
-                <option key={template + "-" + item.act} value={item.prompt}>
-                  {item.act}
-                </option>
-              ))}
-            </Select>
+            />
           </div>
         </div>
 
@@ -155,7 +160,7 @@ export function SystemPromptPanel(props: Props) {
           value={prompt ?? ""}
           onChange={(e) => setPrompt(e.target.value)}
           className="flex-1 !min-h-[50%] text-[14px] placeholder:text-[14px]"
-          placeholder={t("prompt.placeholder")}
+          placeholder={t("prompt.placeholder") || ""}
         />
 
         <div className="flex flex-row items-center justify-between space-x-2">
