@@ -2,9 +2,7 @@ import netlify from "@astrojs/netlify/edge-functions";
 import node from "@astrojs/node";
 import react from "@astrojs/react";
 import vercel from "@astrojs/vercel/edge";
-import tabler from "@iconify-json/tabler/icons.json";
 import { defineConfig } from "astro/config";
-import { presetAttributify, presetIcons, presetUno, transformerVariantGroup } from "unocss";
 import unocss from "unocss/astro";
 
 import app from "./package.json" assert { type: "json" };
@@ -43,29 +41,5 @@ export default defineConfig({
   output: "server",
   adapter: envAdapter(),
   server: { host: true },
-  integrations: [
-    unocss({
-      // include: 'src/**/*.{htm,html,tsx,jsx,css,less,sass}',
-      presets: [
-        presetAttributify(),
-        presetUno(),
-        transformerVariantGroup(),
-        presetIcons({
-          // 添加前缀防止冲突
-          prefix: "i-",
-          // 选择需要的图库导入 https://icon-sets.iconify.design https://icones.js.org
-          // 导入时需添加依赖库 @iconify-json/{name}
-          collections: {
-            // https://tabler-icons.io/
-            tabler,
-          },
-          extraProperties: {
-            display: "inline-block",
-            "vertical-align": "middle",
-          },
-        }),
-      ],
-    }),
-    react(),
-  ],
+  integrations: [unocss(), react()],
 });
