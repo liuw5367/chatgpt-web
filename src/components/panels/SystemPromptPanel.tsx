@@ -130,7 +130,7 @@ export function SystemPromptPanel(props: Props) {
           </div>
           <div sm="min-w-60">
             <Select
-              placeholder={t('prompt.select')}
+              placeholder={t('prompt.select') || ''}
               onChange={(e) => {
                 const prompt = e.target.value;
                 const item = options.find((item) => item.prompt === prompt);
@@ -155,7 +155,7 @@ export function SystemPromptPanel(props: Props) {
           value={prompt ?? ''}
           onChange={(e) => setPrompt(e.target.value)}
           className="flex-1 !min-h-[50%] text-[14px] placeholder:text-[14px]"
-          placeholder={t('prompt.placeholder')}
+          placeholder={t('prompt.placeholder') || ''}
         />
 
         <div className="flex flex-row items-center justify-between space-x-2">

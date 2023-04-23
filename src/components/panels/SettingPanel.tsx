@@ -22,7 +22,7 @@ import { PasswordInput } from '../PasswordInput';
 import SimpleDrawer from '../SimpleDrawer';
 
 type ListItemType<T = string> = {
-  type?: 'password' | 'number';
+  type?: 'password' | 'number' | 'switch';
   label: string;
   value: T;
   placeholder: string;
