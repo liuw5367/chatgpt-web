@@ -1,6 +1,7 @@
 import { Button, IconButton, Select, Textarea, useToast } from '@chakra-ui/react';
 import { useStore } from '@nanostores/react';
 import { IconEraser } from '@tabler/icons-react';
+import { ChakraStylesConfig, Select as SearchSelect } from 'chakra-react-select';
 import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 
@@ -81,6 +82,15 @@ export function SystemPromptPanel(props: Props) {
     handleClose();
   }
 
+  const chakraStyles: ChakraStylesConfig = {
+    dropdownIndicator: (provided) => ({
+      ...provided,
+      background: 'transparent',
+      p: 0,
+      w: '40px',
+    }),
+  };
+
   return (
     <SimpleDrawer
       type={type}
@@ -129,22 +139,18 @@ export function SystemPromptPanel(props: Props) {
             </Select>
           </div>
           <div sm="min-w-60">
-            <Select
-              placeholder={t('prompt.select') || ''}
-              onChange={(e) => {
-                const prompt = e.target.value;
+            <SearchSelect
+              placeholder={t('prompt.select')}
+              chakraStyles={chakraStyles}
+              options={options.map(({ act, prompt }) => ({ label: act, value: prompt }))}
+              onChange={({ value }) => {
+                const prompt = value;
                 const item = options.find((item) => item.prompt === prompt);
                 setPrompt(prompt);
                 setRemark(item?.remark || '');
                 setDesc(item?.desc === prompt ? '' : item?.desc || '');
               }}
-            >
-              {options.map((item) => (
-                <option key={template + '-' + item.act} value={item.prompt}>
-                  {item.act}
-                </option>
-              ))}
-            </Select>
+            />
           </div>
         </div>
 
