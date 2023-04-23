@@ -174,7 +174,7 @@ function ChatItemView(props: ItemProps) {
         {isEditing ? (
           <Input
             value={changed}
-            focusBorderColor="teal"
+            focusBorderColor="teal.600"
             onChange={(e) => setChanged(e.target.value)}
             onClick={(e) => {
               e.stopPropagation();
