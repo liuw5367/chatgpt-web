@@ -143,7 +143,8 @@ export function SystemPromptPanel(props: Props) {
               placeholder={t("prompt.select")}
               chakraStyles={chakraStyles}
               options={options.map(({ act, prompt }) => ({ label: act, value: prompt }))}
-              onChange={({ prompt }) => {
+              onChange={({ value }) => {
+                const prompt = value;
                 const item = options.find((item) => item.prompt === prompt);
                 setPrompt(prompt);
                 setRemark(item?.remark || "");
