@@ -16,7 +16,7 @@ import {
 } from '@tabler/icons-react';
 import { useDebounceEffect } from 'ahooks';
 import { useTranslation } from 'next-i18next';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import VoiceView, { VoiceRef } from '@/components/ai';
 import { ASRStatusEnum } from '@/components/ai/ASRView';
@@ -45,7 +45,7 @@ export default function Page() {
   const { currentChat } = useStore(chatAtom);
   const { conversationId } = currentChat;
   const [inputContent, setInputContent] = useState('');
-  const [isComposing, setComposing] = useState(false);
+  const composingRef = useRef(false);
   const [currentAssistantMessage, setCurrentAssistantMessage] = useState('');
 
   const [asrState, setAsrState] = useState<ASRStatusEnum>(ASRStatusEnum.NORMAL);
@@ -489,8 +489,8 @@ export default function Page() {
             enterKeyHint={enterSend ? 'send' : undefined}
             className="placeholder:text-[14px]"
             value={inputContent === '\n' ? '' : inputContent}
-            onCompositionStart={() => setComposing(true)}
-            onCompositionEnd={() => setComposing(false)}
+            onCompositionStart={() => (composingRef.current = true)}
+            onCompositionEnd={() => (composingRef.current = false)}
             placeholder={enterSend ? t('chat.enterPlaceholder') || '' : t('chat.placeholder') || ''}
             onChange={(e) => setInputContent(e.target.value)}
             onKeyDown={(e) => {
@@ -503,7 +503,7 @@ export default function Page() {
                 }
                 return;
               }
-              if (enterSend && !isComposing && e.key === 'Enter') {
+              if (enterSend && !composingRef.current && e.key === 'Enter') {
                 if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
                   return;
                 }
