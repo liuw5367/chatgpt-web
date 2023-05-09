@@ -1,9 +1,10 @@
 import { useMemoizedFn } from "ahooks";
 import { sha256 } from "js-sha256";
-import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
+import React, { useEffect, useImperativeHandle, useRef } from "react";
 
+import { createStreamPlayer } from "../../utils/Recorder";
+import type { BufferStreamPlayerType } from "../../utils/RecorderType";
 import { getUnisoundKeySecret, Speaker, TTS_CONFIG } from "./Config";
-import PCMPlayer from "./PCMPlayer";
 
 export enum TTSStatusEnum {
   NORMAL,
@@ -26,12 +27,10 @@ interface Props {
 }
 
 const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
-  const { status, onStatusChange, speaker, config = {} } = props;
-  const audioRef = useRef<HTMLAudioElement | null>();
-  const [abortController, setAbortController] = useState<AbortController>();
+  const { onStatusChange, speaker, config = {} } = props;
 
   const socketRef = useRef<WebSocket>();
-  const playerRef = useRef<PCMPlayer>();
+  const playerRef = useRef<BufferStreamPlayerType>();
 
   useImperativeHandle(
     ref,
@@ -81,29 +80,17 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
       }
     }
 
-    try {
-      new window.AudioContext();
-    } catch (e) {
-      alert("您当前的浏览器不支持 Web Audio API");
-      return;
-    }
-    onStatusChange?.(TTSStatusEnum.PLAYING);
-
     const socket = new WebSocket(`${TTS_CONFIG.SOCKET_URL}?appkey=${appKey}&time=${time}&sign=${sign}`);
     socketRef.current = socket;
     socket.binaryType = "arraybuffer";
 
-    const player = new PCMPlayer({
-      inputCodec: "Int16",
-      channels: 1,
-      sampleRate: 16000,
-      flushTime: 100,
-    });
+    const player = createStreamPlayer(playerStop);
     playerRef.current = player;
-    player.inputFinished = false;
-    player.onEnded = () => stopPlay();
 
     socket.onopen = () => {
+      onStatusChange?.(TTSStatusEnum.PLAYING);
+      player.start();
+
       socket.send(
         JSON.stringify({
           format: "pcm",
@@ -125,19 +112,17 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
         if (result.code !== 0) {
           alert("合成遇到点问题，请稍后再试~");
           onStatusChange?.(TTSStatusEnum.NORMAL);
-          player && player.destroy();
+          player && player.stop();
         }
       } catch (e) {
-        player && player.feed(res.data);
+        player && player.input(res.data);
         // console.log('tts socket onmessage', e);
       }
     };
     socket.onclose = (e) => {
-      player.inputFinished = true;
       console.log("tts socket onclose", e);
     };
     socket.onerror = (e) => {
-      player.inputFinished = true;
       console.log("tts socket onerror", e);
     };
   });
@@ -148,24 +133,16 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
   });
 
   const stop = useMemoizedFn(() => {
-    stopPlay();
-    stopAudio();
+    if (playerRef.current) {
+      playerRef.current.stop();
+      playerRef.current = undefined;
+    }
+    playerStop();
   });
 
-  function stopAudio() {
-    abortController?.abort();
-    const audio = audioRef.current;
-    onStatusChange?.(TTSStatusEnum.NORMAL);
-    if (audio) {
-      audio.pause();
-    }
-  }
-
-  function stopPlay() {
+  function playerStop() {
     onStatusChange?.(TTSStatusEnum.NORMAL);
     if (playerRef.current) {
-      playerRef.current?.pause();
-      playerRef.current?.destroy();
       playerRef.current = undefined;
     }
     if (socketRef.current) {
@@ -174,13 +151,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     }
   }
 
-  return (
-    <audio
-      ref={(ref) => (audioRef.current = ref)}
-      autoPlay={true}
-      onEnded={() => onStatusChange?.(TTSStatusEnum.NORMAL)}
-    />
-  );
+  return null;
 });
 
 export default TTSView;
