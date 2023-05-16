@@ -1,5 +1,5 @@
-import { IconButton, useColorMode } from '@chakra-ui/react';
-import { IconMenu2, IconMoonStars, IconPhoto, IconSettings, IconSun } from '@tabler/icons-react';
+import { IconButton, Link, useColorMode } from '@chakra-ui/react';
+import { IconBrandGithub, IconMenu2, IconMoonStars, IconPhoto, IconSettings, IconSun } from '@tabler/icons-react';
 import Head from 'next/head';
 
 import { visibleAtom } from './atom';
@@ -27,6 +27,9 @@ export function Header() {
       </div>
 
       <div className="flex flex-row items-center space-x-1">
+        <Link href="https://github.com/liuw5367/chatgpt-asr-tts" isExternal>
+          <IconButton aria-label="Github" variant="ghost" icon={<IconBrandGithub stroke={1.5} />} />
+        </Link>
         <IconButton
           aria-label="Settings"
           variant="ghost"

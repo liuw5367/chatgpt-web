@@ -18,11 +18,10 @@ import { useDebounceEffect } from 'ahooks';
 import { useTranslation } from 'next-i18next';
 import React, { useEffect, useRef, useState } from 'react';
 
-import VoiceView, { VoiceRef } from '@/components/ai';
-import { ASRStatusEnum } from '@/components/ai/ASRView';
-import { getUnisoundKeySecret, hasUnisoundConfig } from '@/components/ai/Config';
-import { TTSStatusEnum } from '@/components/ai/TTSView';
-
+import VoiceView, { VoiceRef } from '../ai';
+import { ASRStatusEnum } from '../ai/ASRView';
+import { getUnisoundKeySecret, hasUnisoundConfig } from '../ai/Config';
+import { TTSStatusEnum } from '../ai/TTSView';
 import { chatAtom, chatConfigAtom, chatDataAtom, visibleAtom } from '../atom';
 import { AutoResizeTextarea } from '../AutoResizeTextarea';
 import { saveCurrentChatValue } from '../storage';
@@ -57,6 +56,8 @@ export default function Page() {
 
   const [errorInfo, setErrorInfo] = useState<{ code: string; message?: string }>();
 
+  const asrResultRef = useRef('');
+
   const pageWidth =
     chatVisible && promptVisible
       ? 'lg:max-w-176 xl:max-w-160 2xl:max-w-240'
@@ -85,8 +86,11 @@ export default function Page() {
     voiceRef.current?.tts(content);
   }
 
-  function handleAsrResult(result: string) {
-    setInputContent(result);
+  function handleAsrResult(result: string, changing: boolean) {
+    setInputContent(asrResultRef.current + result);
+    if (!changing) {
+      asrResultRef.current += result;
+    }
   }
 
   function checkUnisound() {
@@ -212,6 +216,7 @@ export default function Page() {
     };
     chatDataAtom.set([...messageList, question]);
     setInputContent('');
+    asrResultRef.current = '';
     scrollToPageBottom();
 
     setChatLoading(true);
@@ -308,6 +313,7 @@ export default function Page() {
     voiceRef.current?.stopAsr();
     stopGenerate();
     setInputContent('');
+    asrResultRef.current = '';
     chatDataAtom.set([]);
   }
 
@@ -358,10 +364,13 @@ export default function Page() {
         </Button>
         <IconButton
           aria-label="Eraser"
-          onClick={() => setInputContent('')}
           colorScheme="gray"
           variant="solid"
           icon={<IconEraser stroke={1.5} />}
+          onClick={() => {
+            setInputContent('');
+            asrResultRef.current = '';
+          }}
         />
         <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
       </div>
@@ -388,7 +397,11 @@ export default function Page() {
                 colorScheme={ttsState === TTSStatusEnum.PLAYING ? 'red' : 'gray'}
                 variant={ttsState === TTSStatusEnum.PLAYING ? 'outline' : 'solid'}
                 icon={
-                  ttsState !== TTSStatusEnum.NORMAL ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />
+                  ttsState === TTSStatusEnum.PLAYING ? (
+                    <IconPlayerPause stroke={1.5} />
+                  ) : (
+                    <IconPlayerPlay stroke={1.5} />
+                  )
                 }
               />
             )}

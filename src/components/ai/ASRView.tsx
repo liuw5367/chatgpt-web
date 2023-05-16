@@ -2,8 +2,9 @@ import { useMemoizedFn } from 'ahooks';
 import sha256 from 'crypto-js/sha256';
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
+import { buffer2pcm, createRecorder } from '../../utils/Recorder';
+import type { AudioProcessFn, RecorderType } from '../../utils/RecorderType';
 import { APP_CONFIG, ASR_CONFIG, getUnisoundKeySecret } from './Config';
-import Recorder from './Recorder';
 
 export enum ASRStatusEnum {
   NORMAL,
@@ -20,27 +21,23 @@ interface Props {
   onResultChange?: (v: string, changing: boolean) => void;
   onStatusChange?: (v: ASRStatusEnum) => void;
   config?: Record<string, any>;
+
+  onBuffer?: (v: Int16Array[]) => void;
 }
 
 const langArr = ['cn', 'sichuanese', 'cantonese', 'en'];
 
-interface AsrResult {
-  fixed: string[];
-  changing: string;
-}
-
 const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
-  const { onStatusChange, onResultChange } = props;
+  const { onStatusChange, onResultChange, onBuffer } = props;
 
-  const [currentLang, setCurrentLang] = useState(0);
+  const [currentLang] = useState(0);
 
-  const [simpleResult, setSimpleResult] = useState({ content: '', changing: false });
-  const [asrResult, setAsrResult] = useState<AsrResult>({ fixed: [], changing: '' });
-  const recorderRef = React.useRef<Recorder | null>();
-  const socketRef = React.useRef<WebSocket | null>();
+  const recorderRef = useRef<RecorderType | null>();
+  const socketRef = useRef<WebSocket | null>();
 
   const errorCountRef = useRef(0);
   const retryRef = useRef<any>();
+  const closeRef = useRef(false);
 
   useImperativeHandle(
     ref,
@@ -52,6 +49,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
 
   useEffect(() => {
     return () => {
+      closeRef.current = true;
       stopRecording();
     };
   }, []);
@@ -64,35 +62,33 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     startRecording();
   });
 
-  const clearResult = useMemoizedFn(() => {
-    setAsrResult({ fixed: [], changing: '' });
-    setSimpleResult({ content: '', changing: false });
-  });
-
   function startRecording() {
-    clearResult();
     onStatusChange?.(ASRStatusEnum.RECORDING);
     doStartRecording();
   }
 
   function stopRecording() {
-    doStopRecording();
-    clearResult();
+    doStopRecording(true);
     onStatusChange?.(ASRStatusEnum.NORMAL);
   }
 
   function doStartRecording() {
-    doStopRecording();
-    const recorder = new Recorder(onAudioProcess);
+    doStopRecording(false);
+    if (recorderRef.current) {
+      createSocket();
+      return;
+    }
+    const recorder = createRecorder(onAudioProcess);
     recorderRef.current = recorder;
-    recorder.ready().then(
+    recorder.open(
       () => {
         console.log('recorder ready ...');
         recorder.start();
         createSocket();
       },
-      () => {
-        alert('录音启动失败！');
+      (msg) => {
+        alert('录音启动失败: ' + msg);
+        console.error('录音启动失败: ' + msg);
         socketRef.current?.close();
         onStatusChange?.(ASRStatusEnum.NORMAL);
       },
@@ -100,7 +96,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   }
 
   async function createSocket() {
-    let sid: any;
+    let sid: string;
 
     const chatConfig = getUnisoundKeySecret();
     const appKey = chatConfig.KEY;
@@ -149,46 +145,32 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
       );
     };
 
-    socket.onmessage = (evt: MessageEvent) => {
-      const res = JSON.parse(evt.data);
+    socket.onmessage = (e) => {
+      const res = JSON.parse(e.data);
       if (res.code === 0 && res.text) {
         sid = res.sid;
         const { text } = res;
-        if (res.type === 'fixed') {
-          setAsrResult((draft) => {
-            const result = { fixed: [...draft.fixed, text], changing: '' };
-            const value = result.fixed.join('') + result.changing;
-            onResultChange?.(value, !!result.changing);
-            return { fixed: [], changing: '' };
-          });
-        } else {
-          setAsrResult((draft) => {
-            const result = { ...draft, changing: text };
-            const value = result.fixed.join('') + result.changing;
-            onResultChange?.(value, !!result.changing);
-            return result;
-          });
-        }
-        // onResultChange?.(text, res.type === "variable");
-        setSimpleResult({ content: text, changing: res.type === 'variable' });
+        onResultChange?.(text, res.type === 'variable');
       } else {
-        console.log('asr record end !', [new Date().toLocaleTimeString()], res);
+        console.log('asr record end !', [closeRef.current], res, [new Date().toLocaleTimeString()]);
+        if (closeRef.current) return;
         doStartRecording();
       }
     };
 
-    socket.onerror = function (e: Event) {
+    socket.onerror = function (e) {
       console.log('asr ws error', sid, [new Date().toLocaleTimeString()]);
       console.log(e);
       socketRef.current = null;
       retry();
     };
 
-    socket.onclose = (e: CloseEvent) => {
-      console.log('asr ws close', sid, [new Date().toLocaleTimeString()]);
+    socket.onclose = (e) => {
+      console.log('asr ws close', [sid], [new Date().toLocaleTimeString()]);
       console.log(e);
       socketRef.current = null;
       if (e.code !== 1000) {
+        if (closeRef.current) return;
         retry();
       }
     };
@@ -207,21 +189,30 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     }
   }
 
-  function onAudioProcess(buffer: any) {
+  const onAudioProcess: AudioProcessFn = (buffers, powerLevel, bufferDuration, bufferSampleRate, newBufferIdx) => {
+    const newBuffers = buffers.slice(newBufferIdx);
+    onBuffer?.(newBuffers);
     const socket = socketRef.current;
     // console.log('onAudioProcess():', socket?.readyState, new Date());
 
     if (socket && socket.readyState === 1) {
-      socket.send(buffer);
+      socket.send(buffer2pcm(newBuffers, bufferSampleRate));
+      // console.log('buffers', [bufferSampleRate, bufferDuration]);
+      // console.log('newBuffers', buffers.length, newBuffers.length, pcm.length);
     }
-  }
+  };
 
-  function doStopRecording() {
+  function doStopRecording(closeRecorder = true) {
     retryRef.current && clearTimeout(retryRef.current);
-    recorderRef.current?.stop();
+    if (closeRecorder) {
+      recorderRef.current?.close();
+      recorderRef.current = null;
+    }
     const socket = socketRef.current;
-    if (socket && socket.readyState === 1) {
-      socket.send(JSON.stringify({ type: 'end' }));
+    if (socket) {
+      if (socket.readyState === 1) {
+        socket.send(JSON.stringify({ type: 'end' }));
+      }
       socket.close();
     }
   }
