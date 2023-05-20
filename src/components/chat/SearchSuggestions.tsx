@@ -88,13 +88,15 @@ export function SearchSuggestions(props: Props) {
       }}
     >
       <div
-        className={`relative rounded-lg w-full max-h-[35vh] flex flex-col items-end bg-$chakra-colors-chakra-body-bg`}
-        border="~ solid $chakra-colors-chakra-border-color"
-        overflow="x-hidden y-auto"
-        style={{ maxWidth: "calc(100vw - 32px)" }}
+        className={`relative rounded-lg w-full max-h-[35vh] flex flex-col items-end overflow-x-hidden overflow-y-auto`}
+        style={{
+          maxWidth: "calc(100vw - 32px)",
+          backgroundColor: "var(--chakra-colors-chakra-body-bg)",
+          border: "1px solid var(--chakra-colors-chakra-border-color)",
+        }}
       >
         <CloseButton
-          className="sticky top-0 right-0"
+          className="sticky right-0 top-0"
           size="md"
           onClick={() => {
             setPromptList([]);
@@ -105,8 +107,8 @@ export function SearchSuggestions(props: Props) {
           {promptList.map((item) => (
             <div
               key={item}
-              className="px-4 py-3 flex flex-col space-y-1 last:border-b-none hover:bg-black/15"
-              border="b b-solid b-$chakra-colors-chakra-border-color"
+              className="flex flex-col cursor-pointer px-4 py-3 space-y-1 last:border-b-none hover:bg-black/5"
+              style={{ borderBottom: "1px solid var(--chakra-colors-chakra-border-color)" }}
               onClick={() => {
                 onPromptClick?.(item);
                 setPromptList([]);

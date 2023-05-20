@@ -1,7 +1,7 @@
 import fs from "fs";
 
 const data = fs.readFileSync("./en.csv");
-const text = new String(data);
+const text = String(data);
 
 const json = text
   .split("\n")

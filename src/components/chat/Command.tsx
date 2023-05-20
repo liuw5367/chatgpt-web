@@ -62,21 +62,23 @@ export function Command(props: Props) {
       }}
     >
       <div
-        className={`rounded-lg w-full max-h-[50vh] bg-$chakra-colors-chakra-body-bg`}
-        border="~ solid $chakra-colors-chakra-border-color"
-        overflow="x-hidden y-auto"
-        style={{ maxWidth: "calc(100vw - 32px)" }}
+        className={`rounded-lg w-full max-h-[50vh] overflow-x-hidden overflow-y-auto`}
+        style={{
+          maxWidth: "calc(100vw - 32px)",
+          backgroundColor: "var(--chakra-colors-chakra-body-bg)",
+          border: "1px solid var(--chakra-colors-chakra-border-color)",
+        }}
       >
         <div id={TOP_ID} />
         {promptList.map((item) => (
           <div
-            key={item.desc || item.act}
-            className="px-4 py-3 flex flex-col space-y-1 last:border-b-none hover:bg-black/15"
-            border="b b-solid b-$chakra-colors-chakra-border-color"
+            key={item.id}
+            className="flex flex-col cursor-pointer px-4 py-3 space-y-1 last:border-b-none hover:bg-black/5"
+            style={{ borderBottom: "1px solid var(--chakra-colors-chakra-border-color)" }}
             onClick={() => onPromptClick?.(item.prompt)}
           >
             <div className="">{item.act}</div>
-            <div className="text-[12px] line-clamp-3">{item.prompt}</div>
+            <div className="line-clamp-3 text-[12px]">{item.prompt}</div>
           </div>
         ))}
       </div>

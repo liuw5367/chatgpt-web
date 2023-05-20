@@ -7,7 +7,7 @@ export function UsageTips() {
 
   useEffect(() => {
     setTips(
-      i18n.language.includes("zh")
+      i18n.language.toLowerCase().includes("zh")
         ? [
             "输入 / 可激活 Prompt 搜索窗口",
             "输入框为空时，按上箭头将填充上一条消息内容",
@@ -31,7 +31,7 @@ export function UsageTips() {
     <div className="p-4">
       {tips.map((item) => {
         return (
-          <div key={item} className="flex flex-row space-x-1 text-gray-400 text-[13px]">
+          <div key={item} className="flex flex-row text-[13px] text-gray-400 space-x-1">
             <div className="font-bold">{"•"}</div>
             <div>{item}</div>
           </div>

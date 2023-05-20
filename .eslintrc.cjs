@@ -13,6 +13,7 @@ module.exports = {
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended", // Make sure this is always the last element in the array.
+    "@unocss",
   ],
   plugins: ["simple-import-sort", "prettier", "react-hooks"],
   rules: {

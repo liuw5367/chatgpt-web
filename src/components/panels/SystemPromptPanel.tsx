@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 
 import { chatAtom, visibleAtom } from "../atom";
 import { estimateTokens } from "../chat/token";
-import { templateOptions } from "../prompts";
+import { allPrompts, allTemplates } from "../prompts";
 import SimpleDrawer from "../SimpleDrawer";
 import { saveCurrentChatValue } from "../storage";
 
@@ -19,18 +19,30 @@ interface Props {
 
 export function SystemPromptPanel(props: Props) {
   const { promptVisible, type, sideWidth } = props;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const toast = useToast({ position: "top", isClosable: true });
   const { currentChat } = useStore(chatAtom);
   const { systemMessage = "" } = currentChat;
+  const [token, setToken] = useState(0);
 
+  const [templateList, setTemplateList] = useState(allTemplates);
+  const [options, setOptions] = useState(
+    allTemplates[0].value.map((item) => {
+      return { label: item.act, value: item.id };
+    })
+  );
+
+  const [template, setTemplate] = useState(allTemplates[0].label);
   const [prompt, setPrompt] = useState(systemMessage);
-  const [template, setTemplate] = useState(templateOptions[0].label);
-  const [options, setOptions] = useState(templateOptions[0].value);
   const [desc, setDesc] = useState("");
   const [remark, setRemark] = useState("");
 
-  const [token, setToken] = useState(0);
+  useEffect(() => {
+    setTemplateList((draft) => {
+      draft[0].label = i18n.language.toLowerCase().includes("zh") ? "默认" : "Default";
+      return [...draft];
+    });
+  }, [i18n.language]);
 
   useEffect(() => {
     if (promptVisible) {
@@ -119,7 +131,8 @@ export function SystemPromptPanel(props: Props) {
     >
       <div className={`w-full h-full flex flex-col space-y-2`}>
         <div
-          className="flex flex-col space-y-2"
+          className={`flex flex-col space-y-2`}
+          // @ts-ignore sm
           sm={type === "side" ? "" : "flex-row items-center space-x-4 space-y-0"}
         >
           <div>
@@ -128,25 +141,32 @@ export function SystemPromptPanel(props: Props) {
               onChange={(e) => {
                 const key = e.target.value;
                 setTemplate(key);
-                setOptions(templateOptions.find((item) => item.label === key)?.value || []);
+                const data = templateList.find((item) => item.label === key)?.value || [];
+                setOptions(
+                  data.map((item) => {
+                    return { label: item.act, value: item.id };
+                  })
+                );
               }}
             >
-              {templateOptions.map((item) => (
+              {templateList.map((item) => (
                 <option key={item.label} value={item.label}>
                   {item.label}
                 </option>
               ))}
             </Select>
           </div>
-          <div sm="min-w-60">
+          <div className="sm:min-w-60">
             <SearchSelect
               placeholder={t("prompt.select")}
               chakraStyles={chakraStyles}
-              options={options.map(({ act, prompt }) => ({ label: act, value: prompt }))}
-              onChange={({ value }) => {
-                const prompt = value;
-                const item = options.find((item) => item.prompt === prompt);
-                setPrompt(prompt);
+              options={options}
+              onChange={(e) => {
+                // @ts-ignore
+                const id = e.value;
+                const item = allPrompts.find((item) => item.id === id);
+                if (!item) return;
+                setPrompt(item.prompt);
                 setRemark(item?.remark || "");
                 setDesc(item?.desc === prompt ? "" : item?.desc || "");
               }}
@@ -154,13 +174,13 @@ export function SystemPromptPanel(props: Props) {
           </div>
         </div>
 
-        {remark && <div className="px-2 text-[15px] whitespace-pre-wrap">{remark}</div>}
-        {desc && <div className="px-4 py-2 text-[15px] whitespace-pre-wrap rounded bg-black/10">{desc}</div>}
+        {remark && <div className="whitespace-pre-wrap px-2 text-[15px]">{remark}</div>}
+        {desc && <div className="whitespace-pre-wrap rounded bg-black/5 px-4 py-2 text-[15px]">{desc}</div>}
 
         <Textarea
           value={prompt ?? ""}
           onChange={(e) => setPrompt(e.target.value)}
-          className="flex-1 !min-h-[50%] text-[14px] placeholder:text-[14px]"
+          className="flex-1 text-[14px] !min-h-[50%] placeholder:text-[14px]"
           placeholder={t("prompt.placeholder") || ""}
         />
 
