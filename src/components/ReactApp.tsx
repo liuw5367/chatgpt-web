@@ -17,7 +17,7 @@ export default function App() {
   const theme = extendTheme({ initialColorMode: "system", useSystemColorMode: true });
 
   useEffect(() => {
-    loadCache(t("chat.new"));
+    loadCache(t("New Chat"));
     addCodeCopy();
   }, []);
 
@@ -66,7 +66,7 @@ function Content() {
   return (
     <div className="w-full flex" style={{ height: "calc(100% - 4rem)" }}>
       <ChatPanel chatVisible={chatVisibleState} type={xl || (lg && showChatSide) ? "side" : "drawer"} />
-      <div className="w-full h-full">
+      <div className="h-full w-full">
         <Chat />
       </div>
       <SystemPromptPanel

@@ -17,16 +17,16 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { APP_VERSION } from "../../constants";
-import { chatConfigAtom, visibleAtom } from "../atom";
+import { chatConfigAtom, ChatConfigType, visibleAtom } from "../atom";
 import { PasswordInput } from "../PasswordInput";
 import SimpleDrawer from "../SimpleDrawer";
 
 type ListItemType<T = string> = {
-  type?: "password" | "number";
+  type?: "password" | "number" | "switch";
   label: string;
   value: T;
   placeholder: string;
-  desc?: string;
+  desc?: string | null;
   max?: number;
 };
 
@@ -107,7 +107,7 @@ export function SettingPanel() {
     });
     chatConfigAtom.set(result);
     handleClose();
-    toast({ status: "success", title: t("toast.success") });
+    toast({ status: "success", title: t("Success") });
   }
 
   function renderItem(item: ListItemType) {
@@ -116,7 +116,7 @@ export function SettingPanel() {
         key={item.value}
         item={item}
         balance={balance}
-        value={config[item.value] || ""}
+        value={config[item.value as keyof ChatConfigType] || ""}
         onChange={(value) => setConfig((draft) => ({ ...draft, [item.value]: value }))}
       />
     );
@@ -125,7 +125,7 @@ export function SettingPanel() {
   const chatConfigList: ListItemType[] = [
     {
       type: "switch",
-      label: t("settings.SearchSuggestions"),
+      label: t("SearchSuggestions"),
       value: "searchSuggestions",
       placeholder: "",
     },
@@ -163,17 +163,17 @@ export function SettingPanel() {
       size="md"
       header={
         <div className="space-x-4">
-          <span>{t("settings.title")}</span>
+          <span>{t("Settings")}</span>
           <span className="text-sm font-normal">{APP_VERSION}</span>
         </div>
       }
       footer={
         <>
           <Button variant="outline" mr={3} onClick={handleClose}>
-            {t("actions.cancel")}
+            {t("Cancel")}
           </Button>
           <Button colorScheme="teal" onClick={handleSaveClick}>
-            {t("actions.save")}
+            {t("Save")}
           </Button>
         </>
       }

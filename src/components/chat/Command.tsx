@@ -1,6 +1,7 @@
 import { useDebounceEffect } from "ahooks";
 import { useEffect, useState } from "react";
 
+import { Cache } from "../../constants";
 import type { OptionType } from "../prompts";
 import { allPrompts } from "../prompts";
 import { scrollToElement } from "../utils";
@@ -12,21 +13,30 @@ interface Props {
 }
 
 const TOP_ID = "command-list-top";
-const defaultPrompts = allPrompts.slice(0, 50);
 function scrollToTop() {
   scrollToElement(TOP_ID, { behavior: "auto" });
+}
+
+function getPrompts() {
+  const favorites = JSON.parse(localStorage.getItem(Cache.PROMPT_FAVORITE) || "[]") as OptionType[];
+  const defaultPrompts = allPrompts.slice(0, 50);
+  return [...favorites, ...defaultPrompts];
 }
 
 export function Command(props: Props) {
   const { value, width, onPromptClick } = props;
   const [bottomHeight, setBottomHeight] = useState(146);
-  const [promptList, setPromptList] = useState<OptionType[]>(defaultPrompts);
+  const [promptList, setPromptList] = useState<OptionType[]>([]);
+
+  useEffect(() => {
+    setPromptList(getPrompts());
+  }, []);
 
   useDebounceEffect(
     () => {
       let command = value?.trim();
       if (command === "/") {
-        setPromptList(defaultPrompts);
+        setPromptList(getPrompts());
         scrollToTop();
         return;
       }
@@ -41,7 +51,7 @@ export function Command(props: Props) {
       scrollToTop();
     },
     [value],
-    { wait: 500 }
+    { wait: 100, maxWait: 300 }
   );
 
   useEffect(() => {

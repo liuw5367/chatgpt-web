@@ -1,6 +1,4 @@
 /// <reference types="astro/client" />
-/// <reference types="vite-plugin-pwa/info" />
-/// <reference types="vite-plugin-pwa/client" />
 
 interface ImportMetaEnv {
   readonly OPENAI_API_KEY: string;

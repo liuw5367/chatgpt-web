@@ -54,7 +54,7 @@ export function ImagePanel() {
 
   async function handleSend() {
     if (!prompt?.trim()) {
-      toast({ status: "info", title: t("toast.empty.prompt") });
+      toast({ status: "info", title: t("please enter prompt") });
       return;
     }
     setLoading(true);
@@ -77,12 +77,12 @@ export function ImagePanel() {
         toast({ status: "error", title: json.error.code, description: json.error.message });
       } else {
         if (json.data && Array.isArray(json.data)) {
-          const data = json.data.map(({ url }) => ({ prompt, url }));
+          const data = json.data.map(({ url }: any) => ({ prompt, url }));
           setImageList(data);
           addToHistory(data);
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       toast({ status: "error", title: e.name, description: e.message });
     }
     setLoading(false);
@@ -108,17 +108,17 @@ export function ImagePanel() {
   }
 
   return (
-    <SimpleDrawer isOpen={imageVisible} onClose={handleClose} size="lg" header={t("image.title")}>
-      <div className="w-full h-full flex flex-col space-y-3">
+    <SimpleDrawer isOpen={imageVisible} onClose={handleClose} size="lg" header={t("Image Create")}>
+      <div className="h-full w-full flex flex-col space-y-3">
         <AutoResizeTextarea
           className="min-h-[84px]"
           minRows={3}
           maxRows={10}
-          placeholder={t("image.placeholder")}
+          placeholder={t("please enter prompt") ?? ""}
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
         />
-        <div className="flex flex-row space-x-3 justify-between">
+        <div className="flex flex-row justify-between space-x-3">
           <IconButton
             aria-label="History"
             onClick={() => setImageList([])}
@@ -140,15 +140,15 @@ export function ImagePanel() {
               onClick={handleSend}
               leftIcon={loading ? <IconLoader3 stroke={1.5} className="rotate-img" /> : undefined}
             >
-              {loading ? t("image.generating") : t("image.generate")}
+              {loading ? t("Generating") : t("Generate")}
             </Button>
           </div>
         </div>
         <SimpleGrid columns={2} spacing={2} className="pb-4">
           {displayList?.map(({ url, prompt }) => (
-            <div key={url} className="w-full rounded bg-black/20 relative aspect-square">
-              <img src={url} alt={url} className="w-full rounded aspect-square" />
-              <div className="absolute top-1 right-1">
+            <div key={url} className="relative aspect-square w-full rounded bg-black/20">
+              <img src={url} alt={url} className="aspect-square w-full rounded" />
+              <div className="absolute right-1 top-1">
                 <CloseButton size="sm" onClick={() => deleteImage(url)} />
               </div>
               <div className="absolute bottom-1 right-1 space-x-1">

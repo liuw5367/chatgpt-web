@@ -4,7 +4,7 @@ import ResizeTextarea from "react-textarea-autosize";
 
 export const AutoResizeTextarea = React.forwardRef<
   HTMLTextAreaElement,
-  TextareaProps & { minRows: number; maxRows: number; enterKeyHint: "send" | undefined }
+  TextareaProps & { minRows: number; maxRows: number; enterKeyHint?: "send" | undefined }
 >((props, ref) => {
   return (
     <Textarea
