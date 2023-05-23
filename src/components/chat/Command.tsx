@@ -1,7 +1,7 @@
 import { useDebounceEffect } from "ahooks";
 import { useEffect, useState } from "react";
 
-import { Cache } from "../../constants";
+import { CacheKeys } from "../../constants";
 import type { OptionType } from "../prompts";
 import { allPrompts } from "../prompts";
 import { scrollToElement } from "../utils";
@@ -18,7 +18,7 @@ function scrollToTop() {
 }
 
 function getPrompts() {
-  const favorites = JSON.parse(localStorage.getItem(Cache.PROMPT_FAVORITE) || "[]") as OptionType[];
+  const favorites = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_FAVORITE) || "[]") as OptionType[];
   const defaultPrompts = allPrompts.slice(0, 50);
   return [...favorites, ...defaultPrompts];
 }

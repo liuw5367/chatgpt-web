@@ -5,7 +5,7 @@ import { ChakraStylesConfig, Select as SearchSelect } from "chakra-react-select"
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Cache } from "../../constants";
+import { CacheKeys } from "../../constants";
 import { chatAtom, visibleAtom } from "../atom";
 import { estimateTokens } from "../chat/token";
 import { allPrompts, OptionType } from "../prompts";
@@ -67,7 +67,7 @@ export function SystemPromptPanel(props: Props) {
 
   useEffect(() => {
     if (!promptVisible) return;
-    const value = JSON.parse(localStorage.getItem(Cache.PROMPT_FAVORITE) || "[]") as OptionType[];
+    const value = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_FAVORITE) || "[]") as OptionType[];
     setFavoriteOptions(value);
     const isZh = i18n.language.toLowerCase().includes("zh");
 
@@ -116,7 +116,7 @@ export function SystemPromptPanel(props: Props) {
       if (item.prompt === prompt) return;
       item.prompt = prompt;
       setFavoriteOptions([...favoriteOptions]);
-      localStorage.setItem(Cache.PROMPT_FAVORITE, JSON.stringify(favoriteOptions));
+      localStorage.setItem(CacheKeys.PROMPT_FAVORITE, JSON.stringify(favoriteOptions));
       toast({ status: "success", title: t("Updated") });
     } else {
       setModalOpen(true);
@@ -133,7 +133,7 @@ export function SystemPromptPanel(props: Props) {
     const data = [item, ...favoriteOptions];
     setSelectedId(item.id);
     setFavoriteOptions(data);
-    localStorage.setItem(Cache.PROMPT_FAVORITE, JSON.stringify(data));
+    localStorage.setItem(CacheKeys.PROMPT_FAVORITE, JSON.stringify(data));
     toast({ status: "success", title: t("Saved") });
     setModalOpen(false);
   }
@@ -141,7 +141,7 @@ export function SystemPromptPanel(props: Props) {
   function handleFavoriteDelete() {
     const list = favoriteOptions.filter((v) => v.id !== selectedId);
     setFavoriteOptions(list);
-    localStorage.setItem(Cache.PROMPT_FAVORITE, JSON.stringify(list));
+    localStorage.setItem(CacheKeys.PROMPT_FAVORITE, JSON.stringify(list));
     toast({ status: "success", title: t("Deleted") });
   }
 

@@ -16,7 +16,7 @@ import { IconEraser, IconExternalLink, IconHistory, IconInfoSquare, IconLoader3 
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { Cache } from "../../constants";
+import { CacheKeys } from "../../constants";
 import { chatConfigAtom, visibleAtom } from "../atom";
 import { AutoResizeTextarea } from "../AutoResizeTextarea";
 import SimpleDrawer from "../SimpleDrawer";
@@ -38,7 +38,7 @@ export function ImagePanel() {
 
   useEffect(() => {
     if (imageVisible) {
-      setHistoryList(JSON.parse(localStorage.getItem(Cache.IMAGE_LIST) || "[]"));
+      setHistoryList(JSON.parse(localStorage.getItem(CacheKeys.IMAGE_LIST) || "[]"));
     }
   }, [imageVisible]);
 
@@ -91,7 +91,7 @@ export function ImagePanel() {
 
   function updateHistory(data: ImageItem[]) {
     setHistoryList(data);
-    localStorage.setItem(Cache.IMAGE_LIST, JSON.stringify(data));
+    localStorage.setItem(CacheKeys.IMAGE_LIST, JSON.stringify(data));
   }
 
   function addToHistory(data: ImageItem[]) {
