@@ -1,12 +1,13 @@
-import promptsEn from '../prompts/en.json';
-import promptsOpen from '../prompts/openprompts';
-import promptsOther from '../prompts/other.json';
-import { promptsShortcut, promptsShortcutEn } from '../prompts/shortcuts';
-import promptsZh from '../prompts/zh.json';
+import promptsEn from './en.json';
+import promptsOpen from './openprompts';
+import promptsOther from './other.json';
+import { promptsShortcut, promptsShortcutEn } from './shortcuts';
+import promptsZh from './zh.json';
 
 export { promptsEn, promptsOpen, promptsOther, promptsShortcut, promptsShortcutEn, promptsZh };
 
 export type OptionType = {
+  id?: string;
   act: string;
   prompt: string;
   desc?: string;
@@ -28,7 +29,17 @@ export const templateOptions: TemplateType[] = [
 ];
 
 export const allPrompts: OptionType[] = templateOptions
-  .map(({ label, value }) => value.map(({ act, prompt }) => ({ desc: label + '-' + act, act, prompt })))
+  .map(({ label, value }) =>
+    value.map(({ act, prompt, desc, remark }) => ({
+      id: label + '-' + act,
+      act,
+      prompt,
+      desc,
+      remark,
+    })),
+  )
   .reduce((a, b) => {
     return [...a, ...b];
   });
+
+export const allTemplates: TemplateType[] = [{ label: 'Default', value: allPrompts }];

@@ -1,6 +1,6 @@
 let Recorder: any;
 
-export async function importLib() {
+export async function importRecorderLib() {
   // 必须要先于 engine 导入
   // eslint-disable-next-line simple-import-sort/imports
   const RecorderX = (await import('recorder-core')).default;

@@ -96,7 +96,7 @@ export default function Page() {
   function checkUnisound() {
     const config = getUnisoundKeySecret();
     if (!config.KEY) {
-      toast({ status: 'error', title: t('toast.empty.unisound') });
+      toast({ status: 'error', title: t('please enter unisound AppKey') });
       return true;
     }
     return false;
@@ -194,12 +194,12 @@ export default function Page() {
 
   async function sendMessage(inputValue = inputContent, systemMessage = currentChat.systemMessage) {
     if (chatLoading) {
-      toast({ status: 'warning', title: t('toast.generating') });
+      toast({ status: 'warning', title: t('Generating') });
       return;
     }
     const content = removeLn(inputValue);
     if (!systemMessage && !content) {
-      toast({ status: 'info', title: t('toast.empty.content') });
+      toast({ status: 'info', title: t('please enter content') });
       return;
     }
     stopTTS();
@@ -265,7 +265,7 @@ export default function Page() {
         return;
       }
       if (!response.body) {
-        toast({ status: 'warning', title: t('toast.empty.data') });
+        toast({ status: 'warning', title: t('No Data') });
         setChatLoading(false);
         return;
       }
@@ -362,16 +362,6 @@ export default function Page() {
             <IconBrandTelegram stroke={1.5} />
           )}
         </Button>
-        <IconButton
-          aria-label="Eraser"
-          colorScheme="gray"
-          variant="solid"
-          icon={<IconEraser stroke={1.5} />}
-          onClick={() => {
-            setInputContent('');
-            asrResultRef.current = '';
-          }}
-        />
         <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
       </div>
       <div className="mb-4 flex flex-row items-center space-x-3">
@@ -480,7 +470,7 @@ export default function Page() {
   }
 
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="h-full w-full flex flex-col">
       {messageList && messageList.length > 0 ? (
         <>{renderMessageList}</>
       ) : (

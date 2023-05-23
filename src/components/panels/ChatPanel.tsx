@@ -51,7 +51,7 @@ export function ChatPanel(props: Props) {
 
   function handleChatAddClick() {
     const id = uuid();
-    const item: ChatItem = { id, name: t('chat.new') + ' ' + id.substring(0, 6) };
+    const item: ChatItem = { id, name: t('New Chat') + ' ' + id.substring(0, 6) };
     updateChatList([item, ...chatList]);
   }
 
@@ -66,7 +66,7 @@ export function ChatPanel(props: Props) {
   function handleDelete(item: ChatItem) {
     if (chatList.length === 1) {
       const id = uuid();
-      const item: ChatItem = { id, name: t('chat.new') };
+      const item: ChatItem = { id, name: t('New Chat') };
       updateChatList([item]);
       updateChatId(item);
       handleClose();
@@ -94,7 +94,7 @@ export function ChatPanel(props: Props) {
       onClose={handleClose}
       header={
         type === 'side' ? null : (
-          <div className="flex items-center space-x-2 font-medium">
+          <div className="flex items-center font-medium space-x-2">
             <Logo />
           </div>
         )
@@ -116,7 +116,7 @@ export function ChatPanel(props: Props) {
             leftIcon={<IconPlus stroke={1.5} size="1.3rem" />}
             onClick={handleChatAddClick}
           >
-            {t('chat.new')}
+            {t('New Chat')}
           </Button>
         </div>
       }

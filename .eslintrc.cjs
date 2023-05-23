@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ["next/core-web-vitals"],
+  extends: ["next/core-web-vitals", "@unocss"],
   plugins: ["simple-import-sort"],
   rules: {
     "react/react-in-jsx-scope": "off",

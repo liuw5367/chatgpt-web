@@ -1,4 +1,4 @@
-import { Cache } from '../constants';
+import { CacheKeys } from '../constants';
 import { chatAtom, ChatAtomType, chatConfigAtom, chatDataAtom } from './atom';
 import type { ChatItem } from './types';
 import { uuid } from './utils';
@@ -7,7 +7,7 @@ import { uuid } from './utils';
  * 因为服务端渲染无法使用 localStorage，所以这里重新设置一次
  */
 export function loadCache(newChatName: string) {
-  const chatList: ChatItem[] = JSON.parse(localStorage.getItem(Cache.CHAT_LIST) || '[]');
+  const chatList: ChatItem[] = JSON.parse(localStorage.getItem(CacheKeys.CHAT_LIST) || '[]');
   if (chatList.length === 0) {
     const chatId = uuid();
     const chatItem: ChatItem = {
@@ -17,13 +17,13 @@ export function loadCache(newChatName: string) {
     };
     chatList.push(chatItem);
 
-    localStorage.setItem(Cache.CHAT_ID, chatId);
-    localStorage.setItem(Cache.CHAT_LIST, JSON.stringify(chatList));
+    localStorage.setItem(CacheKeys.CHAT_ID, chatId);
+    localStorage.setItem(CacheKeys.CHAT_LIST, JSON.stringify(chatList));
     const messagesJson = localStorage.getItem('messages') || '[]';
     localStorage.setItem(chatId, messagesJson);
     localStorage.removeItem('messages');
   }
-  const chatId = localStorage.getItem(Cache.CHAT_ID) || '';
+  const chatId = localStorage.getItem(CacheKeys.CHAT_ID) || '';
 
   const chatItem = chatList.find((v) => v.id === chatId);
   chatAtom.set({ ...chatAtom.get(), chatList, currentChat: chatItem as ChatItem });
@@ -46,8 +46,8 @@ export function loadCache(newChatName: string) {
 }
 
 export function saveChatAtom(data: ChatAtomType) {
-  localStorage.setItem(Cache.CHAT_ID, data.currentChat.id);
-  localStorage.setItem(Cache.CHAT_LIST, JSON.stringify(data.chatList));
+  localStorage.setItem(CacheKeys.CHAT_ID, data.currentChat.id);
+  localStorage.setItem(CacheKeys.CHAT_LIST, JSON.stringify(data.chatList));
   chatAtom.set(data);
 }
 

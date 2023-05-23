@@ -1,7 +1,7 @@
 import { useMemoizedFn } from 'ahooks';
 import React, { useEffect, useImperativeHandle, useState } from 'react';
 
-import { importLib } from '@/utils/Recorder';
+import { importRecorderLib } from '@/utils/Recorder';
 
 import ASRView, { ASRRef, ASRStatusEnum } from './ASRView';
 import { defaultSpeaker } from './Config';
@@ -31,7 +31,7 @@ const View = React.forwardRef<VoiceRef, Props>((props, ref) => {
   const [browserFlag, setBrowserFlag] = useState(false);
 
   useEffect(() => {
-    importLib();
+    importRecorderLib();
     setBrowserFlag(true);
   }, []);
 

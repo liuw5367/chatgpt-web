@@ -1,51 +1,44 @@
 {
   "language": "简体中文",
   "chat": {
-    "new": "新的聊天",
     "placeholder": "快捷键: ⬆️ / Ctrl + ↩ / ⌘ + ↩",
     "enterPlaceholder": "快捷键: ⬆️ / ↩ / shift + ↩"
   },
   "prompt": {
-    "title": "AI 设定",
-    "placeholder": "请输入要设定的内容。设定后每次都会跟随消息一起发送",
-    "tip": "设置后消息内容为空可直接发送",
-    "select": "请选择设定"
-  },
-  "image": {
-    "title": "图片生成",
-    "generate": "生成",
-    "generating": "生成中",
-    "placeholder": "请输入提示"
+    "placeholder": "请输入提示词。保存后每次发送消息，消息内容都会拼接在提示词后一起发送"
   },
   "settings": {
-    "title": "设置",
-    "SearchSuggestions": "开启搜索提示",
     "EnterSend": "回车键发送",
-    "temperature": "默认值为1，取值范围0和2之间。像0.8这样较高的值会使输出结果更随机，而像0.2这样较低值会使结果更加集中更确定性。建议修改此项或 top_p，但不要同时修改。",
+    "temperature": "默认值为1，取值范围0和2之间。值越大回复越随机",
     "top_p": "默认值为1。核心采样，作为使用 temperature 进行采样的替代方案，其中模型考虑具有 top_p 概率质量的令牌的结果。因此，0.1 表示仅考虑组成前 10％ 概率质量的 tokens。建议修改此项或 temperature，但不要同时修改。"
-  },
-  "actions": {
-    "save": "保存",
-    "cancel": "取消",
-    "remove": "移除"
   },
   "conversation": {
     "on": "已开启连续对话",
     "off": "已关闭连续对话",
     "desc": "该对话不会和之前的消息关联"
   },
-  "toast": {
-    "empty": {
-      "unisound": "请输入 Unisound AppKey",
-      "content": "请输入内容",
-      "prompt": "请输入提示",
-      "data": "无数据"
-    },
-    "error": {
-      "request": "请求错误"
-    },
-    "generating": "生成中...",
-    "success": "操作成功",
-    "removed": "已移除"
-  }
+  "New Chat": "新的对话",
+  "please enter unisound AppKey": "请输入 Unisound AppKey",
+  "please enter content": "请输入内容",
+  "please enter prompt": "请输入提示词",
+  "No Data": "无数据",
+  "Request Error": "请求错误",
+  "Image Create": "图片生成",
+  "SearchSuggestions": "搜索提示",
+  "Select Prompt": "请选择提示词",
+  "System Prompt": "提示词设置",
+  "Setting": "设置",
+  "Name": "名称",
+  "Description": "描述",
+  "Save To Favorite": "保存到收藏",
+  "Save": "保存",
+  "Cancel": "取消",
+  "Remove": "移除",
+  "Generate": "生成",
+  "Generating": "生成中",
+  "Success": "操作成功",
+  "Removed": "已移除",
+  "Deleted": "已删除",
+  "Saved": "已保存",
+  "Updated": "已更新"
 }

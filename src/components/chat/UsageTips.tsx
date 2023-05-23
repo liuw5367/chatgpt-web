@@ -7,13 +7,16 @@ export function UsageTips() {
 
   useEffect(() => {
     setTips(
-      i18n.language === 'zh'
+      i18n.language.toLowerCase().includes('zh')
         ? [
             '输入 / 可激活 Prompt 搜索窗口',
             '输入框为空时，按上箭头将填充上一条消息内容',
+            '点击提示词设置底部🌟可对提示词进行收藏',
+            '默认非连续对话，需点击底部按钮开启',
+            '连续对话消息底部会显示编码用来定位属于哪个对话',
             '默认开启搜索内容建议，可在设置中关闭',
             '默认未开启回车键发送，可在设置中开启',
-            '默认非连续对话，需点击底部按钮开启',
+            '消息底部统计数字为Token使用量',
             '默认隐藏语音按钮，输入 KEY 后显示',
           ]
         : [
@@ -31,7 +34,7 @@ export function UsageTips() {
     <div className="p-4">
       {tips.map((item) => {
         return (
-          <div key={item} className="flex flex-row space-x-1 text-gray-400 text-[13px]">
+          <div key={item} className="flex flex-row text-[13px] text-gray-400 space-x-1">
             <div className="font-bold">{'•'}</div>
             <div>{item}</div>
           </div>
