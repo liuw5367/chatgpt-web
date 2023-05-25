@@ -52,3 +52,22 @@ export function addCodeCopy() {
     }
   });
 }
+
+export async function readFileAsString(file: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    try {
+      const reader = new FileReader();
+      reader.readAsText(file, 'UTF-8');
+      reader.onload = function (event) {
+        const result = event.target?.result;
+        if (typeof result === 'string') {
+          resolve(result);
+        } else {
+          reject();
+        }
+      };
+    } catch (e) {
+      reject(e);
+    }
+  });
+}

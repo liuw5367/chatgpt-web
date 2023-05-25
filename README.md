@@ -5,19 +5,20 @@
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fliuw5367%2Fchatgpt-asr-tts)
 [![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/liuw5367/chatgpt-asr-tts)
 
-[Astro分支](https://github.com/liuw5367/chatgpt-asr-tts/tree/astro)和主分支代码同步，只是框架不同。个人感觉 Astro 因为使用 Vite 开发体验好一点，但是 astro 服务端渲染不能完整支持 Emotion，所以使用的是客户端渲染。而 Next 服务端渲染支持的比较好，所以首次加载速度会好一些，但因为 Next 使用 Webpack 对 Unocss 支持的不好，导致开发体验不太好。
+[Astro分支](https://github.com/liuw5367/chatgpt-asr-tts/tree/astro)和[主分支](https://github.com/liuw5367/chatgpt-asr-tts)代码同步，只是框架不同。Astro 服务端渲染不能完整支持 Emotion，所以使用的是客户端渲染。而 Next 分支使用服务端渲染，所以首次加载速度会好一些，但因为 Next 使用 Webpack 对 Unocss 支持的不好，导致开发体验不太好。
 
-- [Next 分支体验地址](https://chatgpt-six-lilac.vercel.app)
+- [Next 分支体验地址 Vercel](https://chatgpt-six-lilac.vercel.app)
+- [Next 分支体验地址 Netlify](https://chatgpt-light.netlify.app)
 - [Astro 分支体验地址](https://chatgpt-astro.netlify.app)
 
 
 ## 功能
 
 - 页面样式移动端优先
-- 对话使用 OPENAI 官方 API `/v1/chat/completions`
+- 对话使用 OpenAI 官方 API `/v1/chat/completions`
 - 支持图片生成 `/v1/images/generations`
-- （废弃）支持查询 apiKey 余额 `/dashboard/billing/credit_grants`
 - 支持设置 System Prompt，提供大量模版供选择
+- 支持 Prompt 收藏、导入、导出（浏览器本地缓存）
 - 支持多会话
 - 支持连续对话
 - 消息显示 token 使用数量
@@ -27,7 +28,7 @@
 - 支持代码复制
 - 输入 `/` 搜索 Prompt
 - 支持 i18n
-- 支持 ASR 和 TTS，可用但不完善，需申请 key，[申请地址](https://ai.unisound.com)
+- 支持 ASR 和 TTS，可用但不完善，需[申请 key](https://ai.unisound.com)
 
 ![Dark](./screenshot-dark.png)
 

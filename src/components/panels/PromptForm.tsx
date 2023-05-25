@@ -19,16 +19,22 @@ import { useTranslation } from 'react-i18next';
 
 interface Props {
   open?: boolean;
+  name?: string;
+  desc?: string;
   onSave?: (name: string, desc?: string) => void;
   onClose: () => void;
 }
 
 export function PromptFormModal(props: Props) {
-  const { open, onSave, onClose } = props;
+  const { name, desc, open, onSave, onClose } = props;
   const toast = useToast({ position: 'top', isClosable: true });
   const { t } = useTranslation();
   const disclosure = useDisclosure();
   const [data, setData] = useState<{ name: string; desc?: string }>({ name: '' });
+
+  useEffect(() => {
+    setData({ name: name || '', desc });
+  }, [name, desc]);
 
   useEffect(() => {
     if (open) {
@@ -76,10 +82,12 @@ export function PromptFormModal(props: Props) {
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleSaveClick}>
+          <Button onClick={onClose} mr={3}>
+            {t('Cancel')}
+          </Button>
+          <Button colorScheme="teal" onClick={handleSaveClick}>
             {t('Save')}
           </Button>
-          <Button onClick={onClose}>{t('Cancel')}</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

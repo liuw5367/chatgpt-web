@@ -14,7 +14,7 @@ const nextConfig = {
       // * https://webpack.js.org/configuration/cache/
       config.cache = false;
     }
-    // config.cache = false;
+    config.cache = false;
     config.plugins.push(UnoCSS());
     return config;
   },
