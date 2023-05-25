@@ -103,6 +103,9 @@ dependencies:
   openai:
     specifier: ^3.2.1
     version: 3.2.1
+  papaparse:
+    specifier: ^5.4.1
+    version: 5.4.1
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -132,6 +135,9 @@ devDependencies:
   '@types/markdown-it':
     specifier: ^12.2.3
     version: 12.2.3
+  '@types/papaparse':
+    specifier: ^5.3.7
+    version: 5.3.7
   '@types/react':
     specifier: ^18.2.0
     version: 18.2.0
@@ -2332,6 +2338,16 @@ packages:
     dependencies:
       '@types/unist': 2.0.6
     dev: false
+
+  /@types/node@20.2.3:
+    resolution: {integrity: sha512-pg9d0yC4rVNWQzX8U7xb4olIOFuuVL9za3bzMT2pu2SU0SNEi66i2qrvhE2qt0HvkhuCaWJu7pLNOt/Pj8BIrw==}
+    dev: true
+
+  /@types/papaparse@5.3.7:
+    resolution: {integrity: sha512-f2HKmlnPdCvS0WI33WtCs5GD7X1cxzzS/aduaxSu3I7TbhWlENjSPs6z5TaB9K0J+BH1jbmqTaM+ja5puis4wg==}
+    dependencies:
+      '@types/node': 20.2.3
+    dev: true
 
   /@types/parse-json@4.0.0:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
@@ -6179,6 +6195,10 @@ packages:
   /p-try@2.2.0:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
     engines: {node: '>=6'}
+    dev: false
+
+  /papaparse@5.4.1:
+    resolution: {integrity: sha512-HipMsgJkZu8br23pW15uvo6sib6wne/4woLZPlFf3rpDyMe9ywEXUsuD7+6K9PRkJlVT51j/sCOYDKGGS3ZJrw==}
     dev: false
 
   /parent-module@1.0.1:

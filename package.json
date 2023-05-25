@@ -1,6 +1,6 @@
 {
   "name": "astro-gpt",
-  "version": "1.12.0",
+  "version": "1.12.1",
   "type": "module",
   "private": true,
   "scripts": {
@@ -25,7 +25,6 @@
     "@iconify-json/tabler": "^1.1.72",
     "@nanostores/react": "^0.4.1",
     "@tabler/icons-react": "^2.16.0",
-    "@types/react-helmet": "^6.1.6",
     "@unocss/reset": "^0.51.8",
     "ahooks": "^3.7.6",
     "astro": "^2.3.2",
@@ -49,6 +48,7 @@
     "markdown-it-katex": "^2.0.3",
     "nanostores": "^0.7.4",
     "openai": "^3.2.1",
+    "papaparse": "^5.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
@@ -60,8 +60,10 @@
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
     "@types/markdown-it": "^12.2.3",
+    "@types/papaparse": "^5.3.7",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.1",
+    "@types/react-helmet": "^6.1.6",
     "@types/uuid": "^9.0.1",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.58.0",

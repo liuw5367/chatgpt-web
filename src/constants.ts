@@ -6,4 +6,5 @@ export const CacheKeys = {
   CHAT_ID: "chat-id",
   IMAGE_LIST: "image-create-history",
   PROMPT_FAVORITE: "prompt-favorite",
+  PROMPT_LIST: "prompt-list",
 };
