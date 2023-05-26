@@ -10,10 +10,10 @@ export function Header() {
 
   return (
     <div
-      className="w-full min-h-16 flex flex-row items-center justify-between px-4 border-b"
+      className="min-h-16 w-full flex flex-row items-center justify-between border-b px-4"
       style={{ backgroundColor: "var(--chakra-colors-chakra-body-bg)" }}
     >
-      <div className="flex items-center space-x-2 font-medium">
+      <div className="flex items-center font-medium space-x-2">
         <Logo />
         <IconButton
           aria-label="ChatList"
@@ -27,7 +27,7 @@ export function Header() {
       </div>
 
       <div className="flex flex-row items-center space-x-1">
-        <Link href="https://github.com/liuw5367/chatgpt-asr-tts" isExternal>
+        <Link href="https://github.com/liuw5367/chatgpt-web" isExternal>
           <IconButton aria-label="Github" variant="ghost" icon={<IconBrandGithub stroke={1.5} />} />
         </Link>
         <IconButton
