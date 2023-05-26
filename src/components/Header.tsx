@@ -27,7 +27,7 @@ export function Header() {
       </div>
 
       <div className="flex flex-row items-center space-x-1">
-        <Link href="https://github.com/liuw5367/chatgpt-asr-tts" isExternal>
+        <Link href="https://github.com/liuw5367/chatgpt-web" isExternal>
           <IconButton aria-label="Github" variant="ghost" icon={<IconBrandGithub stroke={1.5} />} />
         </Link>
         <IconButton
