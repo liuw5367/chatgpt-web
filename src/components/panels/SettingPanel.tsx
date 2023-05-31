@@ -222,6 +222,7 @@ function Item({ item, value, onChange, balance }: ItemProps) {
       ) : (
         <Input
           className="flex-1"
+          focusBorderColor="teal.600"
           placeholder={item.placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}

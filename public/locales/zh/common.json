@@ -1,8 +1,8 @@
 {
-  "language": "简体中文",
+  "language": "中文",
   "chat": {
-    "placeholder": "快捷键: ⬆️ / Ctrl + ↩ / ⌘ + ↩",
-    "enterPlaceholder": "快捷键: ⬆️ / ↩ / shift + ↩"
+    "placeholder": "Ctrl + Enter 发送，Enter 换行，/ 搜索提示词，↑ 上一问",
+    "enterPlaceholder": "Enter 发送，Shift + Enter 换行，/ 搜索提示词，↑ 上一问"
   },
   "prompt": {
     "placeholder": "请输入提示词。保存后每次发送消息，消息内容都会拼接在提示词后一起发送"

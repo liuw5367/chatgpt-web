@@ -21,11 +21,11 @@ type TemplateType = {
 
 export const templateOptions: TemplateType[] = [
   { label: 'Shortcut', value: promptsShortcut },
-  { label: 'ShortcutEn', value: promptsShortcutEn },
   { label: 'OpenPrompts', value: promptsOpen },
   { label: '中文', value: promptsZh },
-  { label: '英文', value: promptsEn },
   { label: '其他', value: promptsOther },
+  { label: 'ShortcutEn', value: promptsShortcutEn },
+  { label: '英文', value: promptsEn },
 ];
 
 export const allPrompts: OptionType[] = templateOptions

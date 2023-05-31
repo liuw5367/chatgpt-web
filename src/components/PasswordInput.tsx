@@ -16,7 +16,13 @@ export function PasswordInput(props: Props) {
 
   return (
     <InputGroup size="md" className={className}>
-      <Input type={show ? 'text' : 'password'} placeholder={placeholder} value={value} onChange={onChange} />
+      <Input
+        type={show ? 'text' : 'password'}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        focusBorderColor="teal.600"
+      />
       <InputRightElement>
         <IconButton aria-label="" size="sm" onClick={handleClick}>
           {show ? <IconEye stroke={1.5} size="1.1rem" /> : <IconEyeOff stroke={1.5} size="1.1rem" />}

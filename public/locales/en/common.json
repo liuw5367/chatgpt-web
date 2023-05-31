@@ -1,8 +1,8 @@
 {
-  "language": "English",
+  "language": "EN",
   "chat": {
-    "placeholder": "Shortcuts: ⬆️ / Ctrl + ↩ / ⌘ + ↩",
-    "enterPlaceholder": "Shortcuts: ⬆️ / ↩ / shift + ↩"
+    "placeholder": "⬆️ / Ctrl + ↩ / ⌘ + ↩",
+    "enterPlaceholder": "⬆️ / ↩ / shift + ↩"
   },
   "prompt": {
     "placeholder": "please enter system prompt. After saving, every message sent will be concatenated with the prompt and sent together."

@@ -13,6 +13,7 @@ export const AutoResizeTextarea = React.forwardRef<
       overflow="auto"
       resize="none"
       ref={ref}
+      focusBorderColor="teal.600"
       // @ts-expect-error
       minRows={1}
       as={ResizeTextarea}

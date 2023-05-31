@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react';
 import { scrollToElement } from '../utils';
 
 interface Props {
-  width: string;
   value: string;
   onPromptClick?: (prompt: string) => void;
 }
@@ -17,8 +16,7 @@ function scrollToTop() {
 }
 
 export function SearchSuggestions(props: Props) {
-  const { value, width, onPromptClick } = props;
-  const [bottomHeight, setBottomHeight] = useState(146);
+  const { value, onPromptClick } = props;
   const [promptList, setPromptList] = useState<string[]>([]);
   const lastContentRef = useRef('');
   const valueRef = useRef(value);
@@ -34,13 +32,6 @@ export function SearchSuggestions(props: Props) {
     [value],
     { wait: 200, maxWait: 300 },
   );
-
-  useEffect(() => {
-    const bottom = document.getElementById('chat-bottom-wrapper');
-    if (bottom) {
-      setBottomHeight(bottom.clientHeight);
-    }
-  }, [value]);
 
   async function search() {
     if (!value?.trim() || value?.startsWith('/')) {
@@ -69,7 +60,7 @@ export function SearchSuggestions(props: Props) {
       }
       if (response.ok) {
         const json = await response.json();
-        setPromptList(json);
+        setPromptList(json.reverse());
         scrollToTop();
       }
     } catch (e) {
@@ -80,45 +71,32 @@ export function SearchSuggestions(props: Props) {
   if (promptList.length === 0) return null;
 
   return (
-    <div
-      className={`fixed bottom-0 w-full ${width} flex flex-col justify-end`}
-      style={{
-        paddingBottom: bottomHeight + 16,
-        display: 'flex',
-      }}
-    >
+    <div className={`w-full flex flex-col justify-end`}>
       <div
-        className={`relative rounded-lg w-full max-h-[35vh] flex flex-col items-end overflow-x-hidden overflow-y-auto`}
+        className={`relative rounded-lg w-full max-h-[35vh] flex flex-col items-end overflow-x-hidden overflow-y-auto p-1`}
         style={{
-          maxWidth: 'calc(100vw - 32px)',
           backgroundColor: 'var(--chakra-colors-chakra-body-bg)',
           border: '1px solid var(--chakra-colors-chakra-border-color)',
         }}
       >
-        <CloseButton
-          className="sticky right-0 top-0"
-          size="md"
-          onClick={() => {
-            setPromptList([]);
-          }}
-        />
-        <div id={TOP_ID} />
+        <CloseButton className="sticky right-0 top-0" size="md" onClick={() => setPromptList([])} />
         <div className="w-full -mt-8">
           {promptList.map((item) => (
-            <div
-              key={item}
-              className="flex flex-col cursor-pointer px-4 py-3 space-y-1 last:border-b-none hover:bg-black/5"
-              style={{ borderBottom: '1px solid var(--chakra-colors-chakra-border-color)' }}
-              onClick={() => {
-                onPromptClick?.(item);
-                setPromptList([]);
-                lastContentRef.current = item;
-              }}
-            >
-              <div className="">{item}</div>
+            <div key={item} className="flex flex-col text-[14px]">
+              <div
+                className="flex flex-col cursor-pointer border border-transparent rounded-lg px-2 py-2 hover:border-teal-700 hover:bg-teal-700/5"
+                onClick={() => {
+                  onPromptClick?.(item);
+                  setPromptList([]);
+                  lastContentRef.current = item;
+                }}
+              >
+                <div>{item}</div>
+              </div>
             </div>
           ))}
         </div>
+        <div id={TOP_ID} />
       </div>
     </div>
   );
