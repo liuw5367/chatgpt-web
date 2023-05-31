@@ -354,6 +354,7 @@ export function SystemPromptPanel(props: Props) {
           </Tabs>
           <div className="flex-1">
             <SearchSelect<LabelValue>
+              focusBorderColor="teal.600"
               placeholder={t("Select Prompt")}
               chakraStyles={chakraStyles}
               options={options}
@@ -372,6 +373,7 @@ export function SystemPromptPanel(props: Props) {
         )}
 
         <Textarea
+          focusBorderColor="teal.600"
           value={prompt ?? ""}
           onChange={(e) => setPrompt(e.target.value)}
           className="flex-1 text-[14px] !min-h-[50%] placeholder:text-[14px]"

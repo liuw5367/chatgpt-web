@@ -51,6 +51,13 @@ function Content() {
   const showPromptSideRef = useRef(showPromptSide);
 
   useEffect(() => {
+    const lg = window.matchMedia("(min-width: 1023.9px)").matches;
+    if (lg) {
+      visibleAtom.set({ ...visibleAtom.get(), chatVisible: true });
+    }
+  }, []);
+
+  useEffect(() => {
     const showChat = !showPromptSideRef.current && chatVisible;
     const showPrompt = !showChatSideRef.current && promptVisible;
     showChatSideRef.current = showChat;
@@ -64,11 +71,9 @@ function Content() {
   }, [xl, lg, chatVisible, promptVisible, setShowChatSide, setShowPromptSide]);
 
   return (
-    <div className="w-full flex" style={{ height: "calc(100% - 4rem)" }}>
+    <div className="w-full flex flex-1 overflow-hidden">
       <ChatPanel chatVisible={chatVisibleState} type={xl || (lg && showChatSide) ? "side" : "drawer"} />
-      <div className="h-full w-full">
-        <Chat />
-      </div>
+      <Chat />
       <SystemPromptPanel
         promptVisible={promptVisibleState}
         sideWidth="min-w-100 max-w-100"

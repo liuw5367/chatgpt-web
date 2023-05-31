@@ -57,13 +57,6 @@ export default function Page() {
 
   const asrResultRef = useRef("");
 
-  const pageWidth =
-    chatVisible && promptVisible
-      ? "lg:max-w-176 xl:max-w-160 2xl:max-w-240"
-      : chatVisible || promptVisible
-      ? "lg:max-w-176 xl:max-w-240"
-      : "lg:max-w-200 xl:max-w-240";
-
   useEffect(() => {
     scrollToPageBottom({ behavior: "auto" });
   }, []);
@@ -419,16 +412,16 @@ export default function Page() {
 
   const renderTips = (
     <>
-      <Command value={inputContent} width={pageWidth} onPromptClick={(prompt) => setInputContent(prompt)} />
+      <Command value={inputContent} onPromptClick={setInputContent} />
       {chatConfig.searchSuggestions === "1" && (
-        <SearchSuggestions value={inputContent} width={pageWidth} onPromptClick={(prompt) => setInputContent(prompt)} />
+        <SearchSuggestions value={inputContent} onPromptClick={setInputContent} />
       )}
     </>
   );
 
   const renderMessageList = (
-    <div className={`w-full flex-1 p-4 flex flex-col items-center overflow-y-auto overflow-x-hidden`}>
-      <div className={`relative w-full flex flex-col ${pageWidth}`}>
+    <div className="w-full flex flex-1 flex-col items-center overflow-x-hidden overflow-y-auto p-4">
+      <div className="relative w-full flex flex-col">
         {messageList?.map((item) => (
           <MessageItem
             key={item.id}
@@ -453,38 +446,27 @@ export default function Page() {
             }}
           />
         )}
-        {renderTips}
         <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
         <div id="chat-bottom" />
       </div>
     </div>
   );
 
-  function renderLayout(children: React.ReactNode) {
-    return (
-      <div className={`h-full flex flex-col justify-end items-center`}>
-        <div className={`w-full pl-4 lg:pl-0 ${pageWidth}`}>{children}</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="h-full w-full flex flex-col">
+    <div className="h-full flex flex-1 flex-col">
       {messageList && messageList.length > 0 ? (
         <>{renderMessageList}</>
       ) : (
-        <>
-          {renderLayout(
-            <>
-              <UsageTips />
-              {renderTips}
-            </>
-          )}
-        </>
+        <div className="h-full flex flex-col items-center justify-end overflow-y-auto">
+          <div className="w-full py-4 pl-8 pr-4">
+            <UsageTips />
+          </div>
+        </div>
       )}
       {chatLoading && <Progress size="xs" isIndeterminate />}
-      <div id="chat-bottom-wrapper" className={`px-6 pt-4 border-t flex flex-col items-center`}>
-        <div className={`w-full flex flex-col justify-end space-y-3 ${pageWidth}`}>
+      <div id="chat-bottom-wrapper" className="flex flex-col items-center border-t px-6 pt-3">
+        <div className="w-full flex flex-col justify-end space-y-3">
+          {renderTips}
           <AutoResizeTextarea
             minRows={2}
             maxRows={10}

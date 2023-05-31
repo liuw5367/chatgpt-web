@@ -32,7 +32,7 @@ export function UsageTips() {
   }, [i18n.language]);
 
   return (
-    <div className="p-4">
+    <>
       {tips.map((item) => {
         return (
           <div key={item} className="flex flex-row text-[13px] text-gray-400 space-x-1">
@@ -41,6 +41,6 @@ export function UsageTips() {
           </div>
         );
       })}
-    </div>
+    </>
   );
 }

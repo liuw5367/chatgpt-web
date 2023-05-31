@@ -1,10 +1,10 @@
-import { Button, IconButton, Input } from "@chakra-ui/react";
+import { Button, IconButton, Input, Link } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
 import {
+  IconBrandGithub,
   IconCheck,
   IconEdit,
   IconLanguageHiragana,
-  IconMessage,
   IconPlus,
   IconTrash,
   IconX,
@@ -101,14 +101,19 @@ export function ChatPanel(props: Props) {
       }
       footer={
         <div className="w-full flex flex-row items-center justify-between">
-          <Button
-            aria-label="ChangeLanguage"
-            variant="ghost"
-            leftIcon={<IconLanguageHiragana stroke={1.5} />}
-            onClick={handleChangeLanguage}
-          >
-            {t("language")}
-          </Button>
+          <div className="flex flex-row items-center">
+            <Link href="https://github.com/liuw5367/chatgpt-web" isExternal>
+              <IconButton aria-label="Github" variant="ghost" icon={<IconBrandGithub stroke={1.5} />} />
+            </Link>
+            <Button
+              aria-label="ChangeLanguage"
+              variant="ghost"
+              onClick={handleChangeLanguage}
+              leftIcon={<IconLanguageHiragana stroke={1.5} />}
+            >
+              {t("language")}
+            </Button>
+          </div>
 
           <Button
             aria-label="ChangeLanguage"
@@ -121,7 +126,7 @@ export function ChatPanel(props: Props) {
         </div>
       }
     >
-      <div className="flex flex-col gap-3">
+      <div className="w-full flex flex-col gap-3">
         {chatList.map((chat) => {
           return (
             <ChatItemView
@@ -165,14 +170,14 @@ function ChatItemView(props: ItemProps) {
     <div
       key={chat.id}
       onClick={isEditing ? undefined : onClick}
-      className={`w-full flex flex-row items-center min-h-16 pl-3 pr-1 rounded-lg space-x-2 border cursor-pointer ${
-        selected && "border-teal-700 text-teal-700 border-2"
+      className={`text-[14px] w-full flex flex-row items-center min-h-14 pl-3 pr-1 rounded-lg space-x-2 border cursor-pointer hover:border-teal-700/80 ${
+        selected && "border-teal-700 text-teal-700 border-2 font-medium"
       }`}
     >
-      <IconMessage stroke={1.5} className="min-w-6" />
-      <div className="flex-1" style={{ maxWidth: "calc(100% - 95px)" }}>
-        {isEditing ? (
+      {isEditing ? (
+        <div className="flex-1">
           <Input
+            size="sm"
             value={changed}
             focusBorderColor="teal.600"
             onChange={(e) => setChanged(e.target.value)}
@@ -181,66 +186,67 @@ function ChatItemView(props: ItemProps) {
               e.preventDefault();
             }}
           />
-        ) : (
-          <div className="w-full flex items-center truncate">{chat.name}</div>
-        )}
-      </div>
-      <div className="min-w-13 flex flex-row space-x-1">
-        {isEditing && (
-          <IconButton
-            aria-label="Save"
-            variant="ghost"
-            icon={<IconCheck size="1.0rem" className="opacity-64" />}
-            size="xs"
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              setEditing(false);
-              onNameChange?.(chat, changed);
-            }}
-          />
-        )}
-        {isEditing && (
-          <IconButton
-            aria-label="close"
-            variant="ghost"
-            icon={<IconX size="1.0rem" className="opacity-64" />}
-            size="xs"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setEditing(false);
-              setChanged(chat.name);
-            }}
-          />
-        )}
-        {!isEditing && (
-          <IconButton
-            aria-label="Edit"
-            variant="ghost"
-            icon={<IconEdit size="0.90rem" className="opacity-64" />}
-            size="xs"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setEditing(true);
-            }}
-          />
-        )}
-        {!isEditing && (
-          <IconButton
-            aria-label="Delete"
-            variant="ghost"
-            icon={<IconTrash size="0.90rem" className="opacity-64" />}
-            size="xs"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onDelete(chat);
-            }}
-          />
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className={`flex-1 truncate`}>{chat.name}</div>
+      )}
+      {selected && (
+        <div className="flex flex-row space-x-1">
+          {isEditing ? (
+            <>
+              <IconButton
+                aria-label="Save"
+                variant="ghost"
+                icon={<IconCheck size="1.0rem" className="opacity-64" />}
+                size="xs"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  setEditing(false);
+                  onNameChange?.(chat, changed);
+                }}
+              />
+              <IconButton
+                aria-label="close"
+                variant="ghost"
+                icon={<IconX size="1.0rem" className="opacity-64" />}
+                size="xs"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setEditing(false);
+                  setChanged(chat.name);
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <IconButton
+                aria-label="Edit"
+                variant="ghost"
+                icon={<IconEdit size="0.90rem" className="opacity-64" />}
+                size="xs"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setEditing(true);
+                }}
+              />
+              <IconButton
+                aria-label="Delete"
+                variant="ghost"
+                icon={<IconTrash size="0.90rem" className="opacity-64" />}
+                size="xs"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onDelete(chat);
+                }}
+              />
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

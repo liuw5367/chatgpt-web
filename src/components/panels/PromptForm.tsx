@@ -63,7 +63,7 @@ export function PromptFormModal(props: Props) {
           <FormControl isRequired>
             <FormLabel>{t("Name")}</FormLabel>
             <Input
-              // ref={initialRef}
+              focusBorderColor="teal.600"
               placeholder=""
               value={data.name}
               onChange={(e) => setData((draft) => ({ ...draft, name: e.target.value }))}
@@ -73,6 +73,7 @@ export function PromptFormModal(props: Props) {
           <FormControl mt={4}>
             <FormLabel>{t("Description")}</FormLabel>
             <Textarea
+              focusBorderColor="teal.600"
               placeholder=""
               rows={3}
               value={data.desc}
