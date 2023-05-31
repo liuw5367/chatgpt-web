@@ -1,5 +1,5 @@
 import { useMemoizedFn } from "ahooks";
-import { sha256 } from "js-sha256";
+import sha256 from "crypto-js/sha256";
 import React, { useEffect, useImperativeHandle, useRef } from "react";
 
 import { createStreamPlayer } from "../../utils/Recorder";
