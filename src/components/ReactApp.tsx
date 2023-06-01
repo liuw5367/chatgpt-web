@@ -67,14 +67,29 @@ function Content() {
     setPromptVisibleState(promptVisible);
   }, [xl, lg, chatVisible, promptVisible, setShowChatSide, setShowPromptSide]);
 
+  const leftSide = xl || (lg && showChatSide);
+  const rightSide = xl || (lg && showPromptSide);
+
   return (
     <div className="w-full flex flex-1 overflow-hidden">
-      <ChatPanel chatVisible={chatVisibleState} type={xl || (lg && showChatSide) ? 'side' : 'drawer'} />
-      <Chat />
+      <ChatPanel chatVisible={chatVisibleState} type={leftSide ? 'side' : 'drawer'} />
+      <div
+        className="h-full w-full"
+        style={{
+          maxWidth:
+            leftSide && chatVisibleState && rightSide && promptVisibleState
+              ? 'calc(100% - 45rem)'
+              : (leftSide && chatVisibleState) || (rightSide && promptVisibleState)
+              ? 'calc(100% - 25rem)'
+              : '100%',
+        }}
+      >
+        <Chat />
+      </div>
       <SystemPromptPanel
         promptVisible={promptVisibleState}
         sideWidth="min-w-100 max-w-100"
-        type={xl || (lg && showPromptSide) ? 'side' : 'drawer'}
+        type={rightSide ? 'side' : 'drawer'}
       />
     </div>
   );

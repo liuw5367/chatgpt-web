@@ -178,12 +178,12 @@ export function MessageItem(props: Props) {
         )}
 
         <div
-          className={`flex-1 overflow-hidden rounded-lg py-2 px-3
-              ${colorMode === 'light' ? 'bg-[#EDF2F7]' : 'bg-[#021627]'}
-              ${isUser && 'whitespace-pre-wrap'}`}
+          className={`flex-1 overflow-hidden rounded-lg py-2 px-3 ${
+            colorMode === 'light' ? 'bg-[#EDF2F7]' : 'bg-[#021627]'
+          }`}
         >
           {isUser || showOriginContent ? (
-            <>{item.content || item.prompt}</>
+            <div className="whitespace-pre-wrap">{item.content || item.prompt}</div>
           ) : (
             <div className="markdown-body" dangerouslySetInnerHTML={{ __html: item.markdown || '' }} />
           )}
