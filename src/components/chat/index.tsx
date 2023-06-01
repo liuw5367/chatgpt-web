@@ -466,7 +466,7 @@ export default function Page() {
   );
 
   return (
-    <div className="h-full flex flex-1 flex-col">
+    <div className="h-full w-full flex flex-col">
       {messageList && messageList.length > 0 ? (
         <>{renderMessageList}</>
       ) : (

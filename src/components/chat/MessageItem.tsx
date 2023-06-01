@@ -93,7 +93,7 @@ export function MessageItem(props: Props) {
 
   const actions = (
     <div className={`absolute bottom-0 mt-1 flex ${isUser ? "justify-end right-10" : "left-8"}`}>
-      <div className="-mb-8 flex items-center space-x-1">
+      <div className="flex items-center -mb-8 space-x-1">
         {!item.conversationId ? null : renderConversation(item.conversationId)}
         {item.prompt && renderPrompt(isUser ? "top" : "top-start")}
         {!isUser && (
@@ -177,12 +177,12 @@ export function MessageItem(props: Props) {
         )}
 
         <div
-          className={`flex-1 overflow-hidden rounded-lg py-2 px-3
-              ${colorMode === "light" ? "bg-[#EDF2F7]" : "bg-[#021627]"}
-              ${isUser && "whitespace-pre-wrap"}`}
+          className={`flex-1 overflow-hidden rounded-lg py-2 px-3 ${
+            colorMode === "light" ? "bg-[#EDF2F7]" : "bg-[#021627]"
+          }`}
         >
           {isUser || showOriginContent ? (
-            <>{item.content || item.prompt}</>
+            <div className="whitespace-pre-wrap">{item.content || item.prompt}</div>
           ) : (
             <div className="markdown-body" dangerouslySetInnerHTML={{ __html: item.markdown || "" }} />
           )}
