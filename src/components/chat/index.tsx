@@ -16,14 +16,15 @@ import {
 } from '@tabler/icons-react';
 import { useDebounceEffect } from 'ahooks';
 import { useTranslation } from 'next-i18next';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { createRef, useEffect, useRef, useState } from 'react';
+
+import { AutoResizeTextarea } from '@/components';
 
 import VoiceView, { VoiceRef } from '../ai';
 import { ASRStatusEnum } from '../ai/ASRView';
 import { getUnisoundKeySecret, hasUnisoundConfig } from '../ai/Config';
 import { TTSStatusEnum } from '../ai/TTSView';
 import { chatAtom, chatConfigAtom, chatDataAtom, visibleAtom } from '../atom';
-import { AutoResizeTextarea } from '../AutoResizeTextarea';
 import { saveCurrentChatValue } from '../storage';
 import type { ChatMessage } from '../types';
 import { getCurrentTime, removeLn, scrollToElement, uuid } from '../utils';
@@ -39,10 +40,10 @@ export default function Page() {
   const toast = useToast({ position: 'top', isClosable: true });
   const messageList = useStore(chatDataAtom);
   const chatConfig = useStore(chatConfigAtom);
-  const { chatVisible, promptVisible } = useStore(visibleAtom);
   const enterSend = chatConfig.enterSend === '1';
   const { currentChat } = useStore(chatAtom);
   const { conversationId } = currentChat;
+  const inputRef = createRef<HTMLTextAreaElement>();
   const [inputContent, setInputContent] = useState('');
   const composingRef = useRef(false);
   const [currentAssistantMessage, setCurrentAssistantMessage] = useState('');
@@ -413,9 +414,21 @@ export default function Page() {
 
   const renderTips = (
     <>
-      <Command value={inputContent} onPromptClick={setInputContent} />
+      <Command
+        value={inputContent}
+        onPromptClick={(v) => {
+          setInputContent(v);
+          inputRef.current?.focus();
+        }}
+      />
       {chatConfig.searchSuggestions === '1' && (
-        <SearchSuggestions value={inputContent} onPromptClick={setInputContent} />
+        <SearchSuggestions
+          value={inputContent}
+          onPromptClick={(v) => {
+            setInputContent(v);
+            inputRef.current?.focus();
+          }}
+        />
       )}
     </>
   );
@@ -432,6 +445,7 @@ export default function Page() {
             onRegenerate={handleRegenerate}
             onRetry={(item) => {
               setInputContent(item.content);
+              inputRef.current?.focus();
               updateConversationId(item.conversationId);
               updateSystemPrompt(item.prompt);
             }}
@@ -469,6 +483,7 @@ export default function Page() {
         <div className="w-full flex flex-col justify-end space-y-3">
           {renderTips}
           <AutoResizeTextarea
+            ref={inputRef}
             minRows={2}
             maxRows={10}
             enterKeyHint={enterSend ? 'send' : undefined}
