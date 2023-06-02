@@ -13,10 +13,11 @@ import {
   IconPlayerPause,
   IconPlayerPlay,
 } from "@tabler/icons-react";
-import { useDebounceEffect } from "ahooks";
+import { useDebounceEffect, useDebounceFn } from "ahooks";
 import React, { createRef, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { localDB } from "../../utils/LocalDB";
 import VoiceView, { VoiceRef } from "../ai";
 import { ASRStatusEnum } from "../ai/ASRView";
 import { getUnisoundKeySecret, hasUnisoundConfig } from "../ai/Config";
@@ -56,6 +57,7 @@ export default function Page() {
   const [errorInfo, setErrorInfo] = useState<{ code: string; message?: string }>();
 
   const asrResultRef = useRef("");
+  const { run: scrollToBottom } = useDebounceFn(() => scrollToPageBottom(), { wait: 100, maxWait: 300 });
 
   useEffect(() => {
     scrollToPageBottom({ behavior: "auto" });
@@ -63,7 +65,7 @@ export default function Page() {
 
   useDebounceEffect(() => {
     const chatId = chatAtom.get().currentChat.id;
-    localStorage.setItem(chatId, JSON.stringify(messageList));
+    localDB.setItem(chatId, messageList);
   }, [messageList]);
 
   useEffect(() => {
@@ -224,7 +226,7 @@ export default function Page() {
         assistantMessage = draft + content;
         return assistantMessage;
       });
-      scrollToPageBottom();
+      scrollToBottom();
     }
 
     try {

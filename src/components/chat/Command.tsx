@@ -18,8 +18,8 @@ function scrollToTop() {
 
 function getPrompts() {
   const favorites = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_FAVORITE) || "[]") as OptionType[];
-  const defaultPrompts = allPrompts.slice(0, 50);
-  return [...favorites, ...defaultPrompts];
+  const defaultPrompts = allPrompts.slice(0, 100);
+  return [...favorites, ...defaultPrompts].reverse();
 }
 
 export function Command(props: Props) {

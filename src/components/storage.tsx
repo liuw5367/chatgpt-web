@@ -1,4 +1,5 @@
 import { CacheKeys } from "../constants";
+import { localDB } from "../utils/LocalDB";
 import { chatAtom, ChatAtomType, chatConfigAtom, chatDataAtom } from "./atom";
 import type { ChatItem } from "./types";
 import { uuid } from "./utils";
@@ -6,7 +7,8 @@ import { uuid } from "./utils";
 /**
  * 因为服务端渲染无法使用 localStorage，所以这里重新设置一次
  */
-export function loadCache(newChatName: string) {
+export async function loadCache(newChatName: string) {
+  await moveCacheData2DB();
   const chatList: ChatItem[] = JSON.parse(localStorage.getItem(CacheKeys.CHAT_LIST) || "[]");
   if (chatList.length === 0) {
     const chatId = uuid();
@@ -20,7 +22,7 @@ export function loadCache(newChatName: string) {
     localStorage.setItem(CacheKeys.CHAT_ID, chatId);
     localStorage.setItem(CacheKeys.CHAT_LIST, JSON.stringify(chatList));
     const messagesJson = localStorage.getItem("messages") || "[]";
-    localStorage.setItem(chatId, messagesJson);
+    await localDB.setItem(chatId, JSON.parse(messagesJson));
     localStorage.removeItem("messages");
   }
   const chatId = localStorage.getItem(CacheKeys.CHAT_ID) || "";
@@ -28,8 +30,8 @@ export function loadCache(newChatName: string) {
   const chatItem = chatList.find((v) => v.id === chatId);
   chatAtom.set({ ...chatAtom.get(), chatList, currentChat: chatItem as ChatItem });
 
-  const messagesJson = localStorage.getItem(chatId) || "[]";
-  chatDataAtom.set(JSON.parse(messagesJson) || []);
+  const messagesJson = (await localDB.getItem(chatId)) || [];
+  chatDataAtom.set(messagesJson || []);
 
   chatConfigAtom.set({
     openAIKey: localStorage.getItem("openAIKey") || undefined,
@@ -42,6 +44,35 @@ export function loadCache(newChatName: string) {
 
     unisoundAppKey: localStorage.getItem("unisoundAppKey") || undefined,
     unisoundSecret: localStorage.getItem("unisoundSecret") || undefined,
+  });
+}
+
+async function moveCacheData2DB() {
+  const cacheKeys: string[] = [];
+  const idLength = uuid().length;
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (
+      key &&
+      key.length === idLength &&
+      !key.includes("-") &&
+      !key.includes("_") &&
+      !key.includes("{") &&
+      !key.includes("}") &&
+      !key.includes("[") &&
+      !key.includes(".")
+    ) {
+      cacheKeys.push(key);
+    }
+  }
+
+  cacheKeys.forEach((key) => {
+    const data = localStorage.getItem(key);
+    if (data) {
+      localDB.setItem(key, JSON.parse(data || "[]"));
+      localStorage.removeItem(key);
+    }
   });
 }
 

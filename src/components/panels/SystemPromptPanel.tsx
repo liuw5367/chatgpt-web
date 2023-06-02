@@ -16,6 +16,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { CacheKeys } from "../../constants";
+import { localDB } from "../../utils/LocalDB";
 import { chatAtom, visibleAtom } from "../atom";
 import { estimateTokens } from "../chat/token";
 import { FileUpload } from "../FileUpload";
@@ -72,23 +73,45 @@ export function SystemPromptPanel(props: Props) {
   }, [systemMessage]);
 
   useEffect(() => {
+    load();
+  }, [i18n.language, promptVisible, dataRefreshKey]);
+
+  useEffect(() => {
+    const key = tabList[tabIndex]?.value;
+    if (!key) return;
+    setOptions(
+      allData[key]?.map((item) => {
+        return { label: item.act, value: item.id || "" };
+      }) || []
+    );
+  }, [allData, tabList, tabIndex]);
+
+  useEffect(() => {
+    setToken(prompt ? estimateTokens(prompt) : 0);
+  }, [prompt]);
+
+  async function load() {
     // 从缓存中加载收藏的数据
     if (!promptVisible) return;
     const favoriteOptions = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_FAVORITE) || "[]") as OptionType[];
     setFavoriteOptions(favoriteOptions);
 
     const list = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_LIST) || "[]") as LabelValue[];
-    const promptList = list
-      .map((item) => {
-        const value = JSON.parse(localStorage.getItem(item.value) || "[]") as OptionType[];
-        return {
-          item,
-          value,
-        };
-      })
-      .filter((item) => {
-        return item.value && item.value.length > 0;
-      });
+    const notEmptyList: LabelValue[] = [];
+
+    const promptList: { item: LabelValue; value: OptionType[] }[] = [];
+    for (let i = 0; i < list.length; i++) {
+      const item = list[i];
+      const value = ((await localDB.getItem(item.value)) || []) as OptionType[];
+      if (value && value.length > 0) {
+        promptList.push({ item, value });
+        notEmptyList.push(item);
+      }
+    }
+    // 清除数据为空的
+    if (list.length !== notEmptyList.length) {
+      localStorage.setItem(CacheKeys.PROMPT_LIST, JSON.stringify(notEmptyList));
+    }
 
     const allData: Record<string, OptionType[]> = {
       default: allPrompts,
@@ -105,21 +128,7 @@ export function SystemPromptPanel(props: Props) {
       { label: isZh ? "收藏" : "Favorite", value: "favorite" },
       ...promptList.map((v) => v.item),
     ]);
-  }, [i18n.language, promptVisible, dataRefreshKey]);
-
-  useEffect(() => {
-    const key = tabList[tabIndex]?.value;
-    if (!key) return;
-    setOptions(
-      allData[key]?.map((item) => {
-        return { label: item.act, value: item.id || "" };
-      }) || []
-    );
-  }, [allData, tabList, tabIndex]);
-
-  useEffect(() => {
-    setToken(prompt ? estimateTokens(prompt) : 0);
-  }, [prompt]);
+  }
 
   function handleSelectedChange(id: string) {
     const item = allData[currentTab?.value].find((item) => item.id === id);
@@ -174,7 +183,7 @@ export function SystemPromptPanel(props: Props) {
       list = list.filter((v) => v.value !== currentTab.value);
       localStorage.setItem(CacheKeys.PROMPT_LIST, JSON.stringify(list));
     } else {
-      localStorage.setItem(currentTab.value, JSON.stringify(options));
+      localDB.setItem(currentTab.value, options);
     }
     setDataRefreshKey(Date.now());
     handleClear();
@@ -258,7 +267,7 @@ export function SystemPromptPanel(props: Props) {
     const item: LabelValue = { label: fileName, value: uuid() };
     list.push(item);
     localStorage.setItem(CacheKeys.PROMPT_LIST, JSON.stringify(list));
-    localStorage.setItem(item.value, JSON.stringify(options));
+    localDB.setItem(item.value, options);
     setDataRefreshKey(Date.now());
   }
 
