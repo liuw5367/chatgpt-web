@@ -82,7 +82,9 @@ function Content() {
           maxWidth:
             leftSide && chatVisibleState && rightSide && promptVisibleState
               ? "calc(100% - 45rem)"
-              : (leftSide && chatVisibleState) || (rightSide && promptVisibleState)
+              : leftSide && chatVisibleState
+              ? "calc(100% - 20rem)"
+              : rightSide && promptVisibleState
               ? "calc(100% - 25rem)"
               : "100%",
         }}
