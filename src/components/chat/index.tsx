@@ -57,10 +57,13 @@ export default function Page() {
   const [errorInfo, setErrorInfo] = useState<{ code: string; message?: string }>();
 
   const asrResultRef = useRef("");
-  const { run: scrollToBottom } = useDebounceFn(() => scrollToPageBottom(), { wait: 100, maxWait: 300 });
+  const { run: scrollToBottom } = useDebounceFn((options?: ScrollIntoViewOptions) => scrollToPageBottom(options), {
+    wait: 100,
+    maxWait: 300,
+  });
 
   useEffect(() => {
-    scrollToPageBottom({ behavior: "auto" });
+    scrollToBottom({ behavior: "auto" });
   }, []);
 
   useDebounceEffect(() => {
@@ -125,7 +128,7 @@ export default function Page() {
   function stopGenerate() {
     chatAbortController?.abort();
     setChatLoading(false);
-    scrollToPageBottom();
+    scrollToBottom();
   }
 
   async function handleSendClick(inputValue = inputContent) {
@@ -211,7 +214,7 @@ export default function Page() {
     chatDataAtom.set([...messageList, question]);
     setInputContent("");
     asrResultRef.current = "";
-    scrollToPageBottom();
+    scrollToBottom();
 
     setChatLoading(true);
 
@@ -251,7 +254,7 @@ export default function Page() {
         const json = await response.json();
         if (json?.error?.code || json?.error?.message) {
           setErrorInfo(json.error as any);
-          scrollToPageBottom();
+          scrollToBottom();
         } else {
           toast({ status: "error", title: t("toast.error.request") });
         }
@@ -299,7 +302,7 @@ export default function Page() {
     ]);
     setChatLoading(false);
     setCurrentAssistantMessage("");
-    scrollToPageBottom();
+    scrollToBottom();
   }
 
   function handleClearClick() {
