@@ -13,6 +13,8 @@ import {
 import { useTranslation } from 'next-i18next';
 import { useState } from 'react';
 
+import { localDB } from '@/utils/LocalDB';
+
 import { chatAtom, chatDataAtom, visibleAtom } from '../atom';
 import { scrollToPageBottom } from '../chat';
 import { Logo } from '../Logo';
@@ -37,11 +39,11 @@ export function ChatPanel(props: Props) {
     saveChatAtom({ ...chatAtom.get(), chatList });
   }
 
-  function updateChatId(item: ChatItem) {
+  async function updateChatId(item: ChatItem) {
     saveChatAtom({ ...chatAtom.get(), currentChat: item });
     const chatId = item.id;
     // 切换对话，更新消息列表
-    const messages = JSON.parse(localStorage.getItem(chatId) || '[]');
+    const messages = (await localDB.getItem(chatId)) || [];
     chatDataAtom.set(messages);
   }
 
