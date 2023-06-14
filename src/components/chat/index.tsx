@@ -152,16 +152,19 @@ export default function Page() {
     let maxTokens = 3000;
 
     const model = chatConfig.openAIModel || '';
-    if (model.toLowerCase().includes('gpt-4')) {
-      if (model.toLowerCase().includes('32k')) {
-        const maxResponseTokens = 8192;
-        maxModelTokens = 32768;
-        maxTokens = maxModelTokens - maxResponseTokens;
-      } else {
-        const maxResponseTokens = 2048;
-        maxModelTokens = 8192;
-        maxTokens = maxModelTokens - maxResponseTokens;
-      }
+
+    if (model.toLowerCase().includes('32k')) {
+      const maxResponseTokens = 8192;
+      maxModelTokens = 32768;
+      maxTokens = maxModelTokens - maxResponseTokens;
+    } else if (model.toLowerCase().includes('16k')) {
+      const maxResponseTokens = 4086;
+      maxModelTokens = 16384;
+      maxTokens = maxModelTokens - maxResponseTokens;
+    } else if (model.toLowerCase().includes('gpt-4')) {
+      const maxResponseTokens = 2048;
+      maxModelTokens = 8192;
+      maxTokens = maxModelTokens - maxResponseTokens;
     }
 
     let tokenCount = estimateTokens(question.content) + estimateTokens(systemMessage);
