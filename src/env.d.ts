@@ -8,8 +8,6 @@ interface ImportMetaEnv {
   readonly PUBLIC_UNISOUND_AI_KEY: string;
   readonly UNISOUND_AI_SECRET: string;
 
-  readonly PUBLIC_PACKAGE_VERSION: string;
-
   /** @deprecated */
   readonly PUBLIC_OPENAI_API_KEY: string;
   /** @deprecated */

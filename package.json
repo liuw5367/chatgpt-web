@@ -1,6 +1,6 @@
 {
   "name": "astro-gpt",
-  "version": "1.13.0",
+  "version": "1.13.1",
   "type": "module",
   "private": true,
   "scripts": {
@@ -46,6 +46,7 @@
     "markdown-it": "^13.0.1",
     "markdown-it-highlightjs": "^4.0.1",
     "markdown-it-katex": "^2.0.3",
+    "mermaid": "^10.2.1",
     "nanostores": "^0.7.4",
     "openai": "^3.2.1",
     "papaparse": "^5.4.1",
@@ -53,8 +54,14 @@
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-i18next": "^12.2.0",
+    "react-markdown": "^8.0.7",
     "react-textarea-autosize": "^8.4.1",
     "recorder-core": "^1.2.23020100",
+    "rehype-highlight": "^6.0.0",
+    "rehype-katex": "^6.0.3",
+    "remark-breaks": "^3.0.3",
+    "remark-gfm": "^3.0.1",
+    "remark-math": "^5.1.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
