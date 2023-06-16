@@ -9,6 +9,7 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  Select,
   Switch,
   useToast,
 } from '@chakra-ui/react';
@@ -22,7 +23,7 @@ import { PasswordInput } from '../PasswordInput';
 import SimpleDrawer from '../SimpleDrawer';
 
 type ListItemType<T = string> = {
-  type?: 'password' | 'number' | 'switch';
+  type?: 'password' | 'number' | 'switch' | 'select';
   label: string;
   value: T;
   placeholder: string;
@@ -33,6 +34,20 @@ type ListItemType<T = string> = {
 const voiceList: ListItemType[] = [
   { label: 'Unisound AppKey', value: 'unisoundAppKey', placeholder: 'https://ai.unisound.com' },
   { label: 'Unisound SECRET', value: 'unisoundSecret', type: 'password', placeholder: 'https://ai.unisound.com' },
+];
+
+const modelList = [
+  { label: 'gpt-3.5-turbo', value: 'gpt-3.5-turbo' },
+  { label: 'gpt-3.5-turbo-16k', value: 'gpt-3.5-turbo-16k' },
+  { label: 'gpt-3.5-turbo-0613', value: 'gpt-3.5-turbo-0613' },
+  { label: 'gpt-3.5-turbo-16k-0613', value: 'gpt-3.5-turbo-16k-0613' },
+  { label: 'gpt-4', value: 'gpt-4' },
+  { label: 'gpt-4-0613', value: 'gpt-4-0613' },
+  { label: 'gpt-4-32k', value: 'gpt-4-32k' },
+  { label: 'gpt-4-32k-0613', value: 'gpt-4-32k-0613' },
+  { label: 'text-davinci-003', value: 'text-davinci-003' },
+  { label: 'text-davinci-002', value: 'text-davinci-002' },
+  { label: 'code-davinci-002', value: 'code-davinci-002' },
 ];
 
 export function SettingPanel() {
@@ -137,7 +152,7 @@ export function SettingPanel() {
     },
     { label: 'OpenAI Key', value: 'openAIKey', type: 'password', placeholder: 'please enter OPENAI_KEY' },
     { label: 'OpenAI Host', value: 'openAIHost', placeholder: 'https://api.openai.com' },
-    { label: 'OpenAI Model', value: 'openAIModel', placeholder: 'gpt-3.5-turbo' },
+    { label: 'OpenAI Model', value: 'openAIModel', type: 'select', placeholder: 'gpt-3.5-turbo' },
     {
       type: 'number',
       label: 'temperature',
@@ -209,6 +224,14 @@ function Item({ item, value, onChange, balance }: ItemProps) {
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
+      ) : item.type === 'select' ? (
+        <Select value={value} onChange={(e) => onChange(e.target.value)}>
+          {modelList.map((item) => (
+            <option key={item.label} value={item.label}>
+              {item.value}
+            </option>
+          ))}
+        </Select>
       ) : item.type === 'number' ? (
         <NumberInput className="flex-1" min={0} max={item.max} step={0.1} value={value} onChange={(v) => onChange(v)}>
           <NumberInputField placeholder={item.placeholder} />

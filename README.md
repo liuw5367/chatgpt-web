@@ -5,11 +5,17 @@
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/liuw5367/chatgpt-web)
 [![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/liuw5367/chatgpt-web)
 
-[Astro分支](https://github.com/liuw5367/chatgpt-web/tree/astro)和[主分支](https://github.com/liuw5367/chatgpt-web)代码同步，只是框架不同。Astro 服务端渲染不能完整支持 Emotion，所以使用的是客户端渲染。而 Next 分支使用服务端渲染，所以首次加载速度会好一些，但因为 Next 使用 Webpack 对 Unocss 支持的不好，导致开发体验不太好。
+[Astro分支](https://github.com/liuw5367/chatgpt-web/tree/astro)和[主分支](https://github.com/liuw5367/chatgpt-web)代码同步，只是框架不同。Astro 服务端渲染不能完整支持 Emotion，所以使用的是客户端渲染。而 Next 分支使用服务端渲染，但 Next 与 Unocss 开发体验不好，所以现在都是在 Astro 分支上开发。
 
-- [Next 分支体验地址 Vercel](https://chatgpt-six-lilac.vercel.app)
-- [Next 分支体验地址 Netlify](https://chatgpt-light.netlify.app)
-- [Astro 分支体验地址](https://chatgpt-astro.netlify.app)
+可自行选择部署的分支：
+
+- Next 分支首次加载时白屏时间短
+  - [Next 分支体验地址 Vercel](https://chatgpt-six-lilac.vercel.app)
+  - [Next 分支体验地址 Netlify](https://chatgpt-light.netlify.app)
+
+
+- Astro 分支首次加载时白屏时间长一点，但之后刷新页面时页面显示都挺快
+  - [Astro 分支体验地址](https://chatgpt-astro.netlify.app)
 
 
 ## 功能

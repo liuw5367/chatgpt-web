@@ -168,13 +168,26 @@ function ChatItemView(props: ItemProps) {
   const selected = chat.id === chatId;
   const [changed, setChanged] = useState(chat.name);
   const [isEditing, setEditing] = useState(false);
+  const [hovered, setHovered] = useState(false);
+
+  function handleCancel() {
+    setEditing(false);
+    setChanged(chat.name);
+  }
+
+  function handleSave() {
+    setEditing(false);
+    onNameChange?.(chat, changed);
+  }
 
   return (
     <div
       key={chat.id}
       onClick={isEditing ? undefined : onClick}
-      className={`text-[14px] w-full flex flex-row items-center min-h-14 pl-3 pr-1 rounded-lg space-x-2 border cursor-pointer hover:border-teal-700/80 ${
-        selected && 'border-teal-700 text-teal-700 border-2 font-medium'
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={`transition-all text-[14px] w-full flex flex-row items-center min-h-14 pl-3 pr-1 rounded-lg space-x-2 border cursor-pointer hover:bg-teal-700/5 hover:border-teal-700/80 ${
+        selected && 'border-teal-700 text-teal-700 border-2 font-medium bg-teal-700/5'
       }`}
     >
       {isEditing ? (
@@ -183,6 +196,13 @@ function ChatItemView(props: ItemProps) {
             size="sm"
             value={changed}
             focusBorderColor="teal.600"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.stopPropagation();
+                e.preventDefault();
+                handleSave();
+              }
+            }}
             onChange={(e) => setChanged(e.target.value)}
             onClick={(e) => {
               e.stopPropagation();
@@ -193,7 +213,7 @@ function ChatItemView(props: ItemProps) {
       ) : (
         <div className={`flex-1 truncate`}>{chat.name}</div>
       )}
-      {selected && (
+      {((selected && hovered) || isEditing) && (
         <div className="flex flex-row space-x-1">
           {isEditing ? (
             <>
@@ -203,22 +223,20 @@ function ChatItemView(props: ItemProps) {
                 icon={<IconCheck size="1.0rem" className="opacity-64" />}
                 size="xs"
                 onClick={(e) => {
-                  e.stopPropagation();
                   e.preventDefault();
-                  setEditing(false);
-                  onNameChange?.(chat, changed);
+                  e.stopPropagation();
+                  handleSave();
                 }}
               />
               <IconButton
-                aria-label="close"
+                aria-label="Cancel"
                 variant="ghost"
                 icon={<IconX size="1.0rem" className="opacity-64" />}
                 size="xs"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setEditing(false);
-                  setChanged(chat.name);
+                  handleCancel();
                 }}
               />
             </>
