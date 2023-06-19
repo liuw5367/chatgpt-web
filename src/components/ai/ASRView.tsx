@@ -1,9 +1,11 @@
+import { useToast } from "@chakra-ui/react";
 import { useMemoizedFn } from "ahooks";
 import sha256 from "crypto-js/sha256";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import { buffer2pcm, createRecorder } from "../../utils/Recorder";
 import type { AudioProcessFn, RecorderType } from "../../utils/RecorderType";
+import { request } from "../utils";
 import { APP_CONFIG, ASR_CONFIG, getUnisoundKeySecret } from "./Config";
 
 export enum ASRStatusEnum {
@@ -28,6 +30,7 @@ interface Props {
 const langArr = ["cn", "sichuanese", "cantonese", "en"];
 
 const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
+  const toast = useToast({ position: "top", isClosable: true });
   const { onStatusChange, onResultChange, onBuffer } = props;
 
   const [currentLang] = useState(0);
@@ -87,7 +90,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
         createSocket();
       },
       (msg) => {
-        alert("录音启动失败: " + msg);
+        toast({ status: "error", title: "录音启动失败 ", description: msg });
         console.error("录音启动失败: " + msg);
         socketRef.current?.close();
         onStatusChange?.(ASRStatusEnum.NORMAL);
@@ -108,9 +111,8 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
       sign = sha256(`${appKey}${time}${secret}`).toString().toUpperCase();
     } else {
       try {
-        const response = await fetch("/api/unisound", {
+        const response = await request("/api/unisound", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ key: appKey, time }),
         });
         if (!response.ok) {
@@ -121,7 +123,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
         sign = json.sign;
       } catch (e: any) {
         console.log(e);
-        alert(e?.message || "asr sign error");
+        toast({ status: "error", title: e.message || "asr sign error" });
         return;
       }
     }

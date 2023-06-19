@@ -1,12 +1,15 @@
 import type { APIRoute } from "astro";
 
-import { buildError } from "../../utils";
+import { buildError, checkAccessCode } from "../../utils";
 
 export const post: APIRoute = async (context) => {
   const body = await context.request.json();
   const content = body.content;
 
-  if (!content) {
+  const accessCode = context.request.headers.get("access-code");
+  const [accessCodeError] = checkAccessCode(accessCode);
+
+  if (!content || accessCodeError) {
     return new Response("{}");
   }
 

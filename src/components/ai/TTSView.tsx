@@ -1,9 +1,11 @@
+import { useToast } from "@chakra-ui/react";
 import { useMemoizedFn } from "ahooks";
 import sha256 from "crypto-js/sha256";
 import React, { useEffect, useImperativeHandle, useRef } from "react";
 
 import { createStreamPlayer } from "../../utils/Recorder";
 import type { BufferStreamPlayerType } from "../../utils/RecorderType";
+import { request } from "../utils";
 import { getUnisoundKeySecret, Speaker, TTS_CONFIG } from "./Config";
 
 export enum TTSStatusEnum {
@@ -27,6 +29,7 @@ interface Props {
 }
 
 const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
+  const toast = useToast({ position: "top", isClosable: true });
   const { onStatusChange, speaker, config = {} } = props;
 
   const socketRef = useRef<WebSocket>();
@@ -62,9 +65,8 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
       sign = sha256(`${appKey}${time}${secret}`).toString().toUpperCase();
     } else {
       try {
-        const response = await fetch("/api/unisound", {
+        const response = await request("/api/unisound", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ key: appKey, time }),
         });
         if (!response.ok) {
@@ -75,7 +77,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
         sign = json.sign;
       } catch (e: any) {
         console.log(e);
-        alert(e?.message || "asr sign error");
+        toast({ status: "error", title: e.message || "asr sign error" });
         return;
       }
     }
@@ -110,7 +112,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
         const result = JSON.parse(res.data);
         socket.close();
         if (result.code !== 0) {
-          alert("合成遇到点问题，请稍后再试~");
+          toast({ status: "error", title: "合成遇到点问题，请稍后再试" });
           onStatusChange?.(TTSStatusEnum.NORMAL);
           player && player.stop();
         }

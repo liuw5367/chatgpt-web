@@ -8,6 +8,7 @@ export interface ChatAtomType {
 }
 
 export interface ChatConfigType {
+  accessCode?: string;
   openAIKey?: string;
 
   openAIHost?: string;

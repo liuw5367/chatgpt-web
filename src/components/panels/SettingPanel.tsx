@@ -21,6 +21,7 @@ import { APP_VERSION } from "../../constants";
 import { chatConfigAtom, ChatConfigType, visibleAtom } from "../atom";
 import { PasswordInput } from "../PasswordInput";
 import SimpleDrawer from "../SimpleDrawer";
+import { request } from "../utils";
 
 type ListItemType<T = string> = {
   type?: "password" | "number" | "switch" | "select";
@@ -79,9 +80,8 @@ export function SettingPanel() {
       const controller = new AbortController();
       setAbortController(controller);
 
-      const response = await fetch("/api/usage", {
+      const response = await request("/api/usage", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         signal: controller.signal,
         body: JSON.stringify({
           apiKey: chatConfig.openAIKey,
@@ -119,7 +119,7 @@ export function SettingPanel() {
     });
     chatConfigAtom.set(result);
     handleClose();
-    toast({ status: "success", title: t("Success") });
+    toast({ status: "success", title: t("Success"), duration: 1000 });
   }
 
   function renderItem(item: ListItemType) {
@@ -147,7 +147,13 @@ export function SettingPanel() {
       value: "enterSend",
       placeholder: "",
     },
-    { label: "OpenAI Key", value: "openAIKey", type: "password", placeholder: "please enter OPENAI_KEY" },
+    {
+      label: t("Access Code"),
+      value: "accessCode",
+      type: "password",
+      placeholder: t("please enter") + " " + t("Access Code"),
+    },
+    { label: "OpenAI Key", value: "openAIKey", type: "password", placeholder: t("please enter") + " " + "OPENAI_KEY" },
     { label: "OpenAI Host", value: "openAIHost", placeholder: "https://api.openai.com" },
     { label: "OpenAI Model", value: "openAIModel", type: "select", placeholder: "gpt-3.5-turbo" },
     {

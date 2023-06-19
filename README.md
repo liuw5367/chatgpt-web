@@ -3,19 +3,26 @@
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/liuw5367/chatgpt-web)
 [![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/liuw5367/chatgpt-web)
 
-[Astro分支](https://github.com/liuw5367/chatgpt-web/tree/astro)和[主分支](https://github.com/liuw5367/chatgpt-web)代码同步，只是框架不同。Astro 服务端渲染不能完整支持 Emotion，所以使用的是客户端渲染。而 Next 分支使用服务端渲染，所以首次加载速度会好一些，但因为 Next 使用 Webpack 对 Unocss 支持的不好，导致开发体验不太好。
+[Astro分支](https://github.com/liuw5367/chatgpt-web/tree/astro)和[主分支](https://github.com/liuw5367/chatgpt-web)代码同步，只是框架不同。Astro 服务端渲染不能完整支持 Emotion，所以使用的是客户端渲染。而 Next 分支使用服务端渲染，但 Next 与 Unocss 开发体验不好，所以现在都是在 Astro 分支上开发。
 
-- [Next 分支体验地址 Vercel](https://chatgpt-six-lilac.vercel.app)
-- [Next 分支体验地址 Netlify](https://chatgpt-light.netlify.app)
-- [Astro 分支体验地址](https://chatgpt-astro.netlify.app)
+可自行选择部署的分支：
+
+- Next 分支
+  - [Next 分支体验地址 Vercel](https://chatgpt-six-lilac.vercel.app)
+  - [Next 分支体验地址 Netlify](https://chatgpt-light.netlify.app)
+
+
+- Astro 分支首次加载时白屏时间长一点，但之后刷新页面时页面显示都挺快
+  - [Astro 分支体验地址](https://chatgpt-astro.netlify.app)
 
 ## 功能
 
-- 页面样式移动端优先
 - 对话使用 OpenAI 官方 API `/v1/chat/completions`
 - 支持图片生成 `/v1/images/generations`
-- 支持设置 System Prompt，提供大量模版供选择
-- 支持 Prompt 收藏、导入、导出（浏览器本地缓存）
+- 支持设置 prompt，提供大量模版供选择
+- 页面样式移动端优先
+- 支持设置访问密码
+- 支持 prompt 收藏、导入、导出（浏览器本地缓存）
 - 支持多会话
 - 支持连续对话
 - 消息显示 token 使用数量
@@ -38,13 +45,13 @@
 - 页面中保存的 API KEY 会明文传输进行请求
 - 输入框为空时，按上箭头将填充上一条消息内容
 
-### System Prompt
+### Prompt
 
 - 如果 prompt 最后一句带有问句，个人建议将该问句从 prompt 删除，将其填入消息内容框内，不然每次对话的时候，该问句都会跟随 system prompt 一起发送
-- 配置 System Prompt 后页面底部的设置按钮会高亮
+- 配置 prompt 后页面底部的设置按钮会高亮
 - 消息和回复底部会显示`PROMPT`的标签，点击会复制并显示该 prompt
-- 击消息底部的重试按钮，会恢复对应的 System Prompt 并更新 localStorage 的值
-- 有 prompt 时未填写消息内容，可点击发送按钮。因内容为空，为便于查看，列表中内容区域会显示为 System Prompt
+- 击消息底部的重试按钮，会恢复对应的 prompt 并更新 localStorage 的值
+- 有 prompt 时未填写消息内容，可点击发送按钮。因内容为空，为便于查看，列表中内容区域会显示为 prompt
 
 ### 连续对话
 
@@ -65,8 +72,15 @@
 - `OPENAI_API_HOST`
 - `OPENAI_API_MODEL`
 
+设置访问密码：
+
+- `ACCESS_CODE`
+
+ASR、TTS：
+
 - `PUBLIC_UNISOUND_AI_KEY`
 - `UNISOUND_AI_SECRET`
+
 
 ## 感谢
 

@@ -20,6 +20,7 @@ import { CacheKeys } from "../../constants";
 import { chatConfigAtom, visibleAtom } from "../atom";
 import { AutoResizeTextarea } from "../AutoResizeTextarea";
 import SimpleDrawer from "../SimpleDrawer";
+import { request } from "../utils";
 
 type ImageItem = { prompt: string; url: string };
 
@@ -62,10 +63,9 @@ export function ImagePanel() {
       const controller = new AbortController();
       setAbortController(controller);
 
-      const response = await fetch("/api/image", {
+      const response = await request("/api/image", {
         method: "POST",
         signal: controller.signal,
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           apiKey: chatConfig.openAIKey,
           config: { prompt },
