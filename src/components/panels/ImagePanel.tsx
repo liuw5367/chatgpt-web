@@ -111,7 +111,7 @@ export function ImagePanel() {
     <SimpleDrawer isOpen={imageVisible} onClose={handleClose} size="lg" header={t("Image Create")}>
       <div className="h-full w-full flex flex-col space-y-3">
         <AutoResizeTextarea
-          className="min-h-[84px]"
+          className="!min-h-[84px]"
           minRows={3}
           maxRows={10}
           placeholder={t("please enter prompt") ?? ""}

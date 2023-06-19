@@ -14,7 +14,7 @@ export const post: APIRoute = async (context) => {
   }
 
   try {
-    return await fetch(host + "/v1/images/generations", {
+    const response = await fetch(host + "/v1/images/generations", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -26,6 +26,8 @@ export const post: APIRoute = async (context) => {
         ...config,
       }),
     });
+    const json = await response.json();
+    return new Response(JSON.stringify(json));
   } catch (e: any) {
     console.log("images generations error:", e);
     return buildError({ code: e.name, message: e.message }, 500);
