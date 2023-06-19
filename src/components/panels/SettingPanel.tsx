@@ -70,25 +70,21 @@ export function SettingPanel() {
     if (settingVisible) {
       const data = chatConfigAtom.get();
       setConfig({ ...data });
-      // requestBalance();
+      requestUsage();
     }
   }, [settingVisible]);
 
-  /**
-   * @deprecated 接口已无法使用
-   */
-  async function requestBalance() {
+  async function requestUsage() {
     try {
       const controller = new AbortController();
       setAbortController(controller);
 
-      const response = await fetch('/api/balance', {
+      const response = await fetch('/api/usage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
         body: JSON.stringify({
           apiKey: chatConfig.openAIKey,
-          config: { prompt },
         }),
       });
 
@@ -96,14 +92,15 @@ export function SettingPanel() {
       if (json.error?.code) {
         // toast({ status: "error", title: json.error.code, description: json.error.message });
       } else {
-        const { total_available } = json;
-        if (total_available != null && total_available !== '') {
-          setBalance('$' + total_available);
+        const { total_usage } = json;
+        if (total_usage != null && total_usage !== '') {
+          setBalance('$' + (total_usage / 100).toFixed(5));
         }
       }
     } catch (e) {
       // toast({ status: "error", title: e.toString() });
     }
+    setAbortController(undefined);
   }
 
   function handleClose() {
@@ -210,12 +207,19 @@ interface ItemProps {
 
 function Item({ item, value, onChange, balance }: ItemProps) {
   const horizontal = item.type === 'switch';
+  const { t } = useTranslation();
 
   return (
     <FormControl className={`${horizontal && 'flex flex-row'}`}>
       <FormLabel className={`${horizontal && 'flex-1'}`}>
         <span>{item.label}</span>
-        {item.label === 'OpenAI Key' && <span>&nbsp;{balance}</span>}
+        {item.label === 'OpenAI Key' && balance && (
+          <span className="text-sm text-gray-500">
+            &nbsp;{t('Used this month')}
+            {': '}
+            {balance}
+          </span>
+        )}
       </FormLabel>
       {item.type === 'password' ? (
         <PasswordInput
