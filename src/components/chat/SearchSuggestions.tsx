@@ -2,7 +2,7 @@ import { CloseButton } from '@chakra-ui/react';
 import { useDebounceEffect } from 'ahooks';
 import { useEffect, useRef, useState } from 'react';
 
-import { scrollToElement } from '../utils';
+import { request, scrollToElement } from '../utils';
 
 interface Props {
   value: string;
@@ -46,9 +46,8 @@ export function SearchSuggestions(props: Props) {
     lastContentRef.current = '';
 
     try {
-      const response = await fetch('/api/search', {
+      const response = await request('/api/search', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content,
         }),

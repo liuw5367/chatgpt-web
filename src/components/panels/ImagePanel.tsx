@@ -16,9 +16,11 @@ import { IconEraser, IconExternalLink, IconHistory, IconInfoSquare, IconLoader3 
 import { useTranslation } from 'next-i18next';
 import React, { useEffect, useState } from 'react';
 
-import { CacheKeys } from '../../constants';
+import { AutoResizeTextarea } from '@/components';
+import { request } from '@/components/utils';
+import { CacheKeys } from '@/constants';
+
 import { chatConfigAtom, visibleAtom } from '../atom';
-import { AutoResizeTextarea } from '../AutoResizeTextarea';
 import SimpleDrawer from '../SimpleDrawer';
 
 type ImageItem = { prompt: string; url: string };
@@ -62,10 +64,9 @@ export function ImagePanel() {
       const controller = new AbortController();
       setAbortController(controller);
 
-      const response = await fetch('/api/image', {
+      const response = await request('/api/image', {
         method: 'POST',
         signal: controller.signal,
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           apiKey: chatConfig.openAIKey,
           config: { prompt },
@@ -111,7 +112,7 @@ export function ImagePanel() {
     <SimpleDrawer isOpen={imageVisible} onClose={handleClose} size="lg" header={t('Image Create')}>
       <div className="h-full w-full flex flex-col space-y-3">
         <AutoResizeTextarea
-          className="min-h-[84px]"
+          className="!min-h-[84px]"
           minRows={3}
           maxRows={10}
           placeholder={t('please enter prompt') ?? ''}

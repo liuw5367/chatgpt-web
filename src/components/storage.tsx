@@ -35,6 +35,7 @@ export async function loadCache(newChatName: string) {
   chatDataAtom.set(messagesJson || []);
 
   chatConfigAtom.set({
+    accessCode: localStorage.getItem('accessCode') || undefined,
     openAIKey: localStorage.getItem('openAIKey') || undefined,
     openAIHost: localStorage.getItem('openAIHost') || undefined,
     openAIModel: localStorage.getItem('openAIModel') || undefined,

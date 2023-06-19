@@ -1,13 +1,16 @@
 import { NextRequest } from 'next/server';
 
-import { buildError } from '@/utils';
+import { buildError, checkAccessCode } from '@/utils';
 export const config = { runtime: 'edge' };
 
-export default async function handler(req: NextRequest) {
-  const body = await req.json();
+export default async function handler(request: NextRequest) {
+  const body = await request.json();
   const content = body.content;
 
-  if (!content) {
+  const accessCode = request.headers.get('access-code');
+  const [accessCodeError] = checkAccessCode(accessCode);
+
+  if (!content || accessCodeError) {
     return new Response('{}');
   }
 

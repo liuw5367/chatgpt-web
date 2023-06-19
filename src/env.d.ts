@@ -5,6 +5,8 @@ declare global {
       readonly OPENAI_API_HOST: string;
       readonly OPENAI_API_MODEL: string;
 
+      readonly ACCESS_CODE: string;
+
       readonly NEXT_PUBLIC_UNISOUND_AI_KEY: string;
       readonly UNISOUND_AI_SECRET: string;
 

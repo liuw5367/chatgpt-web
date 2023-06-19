@@ -1,18 +1,27 @@
 import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
 import { NextRequest } from 'next/server';
 
-import { buildError, getEnv } from '@/utils';
+import { buildError, checkAccessCode, ENV_KEY, getEnv } from '@/utils';
 
 export const config = { runtime: 'edge' };
 
-export default async function handler(req: NextRequest) {
-  const body = await req.json();
+export default async function handler(request: NextRequest) {
+  const body = await request.json();
   const env = getEnv();
   const host = body.host || env.HOST;
-  const apiKey = body.apiKey || env.KEY;
+  let apiKey = body.apiKey || env.KEY;
   const model = body.model || env.MODEL;
   const messages = body.messages;
   const config = body.config || {};
+
+  const accessCode = request.headers.get('access-code');
+  const [accessCodeError, accessCodeSuccess] = checkAccessCode(accessCode);
+  if (accessCodeError) {
+    return accessCodeError;
+  }
+  if (accessCodeSuccess) {
+    apiKey = body.apiKey || ENV_KEY;
+  }
 
   if (!apiKey) {
     return buildError({ code: 'No Api Key' }, 401);

@@ -1,6 +1,17 @@
 import Clipboard from 'clipboard';
 import { v4 as uuidFn } from 'uuid';
 
+export function request(url: string, config: RequestInit) {
+  return fetch(url, {
+    ...config,
+    headers: {
+      'Content-Type': 'application/json',
+      'access-code': localStorage.getItem('accessCode') || '',
+      ...config.headers,
+    },
+  });
+}
+
 export function uuid(replace = true) {
   if (!replace) return uuidFn();
   return uuidFn().replaceAll('-', '');

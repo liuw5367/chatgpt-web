@@ -149,7 +149,7 @@ export function SystemPromptPanel(props: Props) {
       item.prompt = prompt;
       setFavoriteOptions([...favoriteOptions]);
       localStorage.setItem(CacheKeys.PROMPT_FAVORITE, JSON.stringify(favoriteOptions));
-      toast({ status: 'success', title: t('Updated') });
+      toast({ status: 'success', title: t('Updated'), duration: 1000 });
     } else {
       setModalOpen(true);
     }
@@ -220,7 +220,7 @@ export function SystemPromptPanel(props: Props) {
   }
 
   function handleRemoveClick() {
-    toast({ status: 'success', title: t('Removed') });
+    toast({ status: 'success', title: t('Removed'), duration: 1000 });
     updateSystemPrompt();
     handleClear();
     handleClose();

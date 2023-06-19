@@ -28,7 +28,7 @@ import { TTSStatusEnum } from '../ai/TTSView';
 import { chatAtom, chatConfigAtom, chatDataAtom, visibleAtom } from '../atom';
 import { saveCurrentChatValue } from '../storage';
 import type { ChatMessage } from '../types';
-import { getCurrentTime, removeLn, scrollToElement, uuid } from '../utils';
+import { getCurrentTime, removeLn, request, scrollToElement, uuid } from '../utils';
 import { Command } from './Command';
 import ErrorItem from './ErrorItem';
 import { MessageItem } from './MessageItem';
@@ -239,10 +239,9 @@ export default function Page() {
 
     try {
       const { messages } = buildRequestMessages(messageList, question, conversationId, systemMessage);
-      const response = await fetch('/api/generate', {
+      const response = await request('/api/generate', {
         method: 'POST',
         signal: abortController.signal,
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages,
           apiKey: chatConfig.openAIKey,
@@ -256,12 +255,16 @@ export default function Page() {
       });
 
       if (!response.ok) {
-        const json = await response.json();
-        if (json?.error?.code || json?.error?.message) {
-          setErrorInfo(json.error as any);
-          scrollToBottom();
-        } else {
-          toast({ status: 'error', title: t('toast.error.request') });
+        try {
+          const json = await response.json();
+          if (json?.error?.code || json?.error?.message) {
+            setErrorInfo(json.error as any);
+            scrollToBottom();
+          } else {
+            toast({ status: 'error', title: t('toast.error.request') });
+          }
+        } catch (e) {
+          setErrorInfo({ code: response.status + '', message: response.statusText });
         }
         setChatLoading(false);
         return;

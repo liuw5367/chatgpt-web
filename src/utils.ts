@@ -1,9 +1,17 @@
-const KEY = process.env.OPENAI_API_KEY || process.env.PUBLIC_OPENAI_API_KEY;
-const HOST = process.env.OPENAI_API_HOST || process.env.PUBLIC_OPENAI_API_HOST || 'https://api.openai.com';
-const MODEL = process.env.OPENAI_API_MODEL || process.env.PUBLIC_OPENAI_API_MODEL || 'gpt-3.5-turbo';
+export const ENV_KEY = process.env.OPENAI_API_KEY || process.env.PUBLIC_OPENAI_API_KEY;
+const ENV_HOST = process.env.OPENAI_API_HOST || process.env.PUBLIC_OPENAI_API_HOST || 'https://api.openai.com';
+const ENV_MODEL = process.env.OPENAI_API_MODEL || process.env.PUBLIC_OPENAI_API_MODEL || 'gpt-3.5-turbo';
+
+export const ENV_ACCESS_CODE = process.env.ACCESS_CODE;
 
 export function getEnv() {
-  return { HOST, KEY, MODEL };
+  const key = ENV_ACCESS_CODE ? '' : ENV_KEY;
+
+  return {
+    HOST: ENV_HOST,
+    KEY: key,
+    MODEL: ENV_MODEL,
+  };
 }
 
 export interface ResponseError {
@@ -13,4 +21,23 @@ export interface ResponseError {
 
 export function buildError(error: ResponseError, status = 400) {
   return new Response(JSON.stringify({ error }), { status });
+}
+
+/**
+ * @return [error，验证成功]
+ */
+export function checkAccessCode(code?: string | null): [Response | null, boolean] {
+  const accessCode = ENV_ACCESS_CODE;
+  if (accessCode) {
+    if (code) {
+      if (accessCode !== code) {
+        return [buildError({ code: 'Access Code Error' }, 401), false];
+      } else {
+        return [null, true];
+      }
+    } else {
+      return [null, false];
+    }
+  }
+  return [null, false];
 }

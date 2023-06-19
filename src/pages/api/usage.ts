@@ -1,16 +1,19 @@
 import { NextRequest } from 'next/server';
 
-import { buildError, getEnv } from '@/utils';
+import { buildError, checkAccessCode, getEnv } from '@/utils';
 
 export const config = { runtime: 'edge' };
 
-export default async function handler(req: NextRequest) {
-  const body = await req.json();
+export default async function handler(request: NextRequest) {
+  const body = await request.json();
   const env = getEnv();
   const host = body.host || env.HOST;
   const apiKey = body.apiKey || env.KEY;
 
-  if (!apiKey) {
+  const accessCode = request.headers.get('access-code');
+  const [accessCodeError] = checkAccessCode(accessCode);
+
+  if (!apiKey || accessCodeError) {
     // 没有 key 不需要提示
     return new Response('{}');
   }
