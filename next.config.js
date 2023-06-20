@@ -14,9 +14,6 @@ const nextConfig = {
       // * https://webpack.js.org/configuration/cache/
       config.cache = false;
     }
-    // 开发时因为因为样式显示异常，所以关闭了缓存
-    config.cache = false;
-
     config.plugins.push(UnoCSS());
     return config;
   },

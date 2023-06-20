@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "start": "next dev",
+    "start": "rm -rf .next && next dev",
     "preview": "next start",
     "build": "next build",
     "lint": "next lint",
@@ -55,18 +55,15 @@
     "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",
     "@types/uuid": "^9.0.1",
-    "@unocss/cli": "^0.50.8",
-    "@unocss/eslint-config": "^0.52.1",
-    "@unocss/preset-attributify": "^0.50.8",
-    "@unocss/preset-icons": "^0.50.8",
-    "@unocss/transformer-variant-group": "^0.50.8",
-    "@unocss/webpack": "^0.50.8",
+    "@unocss/eslint-config": "^0.53.1",
+    "@unocss/transformer-variant-group": "^0.53.1",
+    "@unocss/webpack": "^0.53.1",
     "eslint": "^8.40.0",
     "eslint-config-next": "^13.4.1",
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "prettier": "^2.8.8",
     "punycode": "^2.3.0",
     "typescript": "5.0.4",
-    "unocss": "^0.50.8"
+    "unocss": "^0.53.1"
   }
 }
