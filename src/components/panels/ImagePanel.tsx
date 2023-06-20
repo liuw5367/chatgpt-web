@@ -12,7 +12,14 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useStore } from "@nanostores/react";
-import { IconEraser, IconExternalLink, IconHistory, IconInfoSquare, IconLoader3 } from "@tabler/icons-react";
+import {
+  IconClearAll,
+  IconEraser,
+  IconExternalLink,
+  IconHistory,
+  IconInfoSquare,
+  IconLoader3,
+} from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -94,6 +101,10 @@ export function ImagePanel() {
     localStorage.setItem(CacheKeys.IMAGE_LIST, JSON.stringify(data));
   }
 
+  function handleClearClick() {
+    updateHistory([]);
+  }
+
   function addToHistory(data: ImageItem[]) {
     updateHistory([...data, ...historyList]);
   }
@@ -119,15 +130,27 @@ export function ImagePanel() {
           onChange={(e) => setPrompt(e.target.value)}
         />
         <div className="flex flex-row justify-between space-x-3">
-          <IconButton
-            aria-label="History"
-            onClick={() => setImageList([])}
-            colorScheme="gray"
-            variant="solid"
-            icon={<IconHistory stroke={1.5} />}
-          />
           <div className="flex flex-row space-x-3">
             <IconButton
+              title="History"
+              aria-label="History"
+              onClick={() => setImageList([])}
+              colorScheme="gray"
+              variant="solid"
+              icon={<IconHistory stroke={1.5} />}
+            />
+            {imageList.length === 0 && historyList.length !== 0 && (
+              <IconButton
+                title="Clear History"
+                aria-label="Clear"
+                onClick={handleClearClick}
+                icon={<IconClearAll stroke={1.5} />}
+              />
+            )}
+          </div>
+          <div className="flex flex-row space-x-3">
+            <IconButton
+              title="Clear TextArea"
               aria-label="Eraser"
               onClick={() => setPrompt("")}
               colorScheme="gray"
@@ -135,6 +158,7 @@ export function ImagePanel() {
               icon={<IconEraser stroke={1.5} />}
             />
             <Button
+              title="Send"
               colorScheme={loading ? "red" : "teal"}
               variant={loading ? "outline" : "solid"}
               onClick={handleSend}
@@ -147,7 +171,7 @@ export function ImagePanel() {
         <SimpleGrid columns={2} spacing={2} className="pb-4">
           {displayList?.map(({ url, prompt }) => (
             <div key={url} className="relative aspect-square w-full rounded bg-black/20">
-              <img src={url} alt={url} className="aspect-square w-full rounded" />
+              <img src={url} alt="" className="aspect-square w-full rounded" />
               <div className="absolute right-1 top-1">
                 <CloseButton size="sm" onClick={() => deleteImage(url)} />
               </div>
