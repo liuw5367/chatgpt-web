@@ -19,7 +19,7 @@ import { Logo } from "../Logo";
 import SimpleDrawer from "../SimpleDrawer";
 import { saveChatAtom } from "../storage";
 import type { ChatItem } from "../types";
-import { uuid } from "../utils";
+import { isMobile, uuid } from "../utils";
 
 interface Props {
   type?: "side" | "drawer";
@@ -166,7 +166,8 @@ function ChatItemView(props: ItemProps) {
   const selected = chat.id === chatId;
   const [changed, setChanged] = useState(chat.name);
   const [isEditing, setEditing] = useState(false);
-  const [hovered, setHovered] = useState(false);
+  const [mobileFlag] = useState(isMobile());
+  const [hovered, setHovered] = useState(mobileFlag);
 
   function handleCancel() {
     setEditing(false);
@@ -183,7 +184,7 @@ function ChatItemView(props: ItemProps) {
       key={chat.id}
       onClick={isEditing ? undefined : onClick}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseLeave={() => setHovered(mobileFlag)}
       className={`transition-all text-[14px] w-full flex flex-row items-center min-h-14 pl-3 pr-1 rounded-lg space-x-2 border cursor-pointer hover:bg-teal-700/5 hover:border-teal-700/80 ${
         selected && "border-teal-700 text-teal-700 border-2 font-medium bg-teal-700/5"
       }`}
