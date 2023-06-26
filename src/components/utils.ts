@@ -82,3 +82,7 @@ export async function readFileAsString(file: Blob): Promise<string> {
     }
   });
 }
+
+export function isMobile() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
