@@ -17,29 +17,36 @@ const envAdapter = () => {
   }
 };
 
+const output = () => {
+  if (process.env.OUTPUT === "vercel" || process.env.OUTPUT === "netlify") {
+    return {
+      manualChunks(id) {
+        if (id.includes("node_modules/.pnpm/")) {
+          return id.toString().split("node_modules/.pnpm/")[1].split("/")[0].toString();
+        } else if (id.includes("node_modules/")) {
+          return id.toString().split("node_modules/")[1].split("/")[0].toString();
+        }
+      }
+    };
+  }
+  return {};
+};
+
 // https://astro.build/config
 export default defineConfig({
   vite: {
     define: {
-      __APP_VERSION__: JSON.stringify(app.version),
+      __APP_VERSION__: JSON.stringify(app.version)
     },
     build: {
       chunkSizeWarningLimit: 1300,
       rollupOptions: {
-        output: {
-          manualChunks(id) {
-            if (id.includes("node_modules/.pnpm/")) {
-              return id.toString().split("node_modules/.pnpm/")[1].split("/")[0].toString();
-            } else if (id.includes("node_modules/")) {
-              return id.toString().split("node_modules/")[1].split("/")[0].toString();
-            }
-          },
-        },
-      },
-    },
+        output: output()
+      }
+    }
   },
   output: "server",
   adapter: envAdapter(),
   server: { host: true },
-  integrations: [unocss(), react()],
+  integrations: [unocss(), react()]
 });
