@@ -19,6 +19,10 @@ export default function App() {
   useEffect(() => {
     loadCache(t("New Chat"));
     addCodeCopy();
+    const loading = document.getElementById("app-loading");
+    if (loading && loading.parentNode) {
+      loading.parentNode.removeChild(loading);
+    }
   }, []);
 
   return (

@@ -12,12 +12,51 @@ import "github-markdown-css";
 ---
 
 <Layout title={APP_NAME}>
-  <main><ReactApp client:only="react" /></main>
+  <main>
+    <ReactApp client:only="react" />
+    <div id="app-loading">
+      <div class="spinner" />
+    </div>
+  </main>
 </Layout>
 
 <style>
   main {
     height: 100vh;
     padding: 0;
+  }
+
+  .spinner {
+    margin-bottom: 1rem;
+    height: 2rem;
+    width: 2rem;
+
+    border: 4px solid #d1d5db;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+
+    animation: spinner 800ms linear infinite;
+  }
+
+  @keyframes spinner {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  #app-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin-top: -10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 </style>
