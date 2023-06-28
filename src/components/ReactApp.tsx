@@ -78,7 +78,10 @@ function Content() {
   const rightSide = xl || (lg && showPromptSide);
 
   return (
-    <div className="w-full flex flex-1 overflow-hidden">
+    <div
+      className="w-full flex flex-1 overflow-hidden"
+      style={{ backgroundColor: "var(--chakra-colors-chakra-body-bg)" }}
+    >
       <ChatPanel chatVisible={chatVisibleState} type={leftSide ? "side" : "drawer"} />
       <div
         className="h-full w-full"
