@@ -1,6 +1,6 @@
 {
   "name": "astro-gpt",
-  "version": "1.14.5",
+  "version": "1.14.6",
   "type": "module",
   "private": true,
   "scripts": {

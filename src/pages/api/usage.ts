@@ -1,19 +1,22 @@
 import type { APIRoute } from "astro";
 
-import { buildError, checkAccessCode, getEnv } from "../../utils";
+import { buildError, checkAccessCode, ENV_KEY, getEnv } from "../../utils";
 
 export const post: APIRoute = async (context) => {
   const body = await context.request.json();
   const env = getEnv();
   const host = body.host || env.HOST;
-  const apiKey = body.apiKey || env.KEY;
+  let apiKey = body.apiKey || env.KEY;
 
   const accessCode = context.request.headers.get("access-code");
-  const [accessCodeError] = checkAccessCode(accessCode);
+  const [accessCodeError, accessCodeSuccess] = checkAccessCode(accessCode);
 
-  if (!apiKey || accessCodeError) {
+  if (accessCodeError) {
     // 没有 key 不需要提示
     return new Response("{}");
+  }
+  if (accessCodeSuccess) {
+    apiKey = body.apiKey || ENV_KEY;
   }
 
   try {
