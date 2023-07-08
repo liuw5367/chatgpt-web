@@ -7,6 +7,7 @@ const nextConfig = {
   publicRuntimeConfig: { version },
   reactStrictMode: true,
   i18n,
+  transpilePackages: ['ahooks'],
   webpack: (config, context) => {
     if (context.buildId !== 'development') {
       // * disable filesystem cache for build
