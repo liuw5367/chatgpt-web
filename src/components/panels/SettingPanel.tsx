@@ -23,7 +23,7 @@ import { PasswordInput } from "../PasswordInput";
 import SimpleDrawer from "../SimpleDrawer";
 import { request } from "../utils";
 
-type ListItemType<T = string> = {
+export type SettingItemType<T = string> = {
   type?: "password" | "number" | "switch" | "select";
   label: string;
   value: T;
@@ -32,7 +32,7 @@ type ListItemType<T = string> = {
   max?: number;
 };
 
-const voiceList: ListItemType[] = [
+const voiceList: SettingItemType[] = [
   { label: "Unisound AppKey", value: "unisoundAppKey", placeholder: "https://ai.unisound.com" },
   { label: "Unisound SECRET", value: "unisoundSecret", type: "password", placeholder: "https://ai.unisound.com" },
 ];
@@ -122,9 +122,9 @@ export function SettingPanel() {
     toast({ status: "success", title: t("Success"), duration: 1000 });
   }
 
-  function renderItem(item: ListItemType) {
+  function renderItem(item: SettingItemType) {
     return (
-      <Item
+      <SettingItem
         key={item.value}
         item={item}
         balance={balance}
@@ -134,7 +134,7 @@ export function SettingPanel() {
     );
   }
 
-  const chatConfigList: ListItemType[] = [
+  const chatConfigList: SettingItemType[] = [
     {
       type: "switch",
       label: t("SearchSuggestions"),
@@ -205,13 +205,13 @@ export function SettingPanel() {
 }
 
 interface ItemProps {
-  item: ListItemType;
+  item: SettingItemType;
   value: string;
   onChange: (v: string) => void;
   balance?: string;
 }
 
-function Item({ item, value, onChange, balance }: ItemProps) {
+export function SettingItem({ item, value, onChange, balance }: ItemProps) {
   const horizontal = item.type === "switch";
   const { t } = useTranslation();
 

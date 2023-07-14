@@ -6,6 +6,12 @@ export interface ChatItem {
 
   systemMessage?: string;
   conversationId?: string;
+
+  openAIModel?: string;
+  temperature?: string;
+  top_p?: string;
+  // max_token?: number;
+  // max_message: string;
 }
 
 export interface ChatMessage extends ChatCompletionResponseMessage {

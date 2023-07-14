@@ -17,14 +17,17 @@ import { useTranslation } from "react-i18next";
 
 import { CacheKeys } from "../../constants";
 import { localDB } from "../../utils/LocalDB";
-import { chatAtom, visibleAtom } from "../atom";
+import { chatAtom, ChatConfigType, visibleAtom } from "../atom";
 import { estimateTokens } from "../chat/token";
 import { FileUpload } from "../FileUpload";
 import { allPrompts, OptionType } from "../prompts";
 import SimpleDrawer from "../SimpleDrawer";
 import { saveCurrentChatValue } from "../storage";
+import type { ChatItem } from "../types";
 import { readFileAsString, uuid } from "../utils";
 import { PromptFormModal } from "./PromptForm";
+import type { SettingItemType } from "./SettingPanel";
+import { SettingItem } from "./SettingPanel";
 
 interface Props {
   type?: "side" | "drawer";
@@ -59,6 +62,12 @@ export function SystemPromptPanel(props: Props) {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [dataRefreshKey, setDataRefreshKey] = useState(0);
+
+  const panelTabList: LabelValue[] = [
+    { label: t("System Prompt"), value: "prompt" },
+    { label: t("Chat Settings"), value: "setting" },
+  ];
+  const [panelTabIndex, setPanelTabIndex] = useState(0);
 
   useEffect(() => {
     if (!promptVisible) return;
@@ -311,36 +320,8 @@ export function SystemPromptPanel(props: Props) {
     }),
   };
 
-  return (
-    <SimpleDrawer
-      type={type}
-      sideWidth={sideWidth}
-      isOpen={promptVisible}
-      onClose={handleClose}
-      size="md"
-      header={t("System Prompt")}
-      footer={
-        <div className="w-full flex flex-row justify-between">
-          <Button colorScheme="blue" onClick={handleRemoveClick}>
-            {t("Remove")}
-          </Button>
-          <div className="flex flex-row">
-            {type !== "side" ? (
-              <Button variant="outline" mr={3} onClick={handleClose}>
-                {t("Cancel")}
-              </Button>
-            ) : (
-              <Button variant="outline" mr={3} onClick={handlePromptReset}>
-                {t("Reset")}
-              </Button>
-            )}
-            <Button colorScheme="teal" onClick={handleSaveClick}>
-              {t("Save")}
-            </Button>
-          </div>
-        </div>
-      }
-    >
+  function renderPromptContent() {
+    return (
       <div className={`w-full h-full flex flex-col space-y-3`}>
         <div className={`flex flex-col space-y-3`}>
           <Tabs
@@ -469,6 +450,98 @@ export function SystemPromptPanel(props: Props) {
           </div>
         </div>
       </div>
+    );
+  }
+
+  function renderSettingsContent() {
+    const list: SettingItemType[] = [
+      { label: "Name", value: "name", placeholder: "" },
+      { label: "OpenAI Model", value: "openAIModel", type: "select", placeholder: "gpt-3.5-turbo" },
+      {
+        type: "number",
+        label: "temperature",
+        value: "temperature",
+        max: 2,
+        placeholder: "",
+        desc: t("settings.temperature"),
+      },
+      {
+        type: "number",
+        label: "top_p",
+        value: "top_p",
+        max: 1,
+        placeholder: "",
+        desc: t("settings.top_p"),
+      },
+      { label: "", value: "", placeholder: "" },
+    ];
+    return (
+      <div className="space-y-2">
+        {list.map((item) => (
+          <SettingItem
+            key={item.value}
+            item={item}
+            value={currentChat[item.value as keyof ChatItem] || ""}
+            // onChange={(value) => setConfig((draft) => ({ ...draft, [item.value]: value }))}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <SimpleDrawer
+      type={type}
+      sideWidth={sideWidth}
+      isOpen={promptVisible}
+      onClose={handleClose}
+      size="md"
+      header={
+        <Tabs
+          variant="enclosed"
+          colorScheme="green"
+          index={panelTabIndex}
+          onChange={(index) => {
+            setPanelTabIndex(index);
+          }}
+        >
+          <TabList className="flex-wrap">
+            {panelTabList.map((item) => (
+              <Tab key={item.value} className="whitespace-nowrap">
+                {item.label}
+              </Tab>
+            ))}
+          </TabList>
+        </Tabs>
+      }
+      footer={
+        <div className="w-full flex flex-row justify-between">
+          <Button
+            colorScheme="blue"
+            onClick={handleRemoveClick}
+            style={{ visibility: panelTabIndex === 0 ? "visible" : "hidden" }}
+          >
+            {t("Remove")}
+          </Button>
+          <div className="flex flex-row">
+            {type !== "side" ? (
+              <Button variant="outline" mr={3} onClick={handleClose}>
+                {t("Cancel")}
+              </Button>
+            ) : (
+              <Button variant="outline" mr={3} onClick={handlePromptReset}>
+                {t("Reset")}
+              </Button>
+            )}
+            <Button colorScheme="teal" onClick={handleSaveClick}>
+              {t("Save")}
+            </Button>
+          </div>
+        </div>
+      }
+    >
+      {panelTabIndex === 0 && renderPromptContent()}
+      {panelTabIndex === 1 && renderSettingsContent()}
       <PromptFormModal
         open={modalOpen}
         name={selectedPrompt?.act}
