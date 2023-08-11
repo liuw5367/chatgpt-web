@@ -56,7 +56,6 @@
     "@types/react-dom": "^18.2.4",
     "@types/uuid": "^9.0.1",
     "@unocss/eslint-config": "^0.53.1",
-    "@unocss/transformer-variant-group": "^0.53.1",
     "@unocss/webpack": "^0.53.1",
     "eslint": "^8.40.0",
     "eslint-config-next": "^13.4.1",
