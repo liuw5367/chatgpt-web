@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 import { buildError, checkAccessCode } from '@/utils';
 export const config = { runtime: 'edge' };
@@ -19,8 +19,8 @@ export default async function handler(request: NextRequest) {
     const response = await fetch(url, { method: 'GET' });
     const json = await response.json();
     return new Response(JSON.stringify(json.g?.map((v: any) => v.q) || []));
-  } catch (e: any) {
-    console.log('images generations error:', e);
-    return buildError({ code: e.name, message: e.message }, 500);
+  } catch (error: any) {
+    console.log('images generations error:', error);
+    return buildError({ code: error.name, message: error.message }, 500);
   }
 }

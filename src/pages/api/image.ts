@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 import { buildError, checkAccessCode, ENV_KEY, getEnv } from '@/utils';
 
@@ -37,8 +37,8 @@ export default async function handler(request: NextRequest) {
         ...config,
       }),
     });
-  } catch (e: any) {
-    console.log('images generations error:', e);
-    return buildError({ code: e.name, message: e.message }, 500);
+  } catch (error: any) {
+    console.log('images generations error:', error);
+    return buildError({ code: error.name, message: error.message }, 500);
   }
 }

@@ -1,5 +1,6 @@
-import { createParser, ParsedEvent, ReconnectInterval } from 'eventsource-parser';
-import { NextRequest } from 'next/server';
+import type { ParsedEvent, ReconnectInterval } from 'eventsource-parser';
+import { createParser } from 'eventsource-parser';
+import type { NextRequest } from 'next/server';
 
 import { buildError, checkAccessCode, ENV_KEY, getEnv } from '@/utils';
 
@@ -43,9 +44,9 @@ export default async function handler(request: NextRequest) {
       stream: true,
       ...config,
     }),
-  }).catch((e: Error) => {
-    console.error('chat completions error: ', e);
-    return buildError({ code: e.name, message: e.message }, 500);
+  }).catch((error: Error) => {
+    console.error('chat completions error:', error);
+    return buildError({ code: error.name, message: error.message }, 500);
   });
 
   return parseOpenAIStream(response);
@@ -84,8 +85,8 @@ const parseOpenAIStream = (rawResponse: Response) => {
             const text = json.choices[0].delta?.content || '';
             const queue = encoder.encode(text);
             controller.enqueue(queue);
-          } catch (e) {
-            controller.error(e);
+          } catch (error) {
+            controller.error(error);
           }
         }
       };

@@ -30,11 +30,7 @@ export function checkAccessCode(code?: string | null): [Response | null, boolean
   const accessCode = ENV_ACCESS_CODE;
   if (accessCode) {
     if (code) {
-      if (accessCode !== code) {
-        return [buildError({ code: 'Access Code Error' }, 401), false];
-      } else {
-        return [null, true];
-      }
+      return accessCode === code ? [null, true] : [buildError({ code: 'Access Code Error' }, 401), false];
     } else {
       return [null, false];
     }

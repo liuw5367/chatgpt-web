@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 import { buildError, checkAccessCode, ENV_KEY, getEnv } from '@/utils';
 
@@ -39,9 +39,9 @@ export default async function handler(request: NextRequest) {
     });
     const json = await response.json();
     return new Response(JSON.stringify(json));
-  } catch (e: any) {
-    console.log('usage error:', e);
-    return buildError({ code: e.name, message: e.message }, 500);
+  } catch (error: any) {
+    console.log('usage error:', error);
+    return buildError({ code: error.name, message: error.message }, 500);
   }
 }
 

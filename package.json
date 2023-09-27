@@ -8,6 +8,8 @@
     "preview": "next start",
     "build": "next build",
     "lint": "next lint",
+    "eslint": "eslint src --quiet --ext .js,.jsx,.ts,.tsx",
+    "eslint-fix": "eslint src --quiet --fix --ext .js,.jsx,.ts,.tsx",
     "type-check": "tsc"
   },
   "dependencies": {

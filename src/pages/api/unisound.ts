@@ -1,5 +1,5 @@
 import sha256 from 'crypto-js/sha256';
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 import { buildError, checkAccessCode, ENV_ACCESS_CODE } from '@/utils';
 
