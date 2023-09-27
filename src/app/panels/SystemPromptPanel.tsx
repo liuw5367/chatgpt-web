@@ -26,7 +26,7 @@ import type { ChatItem } from '../types';
 import { readFileAsString, uuid } from '../utils';
 import { PromptFormModal } from './PromptForm';
 import type { SettingItemType } from './SettingPanel';
-import { SettingItem } from './SettingPanel';
+import { modelList, SettingItem } from './SettingPanel';
 
 interface Props {
   type?: 'side' | 'drawer';
@@ -547,15 +547,22 @@ function ChatSetting(props: ChatSettingProps) {
 
   return (
     <div className="space-y-2">
-      {list.map((item) => (
-        <SettingItem
-          key={item.value}
-          item={item}
-          onChange={(value) => updateChat(chat.id, { [item.value]: value })}
-          // @ts-ignore key
-          value={chat[item.value] || config[item.value]}
-        />
-      ))}
+      {list.map((item) => {
+        // @ts-ignore key
+        let value = chat[item.value] || config[item.value];
+        if (item.value === 'openAIModel' && !value) {
+          value = modelList[0].value;
+        }
+
+        return (
+          <SettingItem
+            key={item.value}
+            item={item}
+            onChange={(value) => updateChat(chat.id, { [item.value]: value })}
+            value={value}
+          />
+        );
+      })}
     </div>
   );
 }

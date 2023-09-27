@@ -25,11 +25,7 @@ export function useTranslation() {
   const currentLanguage = language || navigator.language;
 
   const t = useMemoizedFn((key: string): string => {
-    const isZh = currentLanguage.toLowerCase().includes('zh');
-    if (isZh) {
-      return getValue(localeZh, key) || key;
-    }
-    return getValue(localeEn, key) || key;
+    return translate(key, language);
   });
 
   const changeLanguage = useMemoizedFn((language: string) => {
@@ -49,8 +45,7 @@ function getValue(data: any, key: string) {
   return value;
 }
 
-export function t(key: string) {
-  const language = i18nStore.getState().language;
+export function translate(key: string, language = i18nStore.getState().language) {
   const currentLanguage = language || navigator.language;
   const isZh = currentLanguage.toLowerCase().includes('zh');
   if (isZh) {

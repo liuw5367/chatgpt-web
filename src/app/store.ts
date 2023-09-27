@@ -1,8 +1,8 @@
-import { cloneDeep } from 'lodash';
+import { produce } from 'immer';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { t } from './i18n';
+import { translate } from './i18n';
 import type { ChatItem, ChatMessage } from './types';
 import { uuid } from './utils';
 
@@ -76,32 +76,33 @@ export const chatListStore = create<ChatState & ChatAction, [['zustand/persist',
         const { chatList } = get();
         let chat = chatList.find((v) => v.selected)!;
         if (!chat && chatList.length > 0) {
-          chatList[0].selected = true;
           chat = chatList[0];
         }
         if (!chat) {
           const id = uuid();
-          const item: ChatItem = { id, name: t('New Chat') + ' ' + id.slice(0, 6) };
+          const item: ChatItem = { id, name: translate('New Chat') + ' ' + id.slice(0, 6) };
           set({ chatList: [item] });
           chat = item;
         }
         return chat;
       },
       saveChatList: (value) => {
-        const selected = value.find((v) => v.selected);
-        if (!selected && value.length > 0) {
-          value[0].selected = true;
-        }
-        set({ chatList: cloneDeep(value) });
+        set({
+          chatList: produce(value, (draft) => {
+            const selected = draft.find((v) => v.selected);
+            if (!selected && draft.length > 0) {
+              draft[0].selected = true;
+            }
+          }),
+        });
       },
       updateChat: (id, value) => {
-        const chatList = get().chatList;
-        const index = chatList.findIndex((v) => v.id === id);
-        chatList[index] = { ...chatList[index], ...value };
-
-        set((state) => {
-          return { chatList: cloneDeep(state.chatList) };
-        });
+        set((state) => ({
+          chatList: produce(state.chatList, (draft) => {
+            const index = draft.findIndex((v) => v.id === id);
+            draft[index] = { ...draft[index], ...value };
+          }),
+        }));
       },
     }),
     {

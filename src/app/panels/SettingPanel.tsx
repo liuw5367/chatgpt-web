@@ -36,7 +36,7 @@ const voiceList: SettingItemType[] = [
   { label: 'Unisound SECRET', value: 'unisoundSecret', type: 'password', placeholder: 'https://ai.unisound.com' },
 ];
 
-const modelList = [
+export const modelList = [
   { label: 'gpt-3.5-turbo', value: 'gpt-3.5-turbo' },
   { label: 'gpt-3.5-turbo-16k', value: 'gpt-3.5-turbo-16k' },
   { label: 'gpt-4', value: 'gpt-4' },

@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 
 import { buildError, checkAccessCode, ENV_KEY, getEnv } from '../../utils';
 
-export const post: APIRoute = async (context) => {
+export const POST: APIRoute = async (context) => {
   const body = await context.request.json();
   const env = getEnv();
   const host = body.host || env.HOST;

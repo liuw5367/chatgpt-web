@@ -8,20 +8,14 @@ import type { AudioProcessFn, RecorderType } from '../../utils/RecorderType';
 import { request } from '../utils';
 import { APP_CONFIG, ASR_CONFIG, getUnisoundKeySecret } from './Config';
 
-export enum ASRStatusEnum {
-  NORMAL,
-  RECORDING,
-}
-
 export interface ASRRef {
   start: () => void;
   stop: () => void;
 }
 
 interface Props {
-  status?: ASRStatusEnum;
   onResultChange?: (v: string, changing: boolean) => void;
-  onStatusChange?: (v: ASRStatusEnum) => void;
+  onStatusChange?: (recording: boolean) => void;
   config?: Record<string, any>;
 
   onBuffer?: (v: Int16Array[]) => void;
@@ -29,7 +23,7 @@ interface Props {
 
 const langArr = ['cn', 'sichuanese', 'cantonese', 'en'];
 
-const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
+export const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   const toast = useToast({ position: 'top', isClosable: true });
   const { onStatusChange, onResultChange, onBuffer } = props;
 
@@ -66,13 +60,13 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   });
 
   function startRecording() {
-    onStatusChange?.(ASRStatusEnum.RECORDING);
+    onStatusChange?.(true);
     doStartRecording();
   }
 
   function stopRecording() {
     doStopRecording(true);
-    onStatusChange?.(ASRStatusEnum.NORMAL);
+    onStatusChange?.(false);
   }
 
   function doStartRecording() {
@@ -93,7 +87,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
         toast({ status: 'error', title: '录音启动失败 ', description: msg });
         console.error('录音启动失败: ' + msg);
         socketRef.current?.close();
-        onStatusChange?.(ASRStatusEnum.NORMAL);
+        onStatusChange?.(false);
       },
     );
   }
@@ -221,5 +215,3 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
 
   return null;
 });
-
-export default ASRView;

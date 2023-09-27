@@ -9,27 +9,18 @@ import { request } from '../utils';
 import type { Speaker } from './Config';
 import { getUnisoundKeySecret, TTS_CONFIG } from './Config';
 
-export enum TTSStatusEnum {
-  NORMAL,
-  /** 合成中 */
-  GENERATING,
-  /** 播放中 */
-  PLAYING,
-}
-
 export interface TTSRef {
   start: (content: string) => void;
   stop: () => void;
 }
 
 interface Props {
-  status: TTSStatusEnum;
-  onStatusChange?: (v: TTSStatusEnum) => void;
+  onStatusChange?: (playing: boolean) => void;
   speaker: Speaker;
   config?: Record<string, any>;
 }
 
-const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
+export const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
   const toast = useToast({ position: 'top', isClosable: true });
   const { onStatusChange, speaker, config = {} } = props;
 
@@ -91,7 +82,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     playerRef.current = player;
 
     socket.addEventListener('open', () => {
-      onStatusChange?.(TTSStatusEnum.PLAYING);
+      onStatusChange?.(true);
       player.start();
 
       socket.send(
@@ -114,7 +105,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
         socket.close();
         if (result.code !== 0) {
           toast({ status: 'error', title: '合成遇到点问题，请稍后再试' });
-          onStatusChange?.(TTSStatusEnum.NORMAL);
+          onStatusChange?.(false);
           player && player.stop();
         }
       } catch {
@@ -144,7 +135,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
   });
 
   function playerStop() {
-    onStatusChange?.(TTSStatusEnum.NORMAL);
+    onStatusChange?.(false);
     if (playerRef.current) {
       playerRef.current = undefined;
     }
@@ -156,5 +147,3 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
 
   return null;
 });
-
-export default TTSView;

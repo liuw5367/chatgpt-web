@@ -8,7 +8,7 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-react';
-import { cloneDeep } from 'lodash';
+import { produce } from 'immer';
 import { useState } from 'react';
 
 import { SimpleDrawer } from '../../components';
@@ -77,8 +77,13 @@ export function ChatPanel(props: Props) {
     if (item.id === currentChat.id) return;
 
     chatListStore.setState(({ chatList }) => {
-      for (const v of chatList) v.selected = v.id === item.id;
-      return { chatList: cloneDeep(chatList) };
+      return {
+        chatList: produce(chatList, (draft) => {
+          for (const v of draft) {
+            v.selected = v.id === item.id;
+          }
+        }),
+      };
     });
     updateChatMessage(item);
     scrollToPageBottom();

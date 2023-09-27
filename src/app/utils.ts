@@ -90,3 +90,10 @@ export async function readFileAsString(file: Blob): Promise<string> {
 export function isMobile() {
   return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent);
 }
+
+export function moveCursorToEnd(element: HTMLTextAreaElement) {
+  setTimeout(() => {
+    element.focus();
+    element.setSelectionRange(element.value.length, element.value.length);
+  }, 0);
+}

@@ -1,8 +1,11 @@
 {
   "name": "astro-gpt",
-  "version": "1.15.0",
+  "version": "1.15.1",
   "type": "module",
   "private": true,
+  "engines": {
+    "node": ">=18.14.1"
+  },
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -38,6 +41,7 @@
     "github-markdown-css": "^5.2.0",
     "gpt3-tokenizer": "^1.1.5",
     "highlight.js": "^11.8.0",
+    "immer": "^10.0.2",
     "js-sha256": "^0.9.0",
     "katex": "^0.16.8",
     "lodash": "^4.17.21",

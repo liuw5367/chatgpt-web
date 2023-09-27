@@ -6,7 +6,7 @@ import { buildError, checkAccessCode, ENV_ACCESS_CODE } from '../../utils';
 const KEY = import.meta.env.PUBLIC_UNISOUND_AI_KEY;
 const SECRET = import.meta.env.UNISOUND_AI_SECRET || import.meta.env.PUBLIC_UNISOUND_AI_SECRET;
 
-export const post: APIRoute = async (context) => {
+export const POST: APIRoute = async (context) => {
   const body = await context.request.json();
   const apiKey = body.key || KEY;
   const time = body.time;
