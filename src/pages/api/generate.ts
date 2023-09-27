@@ -1,7 +1,8 @@
-import type { APIRoute } from "astro";
-import { createParser, ParsedEvent, ReconnectInterval } from "eventsource-parser";
+import type { APIRoute } from 'astro';
+import type { ParsedEvent, ReconnectInterval } from 'eventsource-parser';
+import { createParser } from 'eventsource-parser';
 
-import { buildError, checkAccessCode, ENV_KEY, getEnv } from "../../utils";
+import { buildError, checkAccessCode, ENV_KEY, getEnv } from '../../utils';
 
 export const post: APIRoute = async (context) => {
   const body = await context.request.json();
@@ -12,7 +13,7 @@ export const post: APIRoute = async (context) => {
   const messages = body.messages;
   const config = body.config || {};
 
-  const accessCode = context.request.headers.get("access-code");
+  const accessCode = context.request.headers.get('access-code');
   const [accessCodeError, accessCodeSuccess] = checkAccessCode(accessCode);
   if (accessCodeError) {
     return accessCodeError;
@@ -22,17 +23,17 @@ export const post: APIRoute = async (context) => {
   }
 
   if (!apiKey) {
-    return buildError({ code: "No Api Key" }, 401);
+    return buildError({ code: 'No Api Key' }, 401);
   }
 
   if (!messages) {
-    return buildError({ code: "No Prompt" });
+    return buildError({ code: 'No Prompt' });
   }
 
-  const response = await fetch(host + "/v1/chat/completions", {
-    method: "POST",
+  const response = await fetch(host + '/v1/chat/completions', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
@@ -41,9 +42,9 @@ export const post: APIRoute = async (context) => {
       stream: true,
       ...config,
     }),
-  }).catch((e: Error) => {
-    console.error("chat completions error: ", e);
-    return buildError({ code: e.name, message: e.message }, 500);
+  }).catch((error: Error) => {
+    console.error('chat completions error:', error);
+    return buildError({ code: error.name, message: error.message }, 500);
   });
 
   return parseOpenAIStream(response);
@@ -62,9 +63,9 @@ const parseOpenAIStream = (rawResponse: Response) => {
   const stream = new ReadableStream({
     async start(controller) {
       const streamParser = (event: ParsedEvent | ReconnectInterval) => {
-        if (event.type === "event") {
+        if (event.type === 'event') {
           const data = event.data;
-          if (data === "[DONE]") {
+          if (data === '[DONE]') {
             controller.close();
             return;
           }
@@ -79,11 +80,11 @@ const parseOpenAIStream = (rawResponse: Response) => {
             //   ],
             // }
             const json = JSON.parse(data);
-            const text = json.choices[0].delta?.content || "";
+            const text = json.choices[0].delta?.content || '';
             const queue = encoder.encode(text);
             controller.enqueue(queue);
-          } catch (e) {
-            controller.error(e);
+          } catch (error) {
+            controller.error(error);
           }
         }
       };

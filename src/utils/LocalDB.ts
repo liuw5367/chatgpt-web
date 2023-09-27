@@ -8,7 +8,7 @@ export default class LocalDB {
 
   private db: IDBDatabase | undefined;
 
-  constructor(name = "db", storeName = "store") {
+  constructor(name = 'db', storeName = 'store') {
     this.dbName = name;
     this.objectStoreName = storeName;
   }
@@ -33,11 +33,11 @@ export default class LocalDB {
           db.createObjectStore(this.objectStoreName);
         }
       };
-      request.onerror = (event) => reject(event);
+      request.addEventListener('error', (event) => reject(event));
     });
   }
 
-  public getDBStore(mode: IDBTransactionMode = "readwrite"): Promise<IDBObjectStore> {
+  public getDBStore(mode: IDBTransactionMode = 'readwrite'): Promise<IDBObjectStore> {
     return new Promise((resolve, reject) => {
       this.getDB()
         .then((db) => {
@@ -49,12 +49,12 @@ export default class LocalDB {
 
   public getItem(key: KeyType): Promise<ValueType> {
     return new Promise((resolve, reject) => {
-      this.getDBStore("readonly")
+      this.getDBStore('readonly')
         .then((db) => {
           const request = db.get(key);
 
           request.onsuccess = () => resolve(request.result);
-          request.onerror = reject;
+          request.addEventListener('error', reject);
         })
         .catch(reject);
     });
@@ -67,7 +67,7 @@ export default class LocalDB {
           const request = db.put(value, key);
 
           request.onsuccess = () => resolve(value);
-          request.onerror = reject;
+          request.addEventListener('error', reject);
         })
         .catch(reject);
     });
@@ -80,7 +80,7 @@ export default class LocalDB {
           const request = db.delete(key);
 
           request.onsuccess = () => resolve(key);
-          request.onerror = reject;
+          request.addEventListener('error', reject);
         })
         .catch(reject);
     });
@@ -88,12 +88,12 @@ export default class LocalDB {
 
   public keys(): Promise<KeyType[]> {
     return new Promise((resolve, reject) => {
-      this.getDBStore("readonly")
+      this.getDBStore('readonly')
         .then((db) => {
           const request = db.getAllKeys();
 
           request.onsuccess = () => resolve(request.result);
-          request.onerror = reject;
+          request.addEventListener('error', reject);
         })
         .catch(reject);
     });
@@ -105,8 +105,8 @@ export default class LocalDB {
         .then((db) => {
           const request = db.clear();
 
-          request.onsuccess = () => resolve("clear");
-          request.onerror = reject;
+          request.onsuccess = () => resolve('clear');
+          request.addEventListener('error', reject);
         })
         .catch(reject);
     });

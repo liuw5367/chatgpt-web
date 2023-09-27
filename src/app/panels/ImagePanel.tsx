@@ -10,7 +10,7 @@ import {
   PopoverTrigger,
   SimpleGrid,
   useToast,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 import {
   IconClearAll,
   IconEraser,
@@ -18,25 +18,25 @@ import {
   IconHistory,
   IconInfoSquare,
   IconLoader3,
-} from "@tabler/icons-react";
-import React, { useEffect, useState } from "react";
+} from '@tabler/icons-react';
+import React, { useEffect, useState } from 'react';
 
-import { AutoResizeTextarea, SimpleDrawer } from "../../components";
-import { CacheKeys } from "../../constants";
-import { useTranslation } from "../i18n";
-import { chatConfigStore, visibleStore } from "../store";
-import { request } from "../utils";
+import { AutoResizeTextarea, SimpleDrawer } from '../../components';
+import { CacheKeys } from '../../constants';
+import { useTranslation } from '../i18n';
+import { chatConfigStore, visibleStore } from '../store';
+import { request } from '../utils';
 
 type ImageItem = { prompt: string; url: string };
 
 export function ImagePanel() {
   const { t } = useTranslation();
-  const toast = useToast({ position: "top", isClosable: true });
+  const toast = useToast({ position: 'top', isClosable: true });
 
   const chatConfig = chatConfigStore();
   const imageVisible = visibleStore((s) => s.imageVisible);
 
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [abortController, setAbortController] = useState<AbortController>();
   const [historyList, setHistoryList] = useState<ImageItem[]>([]);
@@ -44,7 +44,7 @@ export function ImagePanel() {
 
   useEffect(() => {
     if (imageVisible) {
-      setHistoryList(JSON.parse(localStorage.getItem(CacheKeys.IMAGE_LIST) || "[]"));
+      setHistoryList(JSON.parse(localStorage.getItem(CacheKeys.IMAGE_LIST) || '[]'));
     }
   }, [imageVisible]);
 
@@ -55,12 +55,12 @@ export function ImagePanel() {
   }, [abortController]);
 
   function handleClose() {
-    visibleStore.setState({ imageVisible: true });
+    visibleStore.setState({ imageVisible: false });
   }
 
   async function handleSend() {
     if (!prompt?.trim()) {
-      toast({ status: "info", title: t("please enter prompt") });
+      toast({ status: 'info', title: t('please enter prompt') });
       return;
     }
     setLoading(true);
@@ -68,8 +68,8 @@ export function ImagePanel() {
       const controller = new AbortController();
       setAbortController(controller);
 
-      const response = await request("/api/image", {
-        method: "POST",
+      const response = await request('/api/image', {
+        method: 'POST',
         signal: controller.signal,
         body: JSON.stringify({
           apiKey: chatConfig.openAIKey,
@@ -79,7 +79,7 @@ export function ImagePanel() {
 
       const json = await response.json();
       if (json.error?.code) {
-        toast({ status: "error", title: json.error.code, description: json.error.message });
+        toast({ status: 'error', title: json.error.code, description: json.error.message });
       } else {
         if (json.data && Array.isArray(json.data)) {
           const data = json.data.map(({ url }: any) => ({ prompt, url }));
@@ -87,8 +87,8 @@ export function ImagePanel() {
           addToHistory(data);
         }
       }
-    } catch (e: any) {
-      toast({ status: "error", title: e.name, description: e.message });
+    } catch (error: any) {
+      toast({ status: 'error', title: error.name, description: error.message });
     }
     setLoading(false);
     setAbortController(undefined);
@@ -117,13 +117,13 @@ export function ImagePanel() {
   }
 
   return (
-    <SimpleDrawer isOpen={imageVisible} onClose={handleClose} size="lg" header={t("Image Create")}>
+    <SimpleDrawer isOpen={imageVisible} onClose={handleClose} size="lg" header={t('Image Create')}>
       <div className="h-full w-full flex flex-col space-y-3">
         <AutoResizeTextarea
           className="!min-h-[84px]"
           minRows={3}
           maxRows={10}
-          placeholder={t("please enter prompt") ?? ""}
+          placeholder={t('please enter prompt') ?? ''}
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
         />
@@ -137,7 +137,7 @@ export function ImagePanel() {
               variant="solid"
               icon={<IconHistory stroke={1.5} />}
             />
-            {imageList.length === 0 && historyList.length !== 0 && (
+            {imageList.length === 0 && historyList.length > 0 && (
               <IconButton
                 title="Clear History"
                 aria-label="Clear"
@@ -150,19 +150,19 @@ export function ImagePanel() {
             <IconButton
               title="Clear TextArea"
               aria-label="Eraser"
-              onClick={() => setPrompt("")}
+              onClick={() => setPrompt('')}
               colorScheme="gray"
               variant="solid"
               icon={<IconEraser stroke={1.5} />}
             />
             <Button
               title="Send"
-              colorScheme={loading ? "red" : "teal"}
-              variant={loading ? "outline" : "solid"}
+              colorScheme={loading ? 'red' : 'teal'}
+              variant={loading ? 'outline' : 'solid'}
               onClick={handleSend}
               leftIcon={loading ? <IconLoader3 stroke={1.5} className="rotate-img" /> : undefined}
             >
-              {loading ? t("Generating") : t("Generate")}
+              {loading ? t('Generating') : t('Generate')}
             </Button>
           </div>
         </div>
@@ -198,7 +198,7 @@ export function ImagePanel() {
                   aria-label="OpenExternal"
                   icon={<IconExternalLink stroke={1.5} />}
                   colorScheme="blackAlpha"
-                  onClick={() => window.open(url, "_blank")}
+                  onClick={() => window.open(url, '_blank')}
                 />
               </div>
             </div>

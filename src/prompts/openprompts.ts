@@ -1,4 +1,4 @@
-import data from "./openprompts.json";
+import data from './openprompts.json';
 
 const openPrompts = data.map((item) => {
   const { name, description, prompt } = item;

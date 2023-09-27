@@ -1,4 +1,4 @@
-import { Button, IconButton, Input, Link } from "@chakra-ui/react";
+import { Button, IconButton, Input, Link } from '@chakra-ui/react';
 import {
   IconBrandGithub,
   IconCheck,
@@ -7,21 +7,21 @@ import {
   IconPlus,
   IconTrash,
   IconX,
-} from "@tabler/icons-react";
-import { cloneDeep } from "lodash";
-import { useState } from "react";
+} from '@tabler/icons-react';
+import { cloneDeep } from 'lodash';
+import { useState } from 'react';
 
-import { SimpleDrawer } from "../../components";
-import { localDB } from "../../utils/LocalDB";
-import { scrollToPageBottom } from "../chat";
-import { useTranslation } from "../i18n";
-import { Logo } from "../Logo";
-import { chatDataStore, chatListStore, visibleStore } from "../store";
-import type { ChatItem } from "../types";
-import { isMobile, uuid } from "../utils";
+import { SimpleDrawer } from '../../components';
+import { localDB } from '../../utils/LocalDB';
+import { scrollToPageBottom } from '../chat';
+import { useTranslation } from '../i18n';
+import { Logo } from '../Logo';
+import { chatDataStore, chatListStore, visibleStore } from '../store';
+import type { ChatItem } from '../types';
+import { isMobile, uuid } from '../utils';
 
 interface Props {
-  type?: "side" | "drawer";
+  type?: 'side' | 'drawer';
   sideWidth?: string;
   chatVisible: boolean;
 }
@@ -40,13 +40,13 @@ export function ChatPanel(props: Props) {
   }
 
   function handleClose() {
-    if (type === "side") return;
+    if (type === 'side') return;
     visibleStore.setState({ chatVisible: false });
   }
 
   function handleChatAddClick() {
     const id = uuid();
-    const item: ChatItem = { id, name: t("New Chat") + " " + id.substring(0, 6) };
+    const item: ChatItem = { id, name: t('New Chat') + ' ' + id.slice(0, 6) };
     chatListStore.setState(({ chatList }) => ({ chatList: [item, ...chatList] }));
   }
 
@@ -57,7 +57,7 @@ export function ChatPanel(props: Props) {
   function handleDelete(item: ChatItem) {
     if (chatList.length === 1) {
       const id = uuid();
-      const item: ChatItem = { id, name: t("New Chat"), selected: true };
+      const item: ChatItem = { id, name: t('New Chat'), selected: true };
       chatListStore.setState({ chatList: [item] });
       updateChatMessage(item);
       handleClose();
@@ -77,7 +77,7 @@ export function ChatPanel(props: Props) {
     if (item.id === currentChat.id) return;
 
     chatListStore.setState(({ chatList }) => {
-      chatList.forEach((v) => (v.selected = v.id === item.id));
+      for (const v of chatList) v.selected = v.id === item.id;
       return { chatList: cloneDeep(chatList) };
     });
     updateChatMessage(item);
@@ -85,7 +85,7 @@ export function ChatPanel(props: Props) {
   }
 
   function handleChangeLanguage() {
-    changeLanguage(language === "en" ? "zh" : "en");
+    changeLanguage(language === 'en' ? 'zh' : 'en');
   }
 
   return (
@@ -97,7 +97,7 @@ export function ChatPanel(props: Props) {
       placement="left"
       onClose={handleClose}
       header={
-        type === "side" ? null : (
+        type === 'side' ? null : (
           <div className="flex items-center font-medium space-x-2">
             <Logo />
           </div>
@@ -115,7 +115,7 @@ export function ChatPanel(props: Props) {
               onClick={handleChangeLanguage}
               leftIcon={<IconLanguageHiragana stroke={1.5} />}
             >
-              {t("language")}
+              {t('language')}
             </Button>
           </div>
 
@@ -125,7 +125,7 @@ export function ChatPanel(props: Props) {
             leftIcon={<IconPlus stroke={1.5} size="1.3rem" />}
             onClick={handleChatAddClick}
           >
-            {t("New Chat")}
+            {t('New Chat')}
           </Button>
         </div>
       }
@@ -180,7 +180,7 @@ function ChatItemView(props: ItemProps) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(mobileFlag)}
       className={`transition-all text-[14px] w-full flex flex-row items-center min-h-14 pl-3 pr-1 rounded-lg space-x-2 border cursor-pointer hover:bg-teal-700/5 hover:border-teal-700/80 ${
-        selected && "border-teal-700 text-teal-700 border-2 font-medium bg-teal-700/5"
+        selected && 'border-teal-700 text-teal-700 border-2 font-medium bg-teal-700/5'
       }`}
     >
       {isEditing ? (
@@ -190,7 +190,7 @@ function ChatItemView(props: ItemProps) {
             value={changed}
             focusBorderColor="teal.600"
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (e.key === 'Enter') {
                 e.stopPropagation();
                 e.preventDefault();
                 handleSave();

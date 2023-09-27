@@ -1,12 +1,12 @@
-import Clipboard from "clipboard";
-import { v4 as uuidFn } from "uuid";
+import Clipboard from 'clipboard';
+import { v4 as uuidFn } from 'uuid';
 
 export function request(url: string, config: RequestInit) {
   return fetch(url, {
     ...config,
     headers: {
-      "Content-Type": "application/json",
-      "access-code": localStorage.getItem("accessCode") || "",
+      'Content-Type': 'application/json',
+      'access-code': localStorage.getItem('accessCode') || '',
       ...config.headers,
     },
   });
@@ -14,19 +14,19 @@ export function request(url: string, config: RequestInit) {
 
 export function uuid(replace = true) {
   if (!replace) return uuidFn();
-  return uuidFn().replaceAll("-", "");
+  return uuidFn().replaceAll('-', '');
 }
 
 export function scrollToElement(value: string | HTMLElement, option?: ScrollIntoViewOptions) {
   setTimeout(() => {
     let element;
-    if (typeof value === "string") {
+    if (typeof value === 'string') {
       element = document.getElementById(value);
     } else if (value) {
       element = value;
     }
     if (element && element.scrollIntoView) {
-      element.scrollIntoView({ behavior: "smooth", block: "center", ...option });
+      element.scrollIntoView({ behavior: 'smooth', block: 'center', ...option });
     }
   }, 40);
 }
@@ -37,29 +37,30 @@ export function getCurrentTime() {
 
 export function removeLn(content?: string): string {
   let result = content?.trim();
-  if (!result) return "";
-  while (result.startsWith("\n") || result.endsWith("\n")) {
-    if (result.startsWith("\n")) {
-      result = result.substring(2);
+  if (!result) return '';
+  while (result.startsWith('\n') || result.endsWith('\n')) {
+    if (result.startsWith('\n')) {
+      result = result.slice(2);
     }
-    if (result.endsWith("\n")) {
-      result = result.substring(0, result.length - 2);
+    if (result.endsWith('\n')) {
+      result = result.slice(0, -2);
     }
   }
   return result;
 }
 
 export function addCodeCopy() {
-  const clipboard = new Clipboard(".markdown-it-code-copy", {
+  const clipboard = new Clipboard('.markdown-it-code-copy', {
     text: function (trigger) {
-      return decodeURIComponent(trigger.getAttribute("data-clipboard-text") || "");
+      // eslint-disable-next-line unicorn/prefer-dom-node-dataset
+      return decodeURIComponent(trigger.getAttribute('data-clipboard-text') || '');
     },
   });
-  clipboard.on("success", function (e) {
-    const element = e.trigger?.getElementsByClassName("code-copy-content")?.[0];
+  clipboard.on('success', function (e) {
+    const element = e.trigger?.getElementsByClassName('code-copy-content')?.[0];
     if (element) {
-      element.innerHTML = "Copied!";
-      setTimeout(() => (element.innerHTML = ""), 1000);
+      element.innerHTML = 'Copied!';
+      setTimeout(() => (element.innerHTML = ''), 1000);
     }
   });
 }
@@ -68,21 +69,21 @@ export async function readFileAsString(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     try {
       const reader = new FileReader();
-      reader.readAsText(file, "UTF-8");
-      reader.onload = function (event) {
+      reader.readAsText(file, 'utf8');
+      reader.addEventListener('load', function (event) {
         const result = event.target?.result;
-        if (typeof result === "string") {
+        if (typeof result === 'string') {
           resolve(result);
         } else {
           reject();
         }
-      };
-    } catch (e) {
-      reject(e);
+      });
+    } catch (error) {
+      reject(error);
     }
   });
 }
 
 export function isMobile() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent);
 }

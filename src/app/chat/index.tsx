@@ -1,4 +1,4 @@
-import { Button, IconButton, Progress, useToast } from "@chakra-ui/react";
+import { Button, IconButton, Progress, useToast } from '@chakra-ui/react';
 import {
   IconAdjustmentsAlt,
   IconAdjustmentsPlus,
@@ -11,41 +11,41 @@ import {
   IconMicrophoneOff,
   IconPlayerPause,
   IconPlayerPlay,
-} from "@tabler/icons-react";
-import { useDebounceEffect, useDebounceFn, useMemoizedFn } from "ahooks";
-import React, { createRef, useEffect, useRef, useState } from "react";
+} from '@tabler/icons-react';
+import { useDebounceEffect, useDebounceFn, useMemoizedFn } from 'ahooks';
+import React, { createRef, useEffect, useRef, useState } from 'react';
 
-import { AutoResizeTextarea } from "../../components/AutoResizeTextarea";
-import { localDB } from "../../utils/LocalDB";
-import VoiceView, { VoiceRef } from "../ai";
-import { ASRStatusEnum } from "../ai/ASRView";
-import { getUnisoundKeySecret, hasUnisoundConfig } from "../ai/Config";
-import { TTSStatusEnum } from "../ai/TTSView";
-import { useTranslation } from "../i18n";
-import { chatConfigStore, chatDataStore, chatListStore, visibleStore } from "../store";
-import type { ChatMessage } from "../types";
-import { getCurrentTime, removeLn, request, scrollToElement, uuid } from "../utils";
-import { Command } from "./Command";
-import ErrorItem from "./ErrorItem";
-import { MessageItem } from "./MessageItem";
-import { SearchSuggestions } from "./SearchSuggestions";
-import { estimateTokens } from "./token";
-import { UsageTips } from "./UsageTips";
+import { AutoResizeTextarea } from '../../components/AutoResizeTextarea';
+import { localDB } from '../../utils/LocalDB';
+import type { VoiceRef } from '../ai';
+import VoiceView from '../ai';
+import { ASRStatusEnum } from '../ai/ASRView';
+import { getUnisoundKeySecret, hasUnisoundConfig } from '../ai/Config';
+import { TTSStatusEnum } from '../ai/TTSView';
+import { useTranslation } from '../i18n';
+import { chatConfigStore, chatDataStore, chatListStore, visibleStore } from '../store';
+import type { ChatMessage } from '../types';
+import { getCurrentTime, removeLn, request, scrollToElement, uuid } from '../utils';
+import { Command } from './Command';
+import ErrorItem from './ErrorItem';
+import { MessageItem } from './MessageItem';
+import { SearchSuggestions } from './SearchSuggestions';
+import { estimateTokens } from './token';
+import { UsageTips } from './UsageTips';
 
 export default function Page() {
   const { t } = useTranslation();
-  const toast = useToast({ position: "top", isClosable: true });
+  const toast = useToast({ position: 'top', isClosable: true });
   const messageList = chatDataStore((s) => s.data);
   const currentChat = chatListStore((s) => s.currentChat());
   const updateChat = chatListStore((s) => s.updateChat);
 
   const chatConfig = chatConfigStore();
-  const enterSend = chatConfig.enterSend === "1";
-  const { conversationId } = currentChat;
+  const enterSend = chatConfig.enterSend === '1';
   const inputRef = createRef<HTMLTextAreaElement>();
-  const [inputContent, setInputContent] = useState("");
+  const [inputContent, setInputContent] = useState('');
   const composingRef = useRef(false);
-  const [currentAssistantMessage, setCurrentAssistantMessage] = useState("");
+  const [currentAssistantMessage, setCurrentAssistantMessage] = useState('');
 
   const [asrState, setAsrState] = useState<ASRStatusEnum>(ASRStatusEnum.NORMAL);
   const [ttsState, setTtsState] = useState<TTSStatusEnum>(TTSStatusEnum.NORMAL);
@@ -56,7 +56,7 @@ export default function Page() {
 
   const [errorInfo, setErrorInfo] = useState<{ code: string; message?: string }>();
 
-  const asrResultRef = useRef("");
+  const asrResultRef = useRef('');
   const { run: scrollToBottom } = useDebounceFn((options?: ScrollIntoViewOptions) => scrollToPageBottom(options), {
     wait: 100,
     maxWait: 300,
@@ -67,7 +67,7 @@ export default function Page() {
   }, [currentChat.id]);
 
   useEffect(() => {
-    scrollToBottom({ behavior: "auto" });
+    scrollToBottom({ behavior: 'auto' });
   }, []);
 
   useDebounceEffect(() => {
@@ -83,7 +83,7 @@ export default function Page() {
     voiceRef.current?.stopTts();
   }
 
-  function playTTS(content: string = "") {
+  function playTTS(content: string = '') {
     voiceRef.current?.tts(content);
   }
 
@@ -97,7 +97,7 @@ export default function Page() {
   function checkUnisound() {
     const config = getUnisoundKeySecret();
     if (!config.KEY) {
-      toast({ status: "error", title: t("please enter unisound AppKey") });
+      toast({ status: 'error', title: t('please enter unisound AppKey') });
       return true;
     }
     return false;
@@ -106,15 +106,15 @@ export default function Page() {
   function handleTTSClick() {
     if (checkUnisound()) return;
 
-    if (ttsState !== TTSStatusEnum.NORMAL) {
-      stopTTS();
-    } else {
-      const data = [...messageList].filter((v) => v.role === "assistant").reverse();
+    if (ttsState === TTSStatusEnum.NORMAL) {
+      const data = [...messageList].filter((v) => v.role === 'assistant').reverse();
       const content = data?.[0]?.content;
       if (content) {
         voiceRef.current?.stopAsr();
         playTTS(content);
       }
+    } else {
+      stopTTS();
     }
   }
 
@@ -147,23 +147,23 @@ export default function Page() {
     messageList: ChatMessage[],
     question: ChatMessage,
     conversationId: string | undefined,
-    systemMessage?: string
+    systemMessage?: string,
   ) {
     let maxModelTokens = 4095;
     /** 发送出去的内容最多可使用的 token */
     let maxTokens = 3000;
 
-    const model = chatConfig.openAIModel || "";
+    const model = chatConfig.openAIModel || '';
 
-    if (model.toLowerCase().includes("32k")) {
+    if (model.toLowerCase().includes('32k')) {
       const maxResponseTokens = 8192;
-      maxModelTokens = 32768;
+      maxModelTokens = 32_768;
       maxTokens = maxModelTokens - maxResponseTokens;
-    } else if (model.toLowerCase().includes("16k")) {
+    } else if (model.toLowerCase().includes('16k')) {
       const maxResponseTokens = 4086;
-      maxModelTokens = 16384;
+      maxModelTokens = 16_384;
       maxTokens = maxModelTokens - maxResponseTokens;
-    } else if (model.toLowerCase().includes("gpt-4")) {
+    } else if (model.toLowerCase().includes('gpt-4')) {
       const maxResponseTokens = 2048;
       maxModelTokens = 8192;
       maxTokens = maxModelTokens - maxResponseTokens;
@@ -172,7 +172,7 @@ export default function Page() {
     let tokenCount = estimateTokens(question.content) + estimateTokens(systemMessage);
     const list: ChatMessage[] = [];
     if (conversationId) {
-      const conversationList = [...messageList.filter((v) => v.conversationId === conversationId)].reverse();
+      const conversationList = messageList.filter((v) => v.conversationId === conversationId).reverse();
       conversationList.some((item) => {
         const token = tokenCount + (item.token || 0);
         if (token > maxTokens) {
@@ -186,24 +186,24 @@ export default function Page() {
     }
     list.reverse();
 
-    console.log("messages token：", [tokenCount]);
+    console.log('messages token：', [tokenCount]);
 
     list.push(question);
     const messages = list.map(({ role, content }) => ({ role, content }));
     if (systemMessage) {
-      messages.unshift({ role: "system", content: systemMessage });
+      messages.unshift({ role: 'system', content: systemMessage });
     }
     return { messages };
   }
 
   async function sendMessage(inputValue = inputContent, systemMessage = currentChat.systemMessage) {
     if (chatLoading) {
-      toast({ status: "warning", title: t("Generating") });
+      toast({ status: 'warning', title: t('Generating') });
       return;
     }
     const content = removeLn(inputValue);
     if (!systemMessage && !content) {
-      toast({ status: "info", title: t("please enter content") });
+      toast({ status: 'info', title: t('please enter content') });
       return;
     }
     stopTTS();
@@ -211,16 +211,16 @@ export default function Page() {
 
     const question: ChatMessage = {
       id: uuid(),
-      role: "user",
+      role: 'user',
       content,
       time: getCurrentTime(),
       token: estimateTokens(content),
       prompt: systemMessage,
-      conversationId,
+      conversationId: currentChat.conversationId,
     };
     chatDataStore.setState({ data: [...messageList, question] });
-    setInputContent("");
-    asrResultRef.current = "";
+    setInputContent('');
+    asrResultRef.current = '';
     scrollToBottom();
 
     setChatLoading(true);
@@ -228,10 +228,10 @@ export default function Page() {
     const abortController = new AbortController();
     setAbortController(abortController);
 
-    let assistantMessage = "";
+    let assistantMessage = '';
 
     function onProgress(content: string) {
-      if (!content || (content === "\n" && assistantMessage.endsWith("\n"))) return;
+      if (!content || (content === '\n' && assistantMessage.endsWith('\n'))) return;
       setCurrentAssistantMessage((draft) => {
         assistantMessage = draft + content;
         return assistantMessage;
@@ -244,9 +244,9 @@ export default function Page() {
       const temperature = currentChat.temperature ?? chatConfig.temperature;
       const top_p = currentChat.top_p ?? chatConfig.top_p;
 
-      const { messages } = buildRequestMessages(messageList, question, conversationId, systemMessage);
-      const response = await request("/api/generate", {
-        method: "POST",
+      const { messages } = buildRequestMessages(messageList, question, currentChat.conversationId, systemMessage);
+      const response = await request('/api/generate', {
+        method: 'POST',
         signal: abortController.signal,
         body: JSON.stringify({
           messages,
@@ -267,22 +267,22 @@ export default function Page() {
             setErrorInfo(json.error as any);
             scrollToBottom();
           } else {
-            toast({ status: "error", title: t("toast.error.request") });
+            toast({ status: 'error', title: t('toast.error.request') });
           }
-        } catch (e) {
-          setErrorInfo({ code: response.status + "", message: response.statusText });
+        } catch {
+          setErrorInfo({ code: response.status + '', message: response.statusText });
         }
         setChatLoading(false);
         return;
       }
       if (!response.body) {
-        toast({ status: "warning", title: t("No Data") });
+        toast({ status: 'warning', title: t('No Data') });
         setChatLoading(false);
         return;
       }
       // 等待接口完全返回
       const reader = response.body.getReader();
-      const decoder = new TextDecoder("utf-8");
+      const decoder = new TextDecoder('utf8');
       let done = false;
 
       while (!done) {
@@ -290,14 +290,14 @@ export default function Page() {
         done = readerDone;
         onProgress(decoder.decode(value));
       }
-      addResultItem(content, assistantMessage, systemMessage, conversationId);
-    } catch (e) {
-      console.log(e);
-      addResultItem(content, assistantMessage, systemMessage, conversationId);
+      addResultItem(content, assistantMessage, systemMessage, currentChat.conversationId);
+    } catch (error) {
+      console.log(error);
+      addResultItem(content, assistantMessage, systemMessage, currentChat.conversationId);
     }
   }
 
-  function addResultItem(content: string, assistantMessage: string, prompt: string = "", conversationId?: string) {
+  function addResultItem(content: string, assistantMessage: string, prompt: string = '', conversationId?: string) {
     // 完整的返回值
     console.log([assistantMessage]);
     if (!assistantMessage) return;
@@ -307,7 +307,7 @@ export default function Page() {
         ...state.data,
         {
           id: uuid(),
-          role: "assistant",
+          role: 'assistant',
           content: assistantMessage,
           token: estimateTokens(assistantMessage),
           question: content,
@@ -317,7 +317,7 @@ export default function Page() {
       ],
     }));
     setChatLoading(false);
-    setCurrentAssistantMessage("");
+    setCurrentAssistantMessage('');
     scrollToBottom();
   }
 
@@ -325,13 +325,13 @@ export default function Page() {
     stopTTS();
     voiceRef.current?.stopAsr();
     stopGenerate();
-    setInputContent("");
-    asrResultRef.current = "";
+    setInputContent('');
+    asrResultRef.current = '';
     chatDataStore.setState({ data: [] });
   }
 
   async function handleRegenerate(item: ChatMessage) {
-    const content = item.role === "user" ? item.content : item.question;
+    const content = item.role === 'user' ? item.content : item.question;
     updateConversationId(item.conversationId);
     updateSystemPrompt(item.prompt);
     await sendMessage(content, item.prompt);
@@ -350,14 +350,14 @@ export default function Page() {
   }
 
   function handleConversationClick() {
-    if (conversationId) {
+    if (currentChat.conversationId) {
       updateConversationId();
       toast.closeAll();
-      toast({ status: "info", title: t("conversation.off") });
+      toast({ status: 'info', title: t('conversation.off') });
     } else {
       updateConversationId(uuid());
       toast.closeAll();
-      toast({ status: "success", title: t("conversation.on"), description: t("conversation.desc") });
+      toast({ status: 'success', title: t('conversation.on'), description: t('conversation.desc') });
     }
   }
 
@@ -366,8 +366,8 @@ export default function Page() {
       <div className="mb-4 flex flex-row items-center space-x-3">
         <Button
           onClick={() => handleSendClick()}
-          colorScheme={chatLoading ? "red" : "teal"}
-          variant={chatLoading ? "outline" : "solid"}
+          colorScheme={chatLoading ? 'red' : 'teal'}
+          variant={chatLoading ? 'outline' : 'solid'}
         >
           {chatLoading ? ( //
             <IconLoader3 stroke={1.5} className="rotate-img" />
@@ -383,8 +383,8 @@ export default function Page() {
             <IconButton
               aria-label="ASR" //
               onClick={handleASRClick}
-              colorScheme={asrState === ASRStatusEnum.RECORDING ? "red" : "gray"}
-              variant={asrState === ASRStatusEnum.RECORDING ? "outline" : "solid"}
+              colorScheme={asrState === ASRStatusEnum.RECORDING ? 'red' : 'gray'}
+              variant={asrState === ASRStatusEnum.RECORDING ? 'outline' : 'solid'}
               icon={
                 asrState === ASRStatusEnum.RECORDING ? (
                   <IconMicrophoneOff stroke={1.5} />
@@ -397,8 +397,8 @@ export default function Page() {
               <IconButton
                 aria-label="TTS" //
                 onClick={handleTTSClick}
-                colorScheme={ttsState === TTSStatusEnum.PLAYING ? "red" : "gray"}
-                variant={ttsState === TTSStatusEnum.PLAYING ? "outline" : "solid"}
+                colorScheme={ttsState === TTSStatusEnum.PLAYING ? 'red' : 'gray'}
+                variant={ttsState === TTSStatusEnum.PLAYING ? 'outline' : 'solid'}
                 icon={
                   ttsState === TTSStatusEnum.PLAYING ? (
                     <IconPlayerPause stroke={1.5} />
@@ -413,14 +413,14 @@ export default function Page() {
         <IconButton
           aria-label="Conversation"
           title="Continuous conversation"
-          colorScheme={conversationId ? "green" : "gray"}
-          icon={conversationId ? <IconMessages stroke={1.5} /> : <IconMessagesOff stroke={1.5} />}
+          colorScheme={currentChat.conversationId ? 'green' : 'gray'}
+          icon={currentChat.conversationId ? <IconMessages stroke={1.5} /> : <IconMessagesOff stroke={1.5} />}
           onClick={handleConversationClick}
         />
         <IconButton
           aria-label="SystemPrompt"
           title={currentChat.systemMessage}
-          colorScheme={currentChat.systemMessage ? "telegram" : "gray"}
+          colorScheme={currentChat.systemMessage ? 'telegram' : 'gray'}
           icon={currentChat.systemMessage ? <IconAdjustmentsPlus stroke={1.5} /> : <IconAdjustmentsAlt stroke={1.5} />}
           onClick={() => {
             visibleStore.setState((state) => ({ promptVisible: !state.promptVisible }));
@@ -439,7 +439,7 @@ export default function Page() {
           inputRef.current?.focus();
         }}
       />
-      {chatConfig.searchSuggestions === "1" && (
+      {chatConfig.searchSuggestions === '1' && (
         <SearchSuggestions
           value={inputContent}
           onPromptClick={(v) => {
@@ -471,10 +471,10 @@ export default function Page() {
         ))}
         {currentAssistantMessage && (
           <MessageItem
-            key={"-1"}
+            key={'-1'}
             item={{
-              id: "-1",
-              role: "assistant",
+              id: '-1',
+              role: 'assistant',
               content: currentAssistantMessage,
             }}
           />
@@ -504,31 +504,31 @@ export default function Page() {
             ref={inputRef}
             minRows={2}
             maxRows={10}
-            enterKeyHint={enterSend ? "send" : undefined}
+            enterKeyHint={enterSend ? 'send' : undefined}
             className="placeholder:text-[14px]"
-            value={inputContent === "\n" ? "" : inputContent}
+            value={inputContent === '\n' ? '' : inputContent}
             onCompositionStart={() => (composingRef.current = true)}
             onCompositionEnd={() => (composingRef.current = false)}
-            placeholder={enterSend ? t("chat.enterPlaceholder") || "" : t("chat.placeholder") || ""}
+            placeholder={enterSend ? t('chat.enterPlaceholder') || '' : t('chat.placeholder') || ''}
             onChange={(e) => setInputContent(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "ArrowUp") {
+              if (e.key === 'ArrowUp') {
                 if (!inputContent?.trim()) {
-                  const content = [...messageList].reverse().find((v) => v.role === "user" && v.content)?.content;
+                  const content = [...messageList].reverse().find((v) => v.role === 'user' && v.content)?.content;
                   if (content) {
                     setInputContent(content);
                   }
                 }
                 return;
               }
-              if (enterSend && !composingRef.current && e.key === "Enter") {
+              if (enterSend && !composingRef.current && e.key === 'Enter') {
                 if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
                   return;
                 }
                 handleSendClick();
                 return;
               }
-              if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+              if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                 handleSendClick();
               }
             }}
@@ -548,5 +548,5 @@ export default function Page() {
 }
 
 export function scrollToPageBottom(options: ScrollIntoViewOptions = {}) {
-  scrollToElement("chat-bottom", { behavior: "smooth", block: "end", ...options });
+  scrollToElement('chat-bottom', { behavior: 'smooth', block: 'end', ...options });
 }

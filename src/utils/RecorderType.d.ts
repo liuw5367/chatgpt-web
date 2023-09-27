@@ -4,13 +4,13 @@ export type AudioProcessFn = (
   bufferDuration: number,
   bufferSampleRate: number,
   newBufferIdx: number,
-  asyncEnd?: () => void
+  asyncEnd?: () => void,
 ) => void;
 
 export class RecorderType {
   constructor(options: {
-    type: "mp3" | "wav" | "pcm";
-    sampleRate: 16000;
+    type: 'mp3' | 'wav' | 'pcm';
+    sampleRate: 16_000;
     bitRate: 16;
     /**
      * 录音实时回调，大约1秒调用12次本回调，buffers为开始到现在的所有录音pcm数据块(16位小端LE)
@@ -53,7 +53,7 @@ export class RecorderStatic {
   SampleData(
     pcmData: Int16Array[],
     pcmSampleRate: number,
-    newSampleRate: number
+    newSampleRate: number,
   ): {
     /**
      * 转换后的PCM结果(16位小端LE)，为一维数组，可直接new Blob([data],{type:"audio/pcm"})生成Blob文件
@@ -74,14 +74,14 @@ export class RecorderStatic {
   pcm2wav(
     data: {
       /** pcm的采样率 */
-      sampleRate: 16000;
+      sampleRate: 16_000;
       /** pcm的位数 取值：8 或 16  */
       bitRate: 16;
       /** pcm的blob对象  */
       blob: Blob;
     },
     success?: (wavBlob: Blob, duration: number) => void,
-    error?: (msg: string) => void
+    error?: (msg: string) => void,
   ): void;
 
   BufferStreamPlayer(option: BufferStreamPlayerOption): BufferStreamPlayerType;
@@ -141,7 +141,7 @@ export type BufferStreamPlayerOption = Partial<{
     inputData: any,
     sampleRate: number,
     success: (pcm: Int16Array, sampleRate: number) => void,
-    error: (msg) => void
+    error: (msg) => void,
   ) => void;
 }>;
 

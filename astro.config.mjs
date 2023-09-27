@@ -1,7 +1,7 @@
-import netlify from "@astrojs/netlify/edge-functions";
+import netlify from "@astrojs/netlify";
 import node from "@astrojs/node";
 import react from "@astrojs/react";
-import vercel from "@astrojs/vercel/edge";
+import vercel from "@astrojs/vercel/serverless";
 import { defineConfig } from "astro/config";
 import unocss from "unocss/astro";
 
@@ -9,9 +9,9 @@ import app from "./package.json" assert { type: "json" };
 
 const envAdapter = () => {
   if (process.env.OUTPUT === "vercel") {
-    return vercel();
+    return vercel({ edgeMiddleware: true });
   } else if (process.env.OUTPUT === "netlify") {
-    return netlify();
+    return netlify({ edgeMiddleware: true });
   } else {
     return node({ mode: "standalone" });
   }

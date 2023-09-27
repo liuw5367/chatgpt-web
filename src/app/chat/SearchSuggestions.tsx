@@ -1,24 +1,24 @@
-import { CloseButton } from "@chakra-ui/react";
-import { useDebounceEffect } from "ahooks";
-import { useEffect, useRef, useState } from "react";
+import { CloseButton } from '@chakra-ui/react';
+import { useDebounceEffect } from 'ahooks';
+import { useEffect, useRef, useState } from 'react';
 
-import { request, scrollToElement } from "../utils";
+import { request, scrollToElement } from '../utils';
 
 interface Props {
   value: string;
   onPromptClick?: (prompt: string) => void;
 }
 
-const TOP_ID = "search-suggestions-list-top";
+const TOP_ID = 'search-suggestions-list-top';
 
 function scrollToTop() {
-  scrollToElement(TOP_ID, { behavior: "auto" });
+  scrollToElement(TOP_ID, { behavior: 'auto' });
 }
 
 export function SearchSuggestions(props: Props) {
   const { value, onPromptClick } = props;
   const [promptList, setPromptList] = useState<string[]>([]);
-  const lastContentRef = useRef("");
+  const lastContentRef = useRef('');
   const valueRef = useRef(value);
 
   useEffect(() => {
@@ -30,11 +30,11 @@ export function SearchSuggestions(props: Props) {
       search();
     },
     [value],
-    { wait: 200, maxWait: 300 }
+    { wait: 200, maxWait: 300 },
   );
 
   async function search() {
-    if (!value?.trim() || value?.startsWith("/")) {
+    if (!value?.trim() || value?.startsWith('/')) {
       if (promptList.length > 0) {
         setPromptList([]);
       }
@@ -43,11 +43,11 @@ export function SearchSuggestions(props: Props) {
 
     const content = value?.trim();
     if (content === lastContentRef.current) return;
-    lastContentRef.current = "";
+    lastContentRef.current = '';
 
     try {
-      const response = await request("/api/search", {
-        method: "POST",
+      const response = await request('/api/search', {
+        method: 'POST',
         body: JSON.stringify({
           content,
         }),
@@ -62,8 +62,8 @@ export function SearchSuggestions(props: Props) {
         setPromptList(json.reverse());
         scrollToTop();
       }
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -74,8 +74,8 @@ export function SearchSuggestions(props: Props) {
       <div
         className={`relative rounded-lg w-full max-h-[35vh] flex flex-col items-end overflow-x-hidden overflow-y-auto p-1`}
         style={{
-          backgroundColor: "var(--chakra-colors-chakra-body-bg)",
-          border: "1px solid var(--chakra-colors-chakra-border-color)",
+          backgroundColor: 'var(--chakra-colors-chakra-body-bg)',
+          border: '1px solid var(--chakra-colors-chakra-border-color)',
         }}
       >
         <CloseButton className="sticky right-0 top-0" size="md" onClick={() => setPromptList([])} />

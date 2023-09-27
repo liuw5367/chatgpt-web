@@ -6,18 +6,18 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
-} from "@chakra-ui/react";
-import type React from "react";
+} from '@chakra-ui/react';
+import React from 'react';
 
 interface Props {
-  type?: "side" | "drawer";
+  type?: 'side' | 'drawer';
   sideWidth?: string;
 
   isOpen?: boolean;
   onClose: () => void;
 
   size?: string;
-  placement?: "left" | "right";
+  placement?: 'left' | 'right';
 
   header?: React.ReactNode;
   footer?: React.ReactNode;
@@ -25,24 +25,24 @@ interface Props {
 }
 
 export function SimpleDrawer(props: Props) {
-  const { isOpen = false, onClose, size = "sm", placement = "right", type = "drawer", sideWidth } = props;
+  const { isOpen = false, onClose, size = 'sm', placement = 'right', type = 'drawer', sideWidth } = props;
   const { header, footer, children } = props;
 
-  if (isOpen && type === "side") {
+  if (isOpen && type === 'side') {
     return (
       <div
-        className={`${sideWidth || "min-w-80 max-w-80"} h-full flex flex-col`}
+        className={`${sideWidth || 'min-w-80 max-w-80'} h-full flex flex-col`}
         style={
-          placement === "left"
-            ? { borderRight: "1px solid var(--chakra-colors-chakra-border-color)" }
-            : { borderLeft: "1px solid var(--chakra-colors-chakra-border-color)" }
+          placement === 'left'
+            ? { borderRight: '1px solid var(--chakra-colors-chakra-border-color)' }
+            : { borderLeft: '1px solid var(--chakra-colors-chakra-border-color)' }
         }
       >
-        {header && <div className={"px-6 py-4 font-bold"}>{header}</div>}
-        <div className={`px-6 pb-4 w-full flex-1 overflow-y-auto overflow-x-hidden ${header ? "pt-0" : "pt-4"}`}>
+        {header && <div className={'px-6 py-4 font-bold'}>{header}</div>}
+        <div className={`px-6 pb-4 w-full flex-1 overflow-y-auto overflow-x-hidden ${header ? 'pt-0' : 'pt-4'}`}>
           {children}
         </div>
-        {footer && <div className={"px-6 py-4"}>{footer}</div>}
+        {footer && <div className={'px-6 py-4'}>{footer}</div>}
       </div>
     );
   }

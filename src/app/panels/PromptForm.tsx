@@ -13,10 +13,10 @@ import {
   Textarea,
   useDisclosure,
   useToast,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
 
-import { useTranslation } from "../i18n";
+import { useTranslation } from '../i18n';
 
 interface Props {
   open?: boolean;
@@ -28,13 +28,13 @@ interface Props {
 
 export function PromptFormModal(props: Props) {
   const { name, desc, open, onSave, onClose } = props;
-  const toast = useToast({ position: "top", isClosable: true });
+  const toast = useToast({ position: 'top', isClosable: true });
   const { t } = useTranslation();
   const disclosure = useDisclosure();
-  const [data, setData] = useState<{ name: string; desc?: string }>({ name: "" });
+  const [data, setData] = useState<{ name: string; desc?: string }>({ name: '' });
 
   useEffect(() => {
-    setData({ name: name || "", desc });
+    setData({ name: name || '', desc });
   }, [name, desc]);
 
   useEffect(() => {
@@ -47,22 +47,22 @@ export function PromptFormModal(props: Props) {
 
   function handleSaveClick() {
     if (!data.name) {
-      toast({ status: "warning", title: "请输入名称" });
+      toast({ status: 'warning', title: '请输入名称' });
       return;
     }
     onSave?.(data.name, data.desc);
-    setData({ name: "" });
+    setData({ name: '' });
   }
 
   return (
     <Modal isOpen={disclosure.isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>{t("Save To Favorite")}</ModalHeader>
+        <ModalHeader>{t('Save To Favorite')}</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
           <FormControl isRequired>
-            <FormLabel>{t("Name")}</FormLabel>
+            <FormLabel>{t('Name')}</FormLabel>
             <Input
               focusBorderColor="teal.600"
               placeholder=""
@@ -72,7 +72,7 @@ export function PromptFormModal(props: Props) {
           </FormControl>
 
           <FormControl mt={4}>
-            <FormLabel>{t("Description")}</FormLabel>
+            <FormLabel>{t('Description')}</FormLabel>
             <Textarea
               focusBorderColor="teal.600"
               placeholder=""
@@ -85,10 +85,10 @@ export function PromptFormModal(props: Props) {
 
         <ModalFooter>
           <Button onClick={onClose} mr={3}>
-            {t("Cancel")}
+            {t('Cancel')}
           </Button>
           <Button colorScheme="teal" onClick={handleSaveClick}>
-            {t("Save")}
+            {t('Save')}
           </Button>
         </ModalFooter>
       </ModalContent>

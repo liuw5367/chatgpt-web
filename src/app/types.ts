@@ -1,6 +1,6 @@
-import type { ChatConfigType } from "./store";
+import type { ChatConfigType } from './store';
 
-export interface ChatItem extends Pick<ChatConfigType, "openAIModel" | "temperature" | "top_p"> {
+export interface ChatItem extends Pick<ChatConfigType, 'openAIModel' | 'temperature' | 'top_p'> {
   id: string;
   name: string;
   selected?: boolean;
@@ -10,7 +10,7 @@ export interface ChatItem extends Pick<ChatConfigType, "openAIModel" | "temperat
 }
 
 export interface ChatMessage {
-  role: "system" | "user" | "assistant";
+  role: 'system' | 'user' | 'assistant';
   content: string;
 
   id: string;

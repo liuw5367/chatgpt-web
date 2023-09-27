@@ -1,4 +1,5 @@
-import React, { ChangeEvent, useRef } from "react";
+import type { ChangeEvent } from 'react';
+import React, { useRef } from 'react';
 
 interface Props {
   accept?: string;
@@ -8,7 +9,7 @@ interface Props {
 }
 
 export function FileUpload(props: Props) {
-  const { multiple = false, accept = "", onChange, render } = props;
+  const { multiple = false, accept = '', onChange, render } = props;
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const handleClick = () => {

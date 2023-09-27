@@ -1,4 +1,4 @@
-import { IconRobot } from "@tabler/icons-react";
+import { IconRobot } from '@tabler/icons-react';
 
 export function Logo() {
   return (

@@ -1,10 +1,10 @@
-import { cloneDeep } from "lodash";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { cloneDeep } from 'lodash';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { t } from "./i18n";
-import type { ChatItem, ChatMessage } from "./types";
-import { uuid } from "./utils";
+import { t } from './i18n';
+import type { ChatItem, ChatMessage } from './types';
+import { uuid } from './utils';
 
 export interface ChatAtomType {
   currentChat: ChatItem;
@@ -27,17 +27,17 @@ export interface ChatConfigType {
   unisoundSecret?: string;
 }
 
-export const chatConfigStore = create<ChatConfigType, [["zustand/persist", ChatConfigType]]>(
+export const chatConfigStore = create<ChatConfigType, [['zustand/persist', ChatConfigType]]>(
   persist(
     (set, get) => ({
-      temperature: "0.6",
-      top_p: "1",
+      temperature: '0.6',
+      top_p: '1',
     }),
     {
-      name: "persist-chat-config",
+      name: 'persist-chat-config',
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
 export const chatDataStore = create<{ data: ChatMessage[] }>((setState, getState, store) => ({
@@ -68,7 +68,7 @@ interface ChatAction {
   updateChat: (id: string, value: Partial<ChatItem>) => void;
 }
 
-export const chatListStore = create<ChatState & ChatAction, [["zustand/persist", ChatState & ChatAction]]>(
+export const chatListStore = create<ChatState & ChatAction, [['zustand/persist', ChatState & ChatAction]]>(
   persist(
     (set, get) => ({
       chatList: [],
@@ -81,7 +81,7 @@ export const chatListStore = create<ChatState & ChatAction, [["zustand/persist",
         }
         if (!chat) {
           const id = uuid();
-          const item: ChatItem = { id, name: t("New Chat") + " " + id.substring(0, 6) };
+          const item: ChatItem = { id, name: t('New Chat') + ' ' + id.slice(0, 6) };
           set({ chatList: [item] });
           chat = item;
         }
@@ -105,8 +105,8 @@ export const chatListStore = create<ChatState & ChatAction, [["zustand/persist",
       },
     }),
     {
-      name: "persist-chat",
+      name: 'persist-chat',
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );

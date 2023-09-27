@@ -1,6 +1,7 @@
-import { IconButton, Input, InputGroup, InputRightElement } from "@chakra-ui/react";
-import { IconEye, IconEyeOff } from "@tabler/icons-react";
-import React, { ChangeEvent } from "react";
+import { IconButton, Input, InputGroup, InputRightElement } from '@chakra-ui/react';
+import { IconEye, IconEyeOff } from '@tabler/icons-react';
+import type { ChangeEvent } from 'react';
+import React from 'react';
 
 interface Props {
   className?: string;
@@ -17,7 +18,7 @@ export function PasswordInput(props: Props) {
   return (
     <InputGroup size="md" className={className}>
       <Input
-        type={show ? "text" : "password"}
+        type={show ? 'text' : 'password'}
         placeholder={placeholder}
         value={value}
         onChange={onChange}

@@ -1,12 +1,13 @@
-import { useToast } from "@chakra-ui/react";
-import { useMemoizedFn } from "ahooks";
-import sha256 from "crypto-js/sha256";
-import React, { useEffect, useImperativeHandle, useRef } from "react";
+import { useToast } from '@chakra-ui/react';
+import { useMemoizedFn } from 'ahooks';
+import sha256 from 'crypto-js/sha256';
+import React, { useEffect, useImperativeHandle, useRef } from 'react';
 
-import { createStreamPlayer } from "../../utils/Recorder";
-import type { BufferStreamPlayerType } from "../../utils/RecorderType";
-import { request } from "../utils";
-import { getUnisoundKeySecret, Speaker, TTS_CONFIG } from "./Config";
+import { createStreamPlayer } from '../../utils/Recorder';
+import type { BufferStreamPlayerType } from '../../utils/RecorderType';
+import { request } from '../utils';
+import type { Speaker } from './Config';
+import { getUnisoundKeySecret, TTS_CONFIG } from './Config';
 
 export enum TTSStatusEnum {
   NORMAL,
@@ -29,7 +30,7 @@ interface Props {
 }
 
 const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
-  const toast = useToast({ position: "top", isClosable: true });
+  const toast = useToast({ position: 'top', isClosable: true });
   const { onStatusChange, speaker, config = {} } = props;
 
   const socketRef = useRef<WebSocket>();
@@ -40,7 +41,7 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     () => {
       return { start, stop };
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -53,80 +54,80 @@ const TTSView = React.forwardRef<TTSRef, Props>((props, ref) => {
     if (!inputContent.trim()) return;
     let content = inputContent;
     if (content.length > 500) {
-      content = content.substring(0, 500);
+      content = content.slice(0, 500);
     }
 
     const chatConfig = getUnisoundKeySecret();
     const appKey = chatConfig.KEY;
     const secret = chatConfig.SECRET;
-    const time: number = +new Date();
+    const time: number = Date.now();
     let sign: string;
     if (secret) {
       sign = sha256(`${appKey}${time}${secret}`).toString().toUpperCase();
     } else {
       try {
-        const response = await request("/api/unisound", {
-          method: "POST",
+        const response = await request('/api/unisound', {
+          method: 'POST',
           body: JSON.stringify({ key: appKey, time }),
         });
         if (!response.ok) {
           const json = await response.json();
-          throw Error(json?.error?.code);
+          throw new Error(json?.error?.code);
         }
         const json = await response.json();
         sign = json.sign;
-      } catch (e: any) {
-        console.log(e);
-        toast({ status: "error", title: e.message || "asr sign error" });
+      } catch (error: any) {
+        console.log(error);
+        toast({ status: 'error', title: error.message || 'asr sign error' });
         return;
       }
     }
 
     const socket = new WebSocket(`${TTS_CONFIG.SOCKET_URL}?appkey=${appKey}&time=${time}&sign=${sign}`);
     socketRef.current = socket;
-    socket.binaryType = "arraybuffer";
+    socket.binaryType = 'arraybuffer';
 
     const player = createStreamPlayer(playerStop);
     playerRef.current = player;
 
-    socket.onopen = () => {
+    socket.addEventListener('open', () => {
       onStatusChange?.(TTSStatusEnum.PLAYING);
       player.start();
 
       socket.send(
         JSON.stringify({
-          format: "pcm",
+          format: 'pcm',
           vcn: speaker.code,
           text: content,
-          sample: 16000,
+          sample: 16_000,
           speed: 50,
           volume: 50,
           pitch: 50,
           bright: 50,
           ...config,
-        })
+        }),
       );
-    };
-    socket.onmessage = (res) => {
+    });
+    socket.addEventListener('message', (res) => {
       try {
         const result = JSON.parse(res.data);
         socket.close();
         if (result.code !== 0) {
-          toast({ status: "error", title: "合成遇到点问题，请稍后再试" });
+          toast({ status: 'error', title: '合成遇到点问题，请稍后再试' });
           onStatusChange?.(TTSStatusEnum.NORMAL);
           player && player.stop();
         }
-      } catch (e) {
+      } catch {
         player && player.input(res.data);
         // console.log('tts socket onmessage', e);
       }
-    };
-    socket.onclose = (e) => {
-      console.log("tts socket onclose", e);
-    };
-    socket.onerror = (e) => {
-      console.log("tts socket onerror", e);
-    };
+    });
+    socket.addEventListener('close', (e) => {
+      console.log('tts socket onclose', e);
+    });
+    socket.addEventListener('error', (e) => {
+      console.log('tts socket onerror', e);
+    });
   });
 
   const start = useMemoizedFn((content: string) => {

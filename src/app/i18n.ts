@@ -1,23 +1,23 @@
-import { useMemoizedFn } from "ahooks";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { useMemoizedFn } from 'ahooks';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
-import localeEn from "../locales/en.json";
-import localeZh from "../locales/zh.json";
+import localeEn from '../locales/en.json';
+import localeZh from '../locales/zh.json';
 
 interface State {
   language?: string;
 }
-export const i18nStore = create<State, [["zustand/persist", State]]>(
+export const i18nStore = create<State, [['zustand/persist', State]]>(
   persist(
     (set, get) => ({
       language: undefined,
     }),
     {
-      name: "persist-i18n",
+      name: 'persist-i18n',
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
 export function useTranslation() {
@@ -25,7 +25,7 @@ export function useTranslation() {
   const currentLanguage = language || navigator.language;
 
   const t = useMemoizedFn((key: string): string => {
-    const isZh = currentLanguage.toLowerCase().includes("zh");
+    const isZh = currentLanguage.toLowerCase().includes('zh');
     if (isZh) {
       return getValue(localeZh, key) || key;
     }
@@ -40,11 +40,11 @@ export function useTranslation() {
 }
 
 function getValue(data: any, key: string) {
-  const keys = key.split(".");
+  const keys = key.split('.');
   let value = data;
-  for (let i = 0; i < keys.length; i++) {
+  for (const key_ of keys) {
     // @ts-ignore
-    value = value[keys[i]];
+    value = value[key_];
   }
   return value;
 }
@@ -52,7 +52,7 @@ function getValue(data: any, key: string) {
 export function t(key: string) {
   const language = i18nStore.getState().language;
   const currentLanguage = language || navigator.language;
-  const isZh = currentLanguage.toLowerCase().includes("zh");
+  const isZh = currentLanguage.toLowerCase().includes('zh');
   if (isZh) {
     return getValue(localeZh, key) || key;
   }

@@ -1,4 +1,4 @@
-import { Button, IconButton, Tab, TabList, Tabs, Textarea, useToast } from "@chakra-ui/react";
+import { Button, IconButton, Tab, TabList, Tabs, Textarea, useToast } from '@chakra-ui/react';
 import {
   IconCsv,
   IconEraser,
@@ -8,26 +8,28 @@ import {
   IconStarFilled,
   IconStarHalfFilled,
   IconTrash,
-} from "@tabler/icons-react";
-import { ChakraStylesConfig, Select as SearchSelect } from "chakra-react-select";
-import { parse as parseCsv, unparse as unparseCsv } from "papaparse";
-import React, { useEffect, useState } from "react";
+} from '@tabler/icons-react';
+import type { ChakraStylesConfig } from 'chakra-react-select';
+import { Select as SearchSelect } from 'chakra-react-select';
+import { parse as parseCsv, unparse as unparseCsv } from 'papaparse';
+import React, { useEffect, useState } from 'react';
 
-import { FileUpload, SimpleDrawer } from "../../components";
-import { CacheKeys } from "../../constants";
-import { allPrompts, OptionType } from "../../prompts";
-import { localDB } from "../../utils/LocalDB";
-import { estimateTokens } from "../chat/token";
-import { useTranslation } from "../i18n";
-import { chatConfigStore, chatListStore, visibleStore } from "../store";
-import type { ChatItem } from "../types";
-import { readFileAsString, uuid } from "../utils";
-import { PromptFormModal } from "./PromptForm";
-import type { SettingItemType } from "./SettingPanel";
-import { SettingItem } from "./SettingPanel";
+import { FileUpload, SimpleDrawer } from '../../components';
+import { CacheKeys } from '../../constants';
+import type { OptionType } from '../../prompts';
+import { allPrompts } from '../../prompts';
+import { localDB } from '../../utils/LocalDB';
+import { estimateTokens } from '../chat/token';
+import { useTranslation } from '../i18n';
+import { chatConfigStore, chatListStore, visibleStore } from '../store';
+import type { ChatItem } from '../types';
+import { readFileAsString, uuid } from '../utils';
+import { PromptFormModal } from './PromptForm';
+import type { SettingItemType } from './SettingPanel';
+import { SettingItem } from './SettingPanel';
 
 interface Props {
-  type?: "side" | "drawer";
+  type?: 'side' | 'drawer';
   sideWidth?: string;
   promptVisible: boolean;
 }
@@ -40,9 +42,9 @@ interface LabelValue {
 export function SystemPromptPanel(props: Props) {
   const { promptVisible, type, sideWidth } = props;
   const { t, language } = useTranslation();
-  const toast = useToast({ position: "top", isClosable: true });
+  const toast = useToast({ position: 'top', isClosable: true });
   const currentChat = chatListStore((s) => s.currentChat());
-  const { systemMessage = "" } = currentChat;
+  const { id: chatId, systemMessage = '' } = currentChat;
   const [token, setToken] = useState(0);
 
   const [tabList, setTabList] = useState<LabelValue[]>([]);
@@ -61,21 +63,21 @@ export function SystemPromptPanel(props: Props) {
   const [dataRefreshKey, setDataRefreshKey] = useState(0);
 
   const panelTabList: LabelValue[] = [
-    { label: t("System Prompt"), value: "prompt" },
-    { label: t("Chat Settings"), value: "setting" },
+    { label: t('System Prompt'), value: 'prompt' },
+    { label: t('Chat Settings'), value: 'setting' },
   ];
   const [panelTabIndex, setPanelTabIndex] = useState(0);
 
   useEffect(() => {
     if (!promptVisible) return;
     handleClear();
-    setPrompt(chatListStore.getState().currentChat().systemMessage || "");
+    setPrompt(chatListStore.getState().currentChat().systemMessage || '');
   }, [promptVisible]);
 
   useEffect(() => {
     if (!promptVisible) return;
     handleClear();
-    setPrompt(systemMessage || "");
+    setPrompt(systemMessage || '');
   }, [systemMessage]);
 
   useEffect(() => {
@@ -87,8 +89,8 @@ export function SystemPromptPanel(props: Props) {
     if (!key) return;
     setOptions(
       allData[key]?.map((item) => {
-        return { label: item.act, value: item.id || "" };
-      }) || []
+        return { label: item.act, value: item.id || '' };
+      }) || [],
     );
   }, [allData, tabList, tabIndex]);
 
@@ -99,15 +101,14 @@ export function SystemPromptPanel(props: Props) {
   async function load() {
     // 从缓存中加载收藏的数据
     if (!promptVisible) return;
-    const favoriteOptions = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_FAVORITE) || "[]") as OptionType[];
+    const favoriteOptions = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_FAVORITE) || '[]') as OptionType[];
     setFavoriteOptions(favoriteOptions);
 
-    const list = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_LIST) || "[]") as LabelValue[];
+    const list = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_LIST) || '[]') as LabelValue[];
     const notEmptyList: LabelValue[] = [];
 
     const promptList: { item: LabelValue; value: OptionType[] }[] = [];
-    for (let i = 0; i < list.length; i++) {
-      const item = list[i];
+    for (const item of list) {
       const value = ((await localDB.getItem(item.value)) || []) as OptionType[];
       if (value && value.length > 0) {
         promptList.push({ item, value });
@@ -123,15 +124,15 @@ export function SystemPromptPanel(props: Props) {
       default: allPrompts,
       favorite: favoriteOptions,
     };
-    promptList.forEach((item) => {
+    for (const item of promptList) {
       allData[item.item.value] = item.value;
-    });
+    }
     setAllData(allData);
 
-    const isZh = language?.toLowerCase()?.includes("zh");
+    const isZh = language?.toLowerCase()?.includes('zh');
     setTabList([
-      { label: isZh ? "默认" : "Default", value: "default" },
-      { label: isZh ? "收藏" : "Favorite", value: "favorite" },
+      { label: isZh ? '默认' : 'Default', value: 'default' },
+      { label: isZh ? '收藏' : 'Favorite', value: 'favorite' },
       ...promptList.map((v) => v.item),
     ]);
   }
@@ -145,7 +146,7 @@ export function SystemPromptPanel(props: Props) {
 
   function handleFavorite() {
     if (!prompt) {
-      toast({ status: "warning", title: t("please enter prompt") });
+      toast({ status: 'warning', title: t('please enter prompt') });
       return;
     }
     const item = favoriteOptions.find((v) => v.id === selectedPrompt?.id);
@@ -154,7 +155,7 @@ export function SystemPromptPanel(props: Props) {
       item.prompt = prompt;
       setFavoriteOptions([...favoriteOptions]);
       localStorage.setItem(CacheKeys.PROMPT_FAVORITE, JSON.stringify(favoriteOptions));
-      toast({ status: "success", title: t("Updated"), duration: 1000 });
+      toast({ status: 'success', title: t('Updated'), duration: 1000 });
     } else {
       setModalOpen(true);
     }
@@ -168,7 +169,7 @@ export function SystemPromptPanel(props: Props) {
     localStorage.setItem(CacheKeys.PROMPT_FAVORITE, JSON.stringify(data));
     setModalOpen(false);
     setDataRefreshKey(Date.now());
-    toast({ status: "success", title: t("Saved"), duration: 1000 });
+    toast({ status: 'success', title: t('Saved'), duration: 1000 });
   }
 
   function handleFavoriteDelete() {
@@ -177,7 +178,7 @@ export function SystemPromptPanel(props: Props) {
     localStorage.setItem(CacheKeys.PROMPT_FAVORITE, JSON.stringify(list));
     setDataRefreshKey(Date.now());
     handleClear();
-    toast({ status: "success", title: t("Deleted"), duration: 1000 });
+    toast({ status: 'success', title: t('Deleted'), duration: 1000 });
   }
 
   function handleDelete() {
@@ -185,7 +186,7 @@ export function SystemPromptPanel(props: Props) {
     options = options.filter((v) => v.id !== selectedPrompt?.id);
     if (options.length === 0) {
       localStorage.removeItem(currentTab.value);
-      let list = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_LIST) || "[]") as LabelValue[];
+      let list = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_LIST) || '[]') as LabelValue[];
       list = list.filter((v) => v.value !== currentTab.value);
       localStorage.setItem(CacheKeys.PROMPT_LIST, JSON.stringify(list));
     } else {
@@ -193,27 +194,27 @@ export function SystemPromptPanel(props: Props) {
     }
     setDataRefreshKey(Date.now());
     handleClear();
-    toast({ status: "success", title: t("Deleted"), duration: 1000 });
+    toast({ status: 'success', title: t('Deleted'), duration: 1000 });
   }
 
   function handleClose() {
-    if (type === "side") return;
+    if (type === 'side') return;
     visibleStore.setState({ promptVisible: false });
   }
 
   function handlePromptReset() {
     handleClear();
-    setPrompt(systemMessage || "");
+    setPrompt(systemMessage || '');
   }
 
   function handleClear() {
     setSelectedOption(null);
     setSelectedPrompt(undefined);
-    setPrompt("");
+    setPrompt('');
   }
 
   function updateSystemPrompt(prompt?: string) {
-    chatListStore.getState().updateChat(currentChat.id, { systemMessage: prompt });
+    chatListStore.getState().updateChat(chatId, { systemMessage: prompt });
   }
 
   function handleSaveClick() {
@@ -225,7 +226,7 @@ export function SystemPromptPanel(props: Props) {
   }
 
   function handleRemoveClick() {
-    toast({ status: "success", title: t("Removed"), duration: 1000 });
+    toast({ status: 'success', title: t('Removed'), duration: 1000 });
     updateSystemPrompt();
     handleClear();
     handleClose();
@@ -234,7 +235,7 @@ export function SystemPromptPanel(props: Props) {
   async function handleImport(file: File) {
     try {
       const fileName = file.name;
-      if (fileName.endsWith(".json")) {
+      if (fileName.endsWith('.json')) {
         const jsonString = await readFileAsString(file);
         const data = JSON.parse(jsonString) as { name: string; prompt: string; desc: string }[];
         const options = data.map((item) => {
@@ -242,7 +243,7 @@ export function SystemPromptPanel(props: Props) {
           return { id: uuid(), act: name, prompt, desc };
         });
         saveToCache(fileName, options);
-      } else if (fileName.endsWith(".csv")) {
+      } else if (fileName.endsWith('.csv')) {
         parseCsv(file, {
           complete(results) {
             const data = results.data as string[][];
@@ -254,20 +255,20 @@ export function SystemPromptPanel(props: Props) {
           },
         });
       }
-    } catch (e) {
-      toast({ status: "error", title: t("Import Error") });
+    } catch {
+      toast({ status: 'error', title: t('Import Error') });
     }
   }
 
   function saveToCache(name: string, options: OptionType[]) {
     if (!options || options.length === 0) return;
 
-    const fileName = name.replace(".json", "").replace(".csv", "");
-    const cache = localStorage.getItem(CacheKeys.PROMPT_LIST) || "[]";
+    const fileName = name.replace('.json', '').replace('.csv', '');
+    const cache = localStorage.getItem(CacheKeys.PROMPT_LIST) || '[]';
     const list = JSON.parse(cache) as LabelValue[];
     const exist = [...tabList.map((v) => v.label), ...list.map((v) => v.label)];
     if (exist.includes(fileName)) {
-      toast({ status: "error", title: t("File name already exists, please modify and upload again") });
+      toast({ status: 'error', title: t('File name already exists, please modify and upload again') });
       return;
     }
     const item: LabelValue = { label: fileName, value: uuid() };
@@ -277,14 +278,14 @@ export function SystemPromptPanel(props: Props) {
     setDataRefreshKey(Date.now());
   }
 
-  function handleExport(type: "json" | "csv") {
+  function handleExport(type: 'json' | 'csv') {
     const key = currentTab?.value;
-    if (type === "json") {
+    if (type === 'json') {
       const content = allData[key]?.map((item) => {
         const { act, prompt, desc } = item;
         return { name: act, prompt, desc };
       });
-      const data = "data:text/plain;charset=utf-8," + JSON.stringify(content);
+      const data = 'data:text/plain;charset=utf-8,' + JSON.stringify(content);
       download(`${currentTab?.label}.json`, data);
       return;
     }
@@ -293,16 +294,16 @@ export function SystemPromptPanel(props: Props) {
       return [item.act, item.prompt, item.desc];
     });
     const result = unparseCsv({
-      fields: ["name", "prompt", "desc"],
+      fields: ['name', 'prompt', 'desc'],
       data: content,
     });
 
-    const data = "data:text/csv;charset=utf-8," + result;
+    const data = 'data:text/csv;charset=utf-8,' + result;
     download(`${currentTab?.label}.csv`, data);
   }
 
   function download(name: string, data: string) {
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = data;
     link.download = name;
     link.click();
@@ -311,9 +312,9 @@ export function SystemPromptPanel(props: Props) {
   const chakraStyles: ChakraStylesConfig<LabelValue> = {
     dropdownIndicator: (provided) => ({
       ...provided,
-      background: "transparent",
+      background: 'transparent',
       p: 0,
-      w: "40px",
+      w: '40px',
     }),
   };
 
@@ -341,9 +342,7 @@ export function SystemPromptPanel(props: Props) {
           </Tabs>
           <div className="flex-1">
             <SearchSelect<LabelValue>
-              focusBorderColor="teal.600"
-              placeholder={t("Select Prompt")}
-              chakraStyles={chakraStyles}
+              placeholder={t('Select Prompt')}
               options={options}
               value={selectedOption}
               onChange={(option) => {
@@ -351,6 +350,9 @@ export function SystemPromptPanel(props: Props) {
                 setSelectedOption(option);
                 handleSelectedChange(option.value);
               }}
+              // @ts-ignore
+              focusBorderColor="teal.600"
+              chakraStyles={chakraStyles}
             />
           </div>
         </div>
@@ -361,10 +363,10 @@ export function SystemPromptPanel(props: Props) {
 
         <Textarea
           focusBorderColor="teal.600"
-          value={prompt ?? ""}
+          value={prompt ?? ''}
           onChange={(e) => setPrompt(e.target.value)}
           className="flex-1 text-[14px] !min-h-[50%] placeholder:text-[14px]"
-          placeholder={t("prompt.placeholder") || ""}
+          placeholder={t('prompt.placeholder') || ''}
         />
 
         <div className="flex flex-row items-center justify-between space-x-2">
@@ -375,19 +377,19 @@ export function SystemPromptPanel(props: Props) {
             <IconButton
               size="xs"
               aria-label="Clear"
-              title={t("Clear") || ""}
+              title={t('Clear') || ''}
               icon={<IconEraser size="1rem" stroke={1.5} />}
               onClick={handleClear}
             />
             <IconButton
               size="xs"
               aria-label="Favorite"
-              title={t("Favorite") || ""}
+              title={t('Favorite') || ''}
               onClick={handleFavorite}
               icon={
                 prompt === favoriteOptions.find((v) => v.id === selectedPrompt?.id)?.prompt ? (
                   <IconStarFilled size="1rem" stroke={1.5} />
-                ) : favoriteOptions.find((v) => v.id === selectedPrompt?.id) ? (
+                ) : favoriteOptions.some((v) => v.id === selectedPrompt?.id) ? (
                   <IconStarHalfFilled size="1rem" stroke={1.5} />
                 ) : (
                   <IconStar size="1rem" stroke={1.5} />
@@ -398,19 +400,19 @@ export function SystemPromptPanel(props: Props) {
               <IconButton
                 size="xs"
                 aria-label="Delete"
-                title={t("Delete Favorite") || ""}
+                title={t('Delete Favorite') || ''}
                 icon={<IconTrash size="1rem" stroke={1.5} />}
                 onClick={handleFavoriteDelete}
               />
             )}
             {selectedPrompt != null &&
               currentTab?.value != null &&
-              currentTab.value !== "default" &&
-              currentTab.value !== "favorite" && (
+              currentTab.value !== 'default' &&
+              currentTab.value !== 'favorite' && (
                 <IconButton
                   size="xs"
                   aria-label="Delete"
-                  title={t("Delete Favorite") || ""}
+                  title={t('Delete Favorite') || ''}
                   icon={<IconTrash size="1rem" stroke={1.5} />}
                   onClick={handleDelete}
                 />
@@ -424,7 +426,7 @@ export function SystemPromptPanel(props: Props) {
                 <IconButton
                   size="xs"
                   aria-label="Import"
-                  title={t("Import") || ""}
+                  title={t('Import') || ''}
                   icon={<IconFileImport size="1rem" stroke={1.5} />}
                   onClick={onClick}
                 />
@@ -433,16 +435,16 @@ export function SystemPromptPanel(props: Props) {
             <IconButton
               size="xs"
               aria-label="Export"
-              title={t("Export") || ""}
+              title={t('Export') || ''}
               icon={<IconCsv size="1rem" stroke={1.5} />}
-              onClick={() => handleExport("csv")}
+              onClick={() => handleExport('csv')}
             />
             <IconButton
               size="xs"
               aria-label="Export"
-              title={t("Export") || ""}
+              title={t('Export') || ''}
               icon={<IconJson size="1rem" stroke={1.5} />}
-              onClick={() => handleExport("json")}
+              onClick={() => handleExport('json')}
             />
           </div>
         </div>
@@ -479,20 +481,20 @@ export function SystemPromptPanel(props: Props) {
         panelTabIndex === 1 ? null : (
           <div className="w-full flex flex-row justify-between">
             <Button colorScheme="blue" onClick={handleRemoveClick}>
-              {t("Remove")}
+              {t('Remove')}
             </Button>
             <div className="flex flex-row">
-              {type !== "side" ? (
-                <Button variant="outline" mr={3} onClick={handleClose}>
-                  {t("Cancel")}
+              {type === 'side' ? (
+                <Button variant="outline" mr={3} onClick={handlePromptReset}>
+                  {t('Reset')}
                 </Button>
               ) : (
-                <Button variant="outline" mr={3} onClick={handlePromptReset}>
-                  {t("Reset")}
+                <Button variant="outline" mr={3} onClick={handleClose}>
+                  {t('Cancel')}
                 </Button>
               )}
               <Button colorScheme="teal" onClick={handleSaveClick}>
-                {t("Save")}
+                {t('Save')}
               </Button>
             </div>
           </div>
@@ -523,23 +525,23 @@ function ChatSetting(props: ChatSettingProps) {
   const { t } = useTranslation();
 
   const list: SettingItemType[] = [
-    { label: t("Name"), value: "name", placeholder: "" },
-    { label: "model", value: "openAIModel", type: "select", placeholder: "gpt-3.5-turbo" },
+    { label: t('Name'), value: 'name', placeholder: '' },
+    { label: 'model', value: 'openAIModel', type: 'select', placeholder: 'gpt-3.5-turbo' },
     {
-      type: "number",
-      label: "temperature",
-      value: "temperature",
+      type: 'number',
+      label: 'temperature',
+      value: 'temperature',
       max: 2,
-      placeholder: "",
-      desc: t("settings.temperature"),
+      placeholder: '',
+      desc: t('settings.temperature'),
     },
     {
-      type: "number",
-      label: "top_p",
-      value: "top_p",
+      type: 'number',
+      label: 'top_p',
+      value: 'top_p',
       max: 1,
-      placeholder: "",
-      desc: t("settings.top_p"),
+      placeholder: '',
+      desc: t('settings.top_p'),
     },
   ];
 

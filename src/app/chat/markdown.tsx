@@ -1,7 +1,7 @@
-import MarkdownIt from "markdown-it";
-import mdHighlight from "markdown-it-highlightjs";
+import MarkdownIt from 'markdown-it';
+import mdHighlight from 'markdown-it-highlightjs';
 // @ts-ignore
-import mdKatex from "markdown-it-katex";
+import mdKatex from 'markdown-it-katex';
 
 export function renderMarkdown(content: string) {
   const markdown = MarkdownIt({ linkify: true, breaks: true }).use(mdKatex).use(mdHighlight);

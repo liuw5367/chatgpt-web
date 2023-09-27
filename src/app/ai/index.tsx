@@ -1,9 +1,11 @@
-import { useMemoizedFn } from "ahooks";
-import React, { useImperativeHandle, useState } from "react";
+import { useMemoizedFn } from 'ahooks';
+import React, { useImperativeHandle, useState } from 'react';
 
-import ASRView, { ASRRef, ASRStatusEnum } from "./ASRView";
-import { defaultSpeaker } from "./Config";
-import TTSView, { TTSRef, TTSStatusEnum } from "./TTSView";
+import type { ASRRef } from './ASRView';
+import ASRView, { ASRStatusEnum } from './ASRView';
+import { defaultSpeaker } from './Config';
+import type { TTSRef } from './TTSView';
+import TTSView, { TTSStatusEnum } from './TTSView';
 
 export interface VoiceRef {
   asr: () => void;
@@ -31,7 +33,7 @@ const View = React.forwardRef<VoiceRef, Props>((props, ref) => {
     () => {
       return { asr, stopAsr, tts, stopTts };
     },
-    []
+    [],
   );
 
   const stopAsr = useMemoizedFn(() => {

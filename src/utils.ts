@@ -1,10 +1,10 @@
 export const ENV_KEY = import.meta.env.OPENAI_API_KEY || import.meta.env.PUBLIC_OPENAI_API_KEY;
-const ENV_HOST = import.meta.env.OPENAI_API_HOST || import.meta.env.PUBLIC_OPENAI_API_HOST || "https://api.openai.com";
-const ENV_MODEL = import.meta.env.OPENAI_API_MODEL || import.meta.env.PUBLIC_OPENAI_API_MODEL || "gpt-3.5-turbo";
+const ENV_HOST = import.meta.env.OPENAI_API_HOST || import.meta.env.PUBLIC_OPENAI_API_HOST || 'https://api.openai.com';
+const ENV_MODEL = import.meta.env.OPENAI_API_MODEL || import.meta.env.PUBLIC_OPENAI_API_MODEL || 'gpt-3.5-turbo';
 export const ENV_ACCESS_CODE = import.meta.env.ACCESS_CODE;
 
 export function getEnv() {
-  const key = ENV_ACCESS_CODE ? "" : ENV_KEY;
+  const key = ENV_ACCESS_CODE ? '' : ENV_KEY;
 
   return {
     HOST: ENV_HOST,
@@ -29,11 +29,7 @@ export function checkAccessCode(code?: string | null): [Response | null, boolean
   const accessCode = ENV_ACCESS_CODE;
   if (accessCode) {
     if (code) {
-      if (accessCode !== code) {
-        return [buildError({ code: "Access Code Error" }, 401), false];
-      } else {
-        return [null, true];
-      }
+      return accessCode === code ? [null, true] : [buildError({ code: 'Access Code Error' }, 401), false];
     } else {
       return [null, false];
     }

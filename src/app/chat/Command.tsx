@@ -1,23 +1,23 @@
-import { useDebounceEffect } from "ahooks";
-import { useEffect, useState } from "react";
+import { useDebounceEffect } from 'ahooks';
+import { useEffect, useState } from 'react';
 
-import { CacheKeys } from "../../constants";
-import type { OptionType } from "../../prompts";
-import { allPrompts } from "../../prompts";
-import { scrollToElement } from "../utils";
+import { CacheKeys } from '../../constants';
+import type { OptionType } from '../../prompts';
+import { allPrompts } from '../../prompts';
+import { scrollToElement } from '../utils';
 
 interface Props {
   value: string;
   onPromptClick?: (prompt: string) => void;
 }
 
-const TOP_ID = "command-list-top";
+const TOP_ID = 'command-list-top';
 function scrollToTop() {
-  scrollToElement(TOP_ID, { behavior: "auto" });
+  scrollToElement(TOP_ID, { behavior: 'auto' });
 }
 
 function getPrompts() {
-  const favorites = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_FAVORITE) || "[]") as OptionType[];
+  const favorites = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_FAVORITE) || '[]') as OptionType[];
   const defaultPrompts = allPrompts.slice(0, 100);
   return [...favorites, ...defaultPrompts].reverse();
 }
@@ -33,14 +33,14 @@ export function Command(props: Props) {
   useDebounceEffect(
     () => {
       let command = value?.trim();
-      if (command === "/") {
+      if (command === '/') {
         setPromptList(getPrompts());
         scrollToTop();
         return;
       }
       if (!command || command.length <= 1) return;
-      if (!command.startsWith("/")) return;
-      command = command.substring(1).toLowerCase();
+      if (!command.startsWith('/')) return;
+      command = command.slice(1).toLowerCase();
 
       const prompts = allPrompts.filter((item) => {
         return item.act.toLowerCase().includes(command) || item.prompt.toLowerCase().includes(command);
@@ -49,19 +49,19 @@ export function Command(props: Props) {
       scrollToTop();
     },
     [value],
-    { wait: 100, maxWait: 300 }
+    { wait: 100, maxWait: 300 },
   );
 
   if (promptList.length === 0) return null;
-  if (!value.startsWith("/")) return null;
+  if (!value.startsWith('/')) return null;
 
   return (
     <div className={`w-full flex flex-col justify-end`}>
       <div
         className={`rounded-lg w-full max-h-[40vh] overflow-x-hidden overflow-y-auto p-1`}
         style={{
-          backgroundColor: "var(--chakra-colors-chakra-body-bg)",
-          border: "1px solid var(--chakra-colors-chakra-border-color)",
+          backgroundColor: 'var(--chakra-colors-chakra-body-bg)',
+          border: '1px solid var(--chakra-colors-chakra-border-color)',
         }}
       >
         {promptList.map((item) => (

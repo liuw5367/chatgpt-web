@@ -1,12 +1,12 @@
-import { useToast } from "@chakra-ui/react";
-import { useMemoizedFn } from "ahooks";
-import sha256 from "crypto-js/sha256";
-import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useToast } from '@chakra-ui/react';
+import { useMemoizedFn } from 'ahooks';
+import sha256 from 'crypto-js/sha256';
+import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
-import { buffer2pcm, createRecorder } from "../../utils/Recorder";
-import type { AudioProcessFn, RecorderType } from "../../utils/RecorderType";
-import { request } from "../utils";
-import { APP_CONFIG, ASR_CONFIG, getUnisoundKeySecret } from "./Config";
+import { buffer2pcm, createRecorder } from '../../utils/Recorder';
+import type { AudioProcessFn, RecorderType } from '../../utils/RecorderType';
+import { request } from '../utils';
+import { APP_CONFIG, ASR_CONFIG, getUnisoundKeySecret } from './Config';
 
 export enum ASRStatusEnum {
   NORMAL,
@@ -27,10 +27,10 @@ interface Props {
   onBuffer?: (v: Int16Array[]) => void;
 }
 
-const langArr = ["cn", "sichuanese", "cantonese", "en"];
+const langArr = ['cn', 'sichuanese', 'cantonese', 'en'];
 
 const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
-  const toast = useToast({ position: "top", isClosable: true });
+  const toast = useToast({ position: 'top', isClosable: true });
   const { onStatusChange, onResultChange, onBuffer } = props;
 
   const [currentLang] = useState(0);
@@ -47,7 +47,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     () => {
       return { start, stop };
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -85,16 +85,16 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     recorderRef.current = recorder;
     recorder.open(
       () => {
-        console.log("recorder ready ...");
+        console.log('recorder ready ...');
         recorder.start();
         createSocket();
       },
       (msg) => {
-        toast({ status: "error", title: "录音启动失败 ", description: msg });
-        console.error("录音启动失败: " + msg);
+        toast({ status: 'error', title: '录音启动失败 ', description: msg });
+        console.error('录音启动失败: ' + msg);
         socketRef.current?.close();
         onStatusChange?.(ASRStatusEnum.NORMAL);
-      }
+      },
     );
   }
 
@@ -105,77 +105,77 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     const appKey = chatConfig.KEY;
     const secret = chatConfig.SECRET;
     const path = ASR_CONFIG.SOCKET_URL;
-    const time: number = +new Date();
+    const time: number = Date.now();
     let sign: string;
     if (secret) {
       sign = sha256(`${appKey}${time}${secret}`).toString().toUpperCase();
     } else {
       try {
-        const response = await request("/api/unisound", {
-          method: "POST",
+        const response = await request('/api/unisound', {
+          method: 'POST',
           body: JSON.stringify({ key: appKey, time }),
         });
         if (!response.ok) {
           const json = await response.json();
-          throw Error(json?.error?.code);
+          throw new Error(json?.error?.code);
         }
         const json = await response.json();
         sign = json.sign;
-      } catch (e: any) {
-        console.log(e);
-        toast({ status: "error", title: e.message || "asr sign error" });
+      } catch (error: any) {
+        console.log(error);
+        toast({ status: 'error', title: error.message || 'asr sign error' });
         return;
       }
     }
 
     const socket = new WebSocket(`${path}?appkey=${appKey}&time=${time}&sign=${sign}`);
     socketRef.current = socket;
-    socket.onopen = () => {
-      console.log("!!! socket open !!!");
+    socket.addEventListener('open', () => {
+      console.log('!!! socket open !!!');
       errorCountRef.current = 0;
       socket.send(
         JSON.stringify({
-          type: "start",
-          sha: "256",
+          type: 'start',
+          sha: '256',
           data: {
             lang: langArr[currentLang],
             appkey: appKey,
             userId: APP_CONFIG.USER_ID,
             udid: APP_CONFIG.UDID,
           },
-        })
+        }),
       );
-    };
+    });
 
-    socket.onmessage = (e) => {
+    socket.addEventListener('message', (e) => {
       const res = JSON.parse(e.data);
       if (res.code === 0 && res.text) {
         sid = res.sid;
         const { text } = res;
-        onResultChange?.(text, res.type === "variable");
+        onResultChange?.(text, res.type === 'variable');
       } else {
-        console.log("asr record end !", [closeRef.current], res, [new Date().toLocaleTimeString()]);
+        console.log('asr record end !', [closeRef.current], res, [new Date().toLocaleTimeString()]);
         if (closeRef.current) return;
         doStartRecording();
       }
-    };
+    });
 
-    socket.onerror = function (e) {
-      console.log("asr ws error", sid, [new Date().toLocaleTimeString()]);
+    socket.addEventListener('error', (e) => {
+      console.log('asr ws error', sid, [new Date().toLocaleTimeString()]);
       console.log(e);
       socketRef.current = null;
       retry();
-    };
+    });
 
-    socket.onclose = (e) => {
-      console.log("asr ws close", [sid], [new Date().toLocaleTimeString()]);
+    socket.addEventListener('close', (e) => {
+      console.log('asr ws close', [sid], [new Date().toLocaleTimeString()]);
       console.log(e);
       socketRef.current = null;
       if (e.code !== 1000) {
         if (closeRef.current) return;
         retry();
       }
-    };
+    });
   }
 
   function retry() {
@@ -213,7 +213,7 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
     const socket = socketRef.current;
     if (socket) {
       if (socket.readyState === 1) {
-        socket.send(JSON.stringify({ type: "end" }));
+        socket.send(JSON.stringify({ type: 'end' }));
       }
       socket.close();
     }
