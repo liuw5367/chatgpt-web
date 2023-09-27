@@ -24,7 +24,7 @@ interface Props {
   children?: React.ReactNode;
 }
 
-export default function SimpleDrawer(props: Props) {
+export function SimpleDrawer(props: Props) {
   const { isOpen = false, onClose, size = "sm", placement = "right", type = "drawer", sideWidth } = props;
   const { header, footer, children } = props;
 

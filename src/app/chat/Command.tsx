@@ -2,8 +2,8 @@ import { useDebounceEffect } from "ahooks";
 import { useEffect, useState } from "react";
 
 import { CacheKeys } from "../../constants";
-import type { OptionType } from "../prompts";
-import { allPrompts } from "../prompts";
+import type { OptionType } from "../../prompts";
+import { allPrompts } from "../../prompts";
 import { scrollToElement } from "../utils";
 
 interface Props {

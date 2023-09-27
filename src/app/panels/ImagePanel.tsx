@@ -11,7 +11,6 @@ import {
   SimpleGrid,
   useToast,
 } from "@chakra-ui/react";
-import { useStore } from "@nanostores/react";
 import {
   IconClearAll,
   IconEraser,
@@ -21,12 +20,11 @@ import {
   IconLoader3,
 } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 
+import { AutoResizeTextarea, SimpleDrawer } from "../../components";
 import { CacheKeys } from "../../constants";
-import { chatConfigAtom, visibleAtom } from "../atom";
-import { AutoResizeTextarea } from "../AutoResizeTextarea";
-import SimpleDrawer from "../SimpleDrawer";
+import { useTranslation } from "../i18n";
+import { chatConfigStore, visibleStore } from "../store";
 import { request } from "../utils";
 
 type ImageItem = { prompt: string; url: string };
@@ -35,8 +33,8 @@ export function ImagePanel() {
   const { t } = useTranslation();
   const toast = useToast({ position: "top", isClosable: true });
 
-  const chatConfig = useStore(chatConfigAtom);
-  const { imageVisible } = useStore(visibleAtom);
+  const chatConfig = chatConfigStore();
+  const imageVisible = visibleStore((s) => s.imageVisible);
 
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
@@ -57,7 +55,7 @@ export function ImagePanel() {
   }, [abortController]);
 
   function handleClose() {
-    visibleAtom.set({ ...visibleAtom.get(), imageVisible: false });
+    visibleStore.setState({ imageVisible: true });
   }
 
   async function handleSend() {

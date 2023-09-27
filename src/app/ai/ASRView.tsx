@@ -220,19 +220,6 @@ const ASRView = React.forwardRef<ASRRef, Props>((props, ref) => {
   }
 
   return null;
-  /*
-  return (
-    <div className="p-4 bg-light-600">
-      点击开始录音，请对我说想说的话，我可以识别出你说的内容。请允许浏览器获取麦克风权限。
-      <ul className="pt-4 children:mb-2" style={{ cursor: recording ? 'default' : 'pointer' }}>
-        <li onClick={() => !recording && setCurrentLang(0)}>普通话</li>
-        <li onClick={() => !recording && setCurrentLang(1)}>四川话</li>
-        <li onClick={() => !recording && setCurrentLang(2)}>粤语</li>
-        <li onClick={() => !recording && setCurrentLang(3)}>英语</li>
-      </ul>
-    </div>
-  );
-  */
 });
 
 export default ASRView;

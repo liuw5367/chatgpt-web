@@ -13,14 +13,12 @@ import {
   Switch,
   useToast,
 } from "@chakra-ui/react";
-import { useStore } from "@nanostores/react";
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 
+import { PasswordInput, SimpleDrawer } from "../../components";
 import { APP_VERSION } from "../../constants";
-import { chatConfigAtom, ChatConfigType, visibleAtom } from "../atom";
-import { PasswordInput } from "../PasswordInput";
-import SimpleDrawer from "../SimpleDrawer";
+import { useTranslation } from "../i18n";
+import { chatConfigStore, ChatConfigType, visibleStore } from "../store";
 import { request } from "../utils";
 
 export type SettingItemType<T = string> = {
@@ -40,12 +38,8 @@ const voiceList: SettingItemType[] = [
 const modelList = [
   { label: "gpt-3.5-turbo", value: "gpt-3.5-turbo" },
   { label: "gpt-3.5-turbo-16k", value: "gpt-3.5-turbo-16k" },
-  { label: "gpt-3.5-turbo-0613", value: "gpt-3.5-turbo-0613" },
-  { label: "gpt-3.5-turbo-16k-0613", value: "gpt-3.5-turbo-16k-0613" },
   { label: "gpt-4", value: "gpt-4" },
   { label: "gpt-4-32k", value: "gpt-4-32k" },
-  { label: "gpt-4-0613", value: "gpt-4-0613" },
-  { label: "gpt-4-32k-0613", value: "gpt-4-32k-0613" },
   { label: "text-davinci-003", value: "text-davinci-003" },
   { label: "text-davinci-002", value: "text-davinci-002" },
   { label: "code-davinci-002", value: "code-davinci-002" },
@@ -54,8 +48,8 @@ const modelList = [
 export function SettingPanel() {
   const { t } = useTranslation();
   const toast = useToast({ position: "top", isClosable: true });
-  const chatConfig = useStore(chatConfigAtom);
-  const { settingVisible } = useStore(visibleAtom);
+  const chatConfig = chatConfigStore();
+  const settingVisible = visibleStore((s) => s.settingVisible);
 
   const [config, setConfig] = useState({ ...chatConfig });
   const [balance, setBalance] = useState("");
@@ -69,9 +63,7 @@ export function SettingPanel() {
 
   useEffect(() => {
     if (settingVisible) {
-      const data = chatConfigAtom.get();
-      setConfig({ ...data });
-      requestUsage();
+      setConfig({ ...chatConfigStore.getState() });
     }
   }, [settingVisible]);
 
@@ -104,11 +96,11 @@ export function SettingPanel() {
   }
 
   function handleClose() {
-    visibleAtom.set({ ...visibleAtom.get(), settingVisible: false });
+    visibleStore.setState({ settingVisible: false });
   }
 
   function handleSaveClick() {
-    const draft = chatConfigAtom.get();
+    const draft = chatConfigStore.getState();
     const result = { ...draft, ...config };
     Object.entries(result).forEach(([key, value]) => {
       if (value == null || value.trim() === "") {
@@ -117,7 +109,7 @@ export function SettingPanel() {
         localStorage.setItem(key, value.trim());
       }
     });
-    chatConfigAtom.set(result);
+    chatConfigStore.setState(result);
     handleClose();
     toast({ status: "success", title: t("Success"), duration: 1000 });
   }
@@ -207,7 +199,7 @@ export function SettingPanel() {
 interface ItemProps {
   item: SettingItemType;
   value: string;
-  onChange: (v: string) => void;
+  onChange?: (v: string) => void;
   balance?: string;
 }
 
@@ -232,10 +224,10 @@ export function SettingItem({ item, value, onChange, balance }: ItemProps) {
           className="flex-1"
           placeholder={item.placeholder}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange?.(e.target.value)}
         />
       ) : item.type === "select" ? (
-        <Select value={value} onChange={(e) => onChange(e.target.value)}>
+        <Select value={value} onChange={(e) => onChange?.(e.target.value)}>
           {modelList.map((item) => (
             <option key={item.label} value={item.label}>
               {item.value}
@@ -243,7 +235,7 @@ export function SettingItem({ item, value, onChange, balance }: ItemProps) {
           ))}
         </Select>
       ) : item.type === "number" ? (
-        <NumberInput className="flex-1" min={0} max={item.max} step={0.1} value={value} onChange={(v) => onChange(v)}>
+        <NumberInput className="flex-1" min={0} max={item.max} step={0.1} value={value} onChange={(v) => onChange?.(v)}>
           <NumberInputField placeholder={item.placeholder} />
           <NumberInputStepper>
             <NumberIncrementStepper />
@@ -251,14 +243,18 @@ export function SettingItem({ item, value, onChange, balance }: ItemProps) {
           </NumberInputStepper>
         </NumberInput>
       ) : item.type === "switch" ? (
-        <Switch colorScheme="teal" isChecked={value === "1"} onChange={(e) => onChange(e.target.checked ? "1" : "0")} />
+        <Switch
+          colorScheme="teal"
+          isChecked={value === "1"}
+          onChange={(e) => onChange?.(e.target.checked ? "1" : "0")}
+        />
       ) : (
         <Input
           className="flex-1"
           focusBorderColor="teal.600"
           placeholder={item.placeholder}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange?.(e.target.value)}
         />
       )}
       {item.desc && <FormHelperText>{item.desc}</FormHelperText>}

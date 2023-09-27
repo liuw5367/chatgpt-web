@@ -2,8 +2,8 @@ import { IconButton, useColorMode } from "@chakra-ui/react";
 import { IconMenu2, IconMoonStars, IconPhoto, IconSettings, IconSun } from "@tabler/icons-react";
 import { Helmet } from "react-helmet";
 
-import { visibleAtom } from "./atom";
 import { Logo } from "./Logo";
+import { visibleStore } from "./store";
 
 export function Header() {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -20,8 +20,7 @@ export function Header() {
           variant="ghost"
           icon={<IconMenu2 stroke={1.5} />}
           onClick={() => {
-            const values = visibleAtom.get();
-            visibleAtom.set({ ...values, chatVisible: !values.chatVisible });
+            visibleStore.setState((state) => ({ chatVisible: !state.chatVisible }));
           }}
         />
       </div>
@@ -31,13 +30,13 @@ export function Header() {
           aria-label="Settings"
           variant="ghost"
           icon={<IconSettings stroke={1.5} />}
-          onClick={() => visibleAtom.set({ ...visibleAtom.get(), settingVisible: true })}
+          onClick={() => visibleStore.setState({ settingVisible: true })}
         />
         <IconButton
           aria-label="ImageCreate"
           variant="ghost"
           icon={<IconPhoto stroke={1.5} />}
-          onClick={() => visibleAtom.set({ ...visibleAtom.get(), imageVisible: true })}
+          onClick={() => visibleStore.setState({ imageVisible: true })}
         />
         <IconButton
           aria-label="ColorMode"

@@ -1,5 +1,4 @@
 import { Button, IconButton, Input, Link } from "@chakra-ui/react";
-import { useStore } from "@nanostores/react";
 import {
   IconBrandGithub,
   IconCheck,
@@ -9,15 +8,15 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
+import { cloneDeep } from "lodash";
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 
+import { SimpleDrawer } from "../../components";
 import { localDB } from "../../utils/LocalDB";
-import { chatAtom, chatDataAtom, visibleAtom } from "../atom";
 import { scrollToPageBottom } from "../chat";
+import { useTranslation } from "../i18n";
 import { Logo } from "../Logo";
-import SimpleDrawer from "../SimpleDrawer";
-import { saveChatAtom } from "../storage";
+import { chatDataStore, chatListStore, visibleStore } from "../store";
 import type { ChatItem } from "../types";
 import { isMobile, uuid } from "../utils";
 
@@ -29,60 +28,64 @@ interface Props {
 
 export function ChatPanel(props: Props) {
   const { chatVisible, type, sideWidth } = props;
-  const { t, i18n } = useTranslation();
-  const { chatList, currentChat } = useStore(chatAtom);
-  const { id: chatId } = currentChat;
+  const { t, changeLanguage, language } = useTranslation();
+  const chatList = chatListStore((s) => s.chatList);
+  const currentChat = chatListStore((s) => s.currentChat());
 
-  function updateChatList(chatList: ChatItem[]) {
-    saveChatAtom({ ...chatAtom.get(), chatList });
-  }
-
-  async function updateChatId(item: ChatItem) {
-    saveChatAtom({ ...chatAtom.get(), currentChat: item });
+  async function updateChatMessage(item: ChatItem) {
     const chatId = item.id;
     // 切换对话，更新消息列表
     const messages = (await localDB.getItem(chatId)) || [];
-    chatDataAtom.set(messages);
+    chatDataStore.setState({ data: messages });
   }
 
   function handleClose() {
     if (type === "side") return;
-    visibleAtom.set({ ...visibleAtom.get(), chatVisible: false });
+    visibleStore.setState({ chatVisible: false });
   }
 
   function handleChatAddClick() {
     const id = uuid();
     const item: ChatItem = { id, name: t("New Chat") + " " + id.substring(0, 6) };
-    updateChatList([item, ...chatList]);
+    chatListStore.setState(({ chatList }) => ({ chatList: [item, ...chatList] }));
   }
 
-  function handleNameChange(item: ChatItem, value: string) {
-    item.name = value;
-    if (currentChat.id === item.id) {
-      currentChat.name = value;
-    }
-    updateChatList([...chatList]);
+  function handleNameChange(item: ChatItem, name: string) {
+    chatListStore.getState().updateChat(item.id, { name });
   }
 
   function handleDelete(item: ChatItem) {
     if (chatList.length === 1) {
       const id = uuid();
-      const item: ChatItem = { id, name: t("New Chat") };
-      updateChatList([item]);
-      updateChatId(item);
+      const item: ChatItem = { id, name: t("New Chat"), selected: true };
+      chatListStore.setState({ chatList: [item] });
+      updateChatMessage(item);
       handleClose();
     } else {
       const list = chatList.filter((chat) => chat.id !== item.id);
-      updateChatList(list);
-      if (item.id === chatId) {
-        updateChatId(list[0]);
+      if (item.id === currentChat.id) {
+        list[0].selected = true;
         handleClose();
       }
+      chatListStore.setState({ chatList: list });
     }
   }
 
+  function handleItemClick(item: ChatItem) {
+    console.log(item, currentChat);
+    handleClose();
+    if (item.id === currentChat.id) return;
+
+    chatListStore.setState(({ chatList }) => {
+      chatList.forEach((v) => (v.selected = v.id === item.id));
+      return { chatList: cloneDeep(chatList) };
+    });
+    updateChatMessage(item);
+    scrollToPageBottom();
+  }
+
   function handleChangeLanguage() {
-    i18n.changeLanguage(i18n.language === "en" ? "zh" : "en");
+    changeLanguage(language === "en" ? "zh" : "en");
   }
 
   return (
@@ -132,19 +135,11 @@ export function ChatPanel(props: Props) {
           return (
             <ChatItemView
               key={chat.id}
-              chatId={chatId}
+              selected={currentChat.id === chat.id}
               chat={chat}
               onNameChange={handleNameChange}
               onDelete={handleDelete}
-              onClick={() => {
-                if (chat.id === currentChat.id) {
-                  handleClose();
-                  return;
-                }
-                updateChatId(chat);
-                scrollToPageBottom();
-                handleClose();
-              }}
+              onClick={() => handleItemClick(chat)}
             />
           );
         })}
@@ -154,7 +149,7 @@ export function ChatPanel(props: Props) {
 }
 
 interface ItemProps {
-  chatId?: string;
+  selected?: boolean;
   chat: ChatItem;
   onNameChange: (chat: ChatItem, value: string) => void;
   onDelete: (chat: ChatItem) => void;
@@ -162,8 +157,7 @@ interface ItemProps {
 }
 
 function ChatItemView(props: ItemProps) {
-  const { chatId, chat, onClick, onNameChange, onDelete } = props;
-  const selected = chat.id === chatId;
+  const { selected, chat, onClick, onNameChange, onDelete } = props;
   const [changed, setChanged] = useState(chat.name);
   const [isEditing, setEditing] = useState(false);
   const [mobileFlag] = useState(isMobile());

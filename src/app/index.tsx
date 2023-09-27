@@ -1,15 +1,12 @@
-import "./i18n";
-
 import { ChakraProvider, extendTheme, useMediaQuery } from "@chakra-ui/react";
-import { useStore } from "@nanostores/react";
 import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 
-import { visibleAtom } from "./atom";
-import Chat from "./chat/index";
+import Chat from "./chat";
 import { Header } from "./Header";
+import { useTranslation } from "./i18n";
 import { ChatPanel, ImagePanel, SettingPanel, SystemPromptPanel } from "./panels";
 import { loadCache } from "./storage";
+import { visibleStore } from "./store";
 import { addCodeCopy } from "./utils";
 
 export default function App() {
@@ -43,7 +40,8 @@ function Content() {
   // 和 tailwind 保持一致
   const [lg] = useMediaQuery("(min-width: 1023.9px)");
   const [xl] = useMediaQuery("(min-width: 1279.9px)");
-  const { chatVisible, promptVisible } = useStore(visibleAtom);
+  const chatVisible = visibleStore((s) => s.chatVisible);
+  const promptVisible = visibleStore((s) => s.promptVisible);
 
   const [chatVisibleState, setChatVisibleState] = useState(chatVisible);
   const [promptVisibleState, setPromptVisibleState] = useState(promptVisible);
@@ -57,7 +55,7 @@ function Content() {
   useEffect(() => {
     const lg = window.matchMedia("(min-width: 1023.9px)").matches;
     if (lg) {
-      visibleAtom.set({ ...visibleAtom.get(), chatVisible: true });
+      visibleStore.setState({ chatVisible: true });
     }
   }, []);
 

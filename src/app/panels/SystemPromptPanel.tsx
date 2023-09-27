@@ -1,5 +1,4 @@
 import { Button, IconButton, Tab, TabList, Tabs, Textarea, useToast } from "@chakra-ui/react";
-import { useStore } from "@nanostores/react";
 import {
   IconCsv,
   IconEraser,
@@ -13,16 +12,14 @@ import {
 import { ChakraStylesConfig, Select as SearchSelect } from "chakra-react-select";
 import { parse as parseCsv, unparse as unparseCsv } from "papaparse";
 import React, { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
 
+import { FileUpload, SimpleDrawer } from "../../components";
 import { CacheKeys } from "../../constants";
+import { allPrompts, OptionType } from "../../prompts";
 import { localDB } from "../../utils/LocalDB";
-import { chatAtom, ChatConfigType, visibleAtom } from "../atom";
 import { estimateTokens } from "../chat/token";
-import { FileUpload } from "../FileUpload";
-import { allPrompts, OptionType } from "../prompts";
-import SimpleDrawer from "../SimpleDrawer";
-import { saveCurrentChatValue } from "../storage";
+import { useTranslation } from "../i18n";
+import { chatConfigStore, chatListStore, visibleStore } from "../store";
 import type { ChatItem } from "../types";
 import { readFileAsString, uuid } from "../utils";
 import { PromptFormModal } from "./PromptForm";
@@ -42,9 +39,9 @@ interface LabelValue {
 
 export function SystemPromptPanel(props: Props) {
   const { promptVisible, type, sideWidth } = props;
-  const { t, i18n } = useTranslation();
+  const { t, language } = useTranslation();
   const toast = useToast({ position: "top", isClosable: true });
-  const { currentChat } = useStore(chatAtom);
+  const currentChat = chatListStore((s) => s.currentChat());
   const { systemMessage = "" } = currentChat;
   const [token, setToken] = useState(0);
 
@@ -72,7 +69,7 @@ export function SystemPromptPanel(props: Props) {
   useEffect(() => {
     if (!promptVisible) return;
     handleClear();
-    setPrompt(chatAtom.get().currentChat.systemMessage || "");
+    setPrompt(chatListStore.getState().currentChat().systemMessage || "");
   }, [promptVisible]);
 
   useEffect(() => {
@@ -83,7 +80,7 @@ export function SystemPromptPanel(props: Props) {
 
   useEffect(() => {
     load();
-  }, [i18n.language, promptVisible, dataRefreshKey]);
+  }, [promptVisible, dataRefreshKey]);
 
   useEffect(() => {
     const key = tabList[tabIndex]?.value;
@@ -131,7 +128,7 @@ export function SystemPromptPanel(props: Props) {
     });
     setAllData(allData);
 
-    const isZh = i18n.language.toLowerCase().includes("zh");
+    const isZh = language?.toLowerCase()?.includes("zh");
     setTabList([
       { label: isZh ? "默认" : "Default", value: "default" },
       { label: isZh ? "收藏" : "Favorite", value: "favorite" },
@@ -201,7 +198,7 @@ export function SystemPromptPanel(props: Props) {
 
   function handleClose() {
     if (type === "side") return;
-    visibleAtom.set({ ...visibleAtom.get(), promptVisible: false });
+    visibleStore.setState({ promptVisible: false });
   }
 
   function handlePromptReset() {
@@ -216,7 +213,7 @@ export function SystemPromptPanel(props: Props) {
   }
 
   function updateSystemPrompt(prompt?: string) {
-    saveCurrentChatValue("systemMessage", prompt as string);
+    chatListStore.getState().updateChat(currentChat.id, { systemMessage: prompt });
   }
 
   function handleSaveClick() {
@@ -453,42 +450,6 @@ export function SystemPromptPanel(props: Props) {
     );
   }
 
-  function renderSettingsContent() {
-    const list: SettingItemType[] = [
-      { label: "Name", value: "name", placeholder: "" },
-      { label: "OpenAI Model", value: "openAIModel", type: "select", placeholder: "gpt-3.5-turbo" },
-      {
-        type: "number",
-        label: "temperature",
-        value: "temperature",
-        max: 2,
-        placeholder: "",
-        desc: t("settings.temperature"),
-      },
-      {
-        type: "number",
-        label: "top_p",
-        value: "top_p",
-        max: 1,
-        placeholder: "",
-        desc: t("settings.top_p"),
-      },
-      { label: "", value: "", placeholder: "" },
-    ];
-    return (
-      <div className="space-y-2">
-        {list.map((item) => (
-          <SettingItem
-            key={item.value}
-            item={item}
-            value={currentChat[item.value as keyof ChatItem] || ""}
-            // onChange={(value) => setConfig((draft) => ({ ...draft, [item.value]: value }))}
-          />
-        ))}
-      </div>
-    );
-  }
-
   return (
     <SimpleDrawer
       type={type}
@@ -515,33 +476,31 @@ export function SystemPromptPanel(props: Props) {
         </Tabs>
       }
       footer={
-        <div className="w-full flex flex-row justify-between">
-          <Button
-            colorScheme="blue"
-            onClick={handleRemoveClick}
-            style={{ visibility: panelTabIndex === 0 ? "visible" : "hidden" }}
-          >
-            {t("Remove")}
-          </Button>
-          <div className="flex flex-row">
-            {type !== "side" ? (
-              <Button variant="outline" mr={3} onClick={handleClose}>
-                {t("Cancel")}
-              </Button>
-            ) : (
-              <Button variant="outline" mr={3} onClick={handlePromptReset}>
-                {t("Reset")}
-              </Button>
-            )}
-            <Button colorScheme="teal" onClick={handleSaveClick}>
-              {t("Save")}
+        panelTabIndex === 1 ? null : (
+          <div className="w-full flex flex-row justify-between">
+            <Button colorScheme="blue" onClick={handleRemoveClick}>
+              {t("Remove")}
             </Button>
+            <div className="flex flex-row">
+              {type !== "side" ? (
+                <Button variant="outline" mr={3} onClick={handleClose}>
+                  {t("Cancel")}
+                </Button>
+              ) : (
+                <Button variant="outline" mr={3} onClick={handlePromptReset}>
+                  {t("Reset")}
+                </Button>
+              )}
+              <Button colorScheme="teal" onClick={handleSaveClick}>
+                {t("Save")}
+              </Button>
+            </div>
           </div>
-        </div>
+        )
       }
     >
       {panelTabIndex === 0 && renderPromptContent()}
-      {panelTabIndex === 1 && renderSettingsContent()}
+      {panelTabIndex === 1 && <ChatSetting chat={currentChat} />}
       <PromptFormModal
         open={modalOpen}
         name={selectedPrompt?.act}
@@ -550,5 +509,51 @@ export function SystemPromptPanel(props: Props) {
         onClose={() => setModalOpen(false)}
       />
     </SimpleDrawer>
+  );
+}
+
+interface ChatSettingProps {
+  chat: ChatItem;
+}
+
+function ChatSetting(props: ChatSettingProps) {
+  const { chat } = props;
+  const config = chatConfigStore();
+  const updateChat = chatListStore((s) => s.updateChat);
+  const { t } = useTranslation();
+
+  const list: SettingItemType[] = [
+    { label: t("Name"), value: "name", placeholder: "" },
+    { label: "model", value: "openAIModel", type: "select", placeholder: "gpt-3.5-turbo" },
+    {
+      type: "number",
+      label: "temperature",
+      value: "temperature",
+      max: 2,
+      placeholder: "",
+      desc: t("settings.temperature"),
+    },
+    {
+      type: "number",
+      label: "top_p",
+      value: "top_p",
+      max: 1,
+      placeholder: "",
+      desc: t("settings.top_p"),
+    },
+  ];
+
+  return (
+    <div className="space-y-2">
+      {list.map((item) => (
+        <SettingItem
+          key={item.value}
+          item={item}
+          onChange={(value) => updateChat(chat.id, { [item.value]: value })}
+          // @ts-ignore key
+          value={chat[item.value] || config[item.value]}
+        />
+      ))}
+    </div>
   );
 }

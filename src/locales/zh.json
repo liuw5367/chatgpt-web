@@ -10,7 +10,7 @@
   "settings": {
     "EnterSend": "回车键发送",
     "temperature": "默认值为1，取值范围0和2之间。值越大回复越随机",
-    "top_p": "默认值为1。核心采样，作为使用 temperature 进行采样的替代方案，其中模型考虑具有 top_p 概率质量的令牌的结果。因此，0.1 表示仅考虑组成前 10％ 概率质量的 tokens。建议修改此项或 temperature，但不要同时修改。"
+    "top_p": "默认值为1。与 temperature 类似，但不要同时修改。"
   },
   "conversation": {
     "on": "已开启连续对话",

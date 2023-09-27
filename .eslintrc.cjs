@@ -2,7 +2,7 @@ module.exports = {
   root: true,
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    ecmaVersion: 2021,
+    ecmaVersion: 'latest',
     sourceType: "module",
     ecmaFeatures: { jsx: true },
   },
@@ -12,10 +12,10 @@ module.exports = {
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended", // Make sure this is always the last element in the array.
+    "plugin:prettier/recommended",
     "@unocss",
   ],
-  plugins: ["simple-import-sort", "prettier", "react-hooks"],
+  plugins: ["simple-import-sort", "prettier", "react-hooks", 'unused-imports'],
   rules: {
     "prettier/prettier": ["error", {}, { usePrettierrc: true }],
 
@@ -35,8 +35,14 @@ module.exports = {
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-inferrable-types": "off",
 
+    'unused-imports/no-unused-imports': 'error',
+    'unused-imports/no-unused-vars': [
+      'warn',
+      { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
+    ],
+
     "no-unused-vars": ["off", { argsIgnorePattern: "^_" }],
-    eqeqeq: ["error", "allow-null"],
+    eqeqeq: ['error', "always", {"null": "ignore"}],
     "spaced-comment": ["error", "always", { markers: ["/"] }],
     "no-multiple-empty-lines": ["error", { max: 2, maxEOF: 1 }],
     "lines-between-class-members": ["error", "always"],

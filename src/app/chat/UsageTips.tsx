@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+
+import { useTranslation } from "../i18n";
 
 export function UsageTips() {
-  const { i18n } = useTranslation();
+  const { language } = useTranslation();
   const [tips, setTips] = useState<string[]>([]);
 
   useEffect(() => {
     setTips(
-      i18n.language.toLowerCase().includes("zh")
+      language?.toLowerCase()?.includes("zh")
         ? [
             "输入 / 可激活 Prompt 搜索窗口",
             "输入框为空时，按上箭头将填充上一条消息内容",
@@ -29,7 +30,7 @@ export function UsageTips() {
             "The voice button is hidden by default and will be displayed after typing KEY",
           ]
     );
-  }, [i18n.language]);
+  }, [language]);
 
   return (
     <>

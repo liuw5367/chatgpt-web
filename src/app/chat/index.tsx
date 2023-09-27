@@ -1,11 +1,10 @@
 import { Button, IconButton, Progress, useToast } from "@chakra-ui/react";
-import { useStore } from "@nanostores/react";
 import {
+  IconAdjustmentsAlt,
+  IconAdjustmentsPlus,
   IconBrandTelegram,
   IconClearAll,
   IconLoader3,
-  IconMessage,
-  IconMessagePlus,
   IconMessages,
   IconMessagesOff,
   IconMicrophone,
@@ -13,18 +12,17 @@ import {
   IconPlayerPause,
   IconPlayerPlay,
 } from "@tabler/icons-react";
-import { useDebounceEffect, useDebounceFn } from "ahooks";
+import { useDebounceEffect, useDebounceFn, useMemoizedFn } from "ahooks";
 import React, { createRef, useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 
+import { AutoResizeTextarea } from "../../components/AutoResizeTextarea";
 import { localDB } from "../../utils/LocalDB";
 import VoiceView, { VoiceRef } from "../ai";
 import { ASRStatusEnum } from "../ai/ASRView";
 import { getUnisoundKeySecret, hasUnisoundConfig } from "../ai/Config";
 import { TTSStatusEnum } from "../ai/TTSView";
-import { chatAtom, chatConfigAtom, chatDataAtom, visibleAtom } from "../atom";
-import { AutoResizeTextarea } from "../AutoResizeTextarea";
-import { saveCurrentChatValue } from "../storage";
+import { useTranslation } from "../i18n";
+import { chatConfigStore, chatDataStore, chatListStore, visibleStore } from "../store";
 import type { ChatMessage } from "../types";
 import { getCurrentTime, removeLn, request, scrollToElement, uuid } from "../utils";
 import { Command } from "./Command";
@@ -37,10 +35,12 @@ import { UsageTips } from "./UsageTips";
 export default function Page() {
   const { t } = useTranslation();
   const toast = useToast({ position: "top", isClosable: true });
-  const messageList = useStore(chatDataAtom);
-  const chatConfig = useStore(chatConfigAtom);
+  const messageList = chatDataStore((s) => s.data);
+  const currentChat = chatListStore((s) => s.currentChat());
+  const updateChat = chatListStore((s) => s.updateChat);
+
+  const chatConfig = chatConfigStore();
   const enterSend = chatConfig.enterSend === "1";
-  const { currentChat } = useStore(chatAtom);
   const { conversationId } = currentChat;
   const inputRef = createRef<HTMLTextAreaElement>();
   const [inputContent, setInputContent] = useState("");
@@ -63,11 +63,15 @@ export default function Page() {
   });
 
   useEffect(() => {
+    stopGenerate();
+  }, [currentChat.id]);
+
+  useEffect(() => {
     scrollToBottom({ behavior: "auto" });
   }, []);
 
   useDebounceEffect(() => {
-    const chatId = chatAtom.get().currentChat.id;
+    const chatId = chatListStore.getState().currentChat().id;
     localDB.setItem(chatId, messageList);
   }, [messageList]);
 
@@ -125,11 +129,11 @@ export default function Page() {
     }
   }
 
-  function stopGenerate() {
+  const stopGenerate = useMemoizedFn(() => {
     chatAbortController?.abort();
     setChatLoading(false);
     scrollToBottom();
-  }
+  });
 
   async function handleSendClick(inputValue = inputContent) {
     if (chatLoading) {
@@ -214,7 +218,7 @@ export default function Page() {
       prompt: systemMessage,
       conversationId,
     };
-    chatDataAtom.set([...messageList, question]);
+    chatDataStore.setState({ data: [...messageList, question] });
     setInputContent("");
     asrResultRef.current = "";
     scrollToBottom();
@@ -236,6 +240,10 @@ export default function Page() {
     }
 
     try {
+      const model = currentChat.openAIModel ?? chatConfig.openAIModel;
+      const temperature = currentChat.temperature ?? chatConfig.temperature;
+      const top_p = currentChat.top_p ?? chatConfig.top_p;
+
       const { messages } = buildRequestMessages(messageList, question, conversationId, systemMessage);
       const response = await request("/api/generate", {
         method: "POST",
@@ -244,10 +252,10 @@ export default function Page() {
           messages,
           apiKey: chatConfig.openAIKey,
           host: chatConfig.openAIHost,
-          model: chatConfig.openAIModel,
+          model,
           config: {
-            temperature: chatConfig.temperature ? Number(chatConfig.temperature) : undefined,
-            top_p: chatConfig.top_p ? Number(chatConfig.top_p) : undefined,
+            temperature: temperature ? Number(temperature) : undefined,
+            top_p: top_p ? Number(top_p) : undefined,
           },
         }),
       });
@@ -294,18 +302,20 @@ export default function Page() {
     console.log([assistantMessage]);
     if (!assistantMessage) return;
 
-    chatDataAtom.set([
-      ...chatDataAtom.get(),
-      {
-        id: uuid(),
-        role: "assistant",
-        content: assistantMessage,
-        token: estimateTokens(assistantMessage),
-        question: content,
-        prompt,
-        conversationId,
-      },
-    ]);
+    chatDataStore.setState((state) => ({
+      data: [
+        ...state.data,
+        {
+          id: uuid(),
+          role: "assistant",
+          content: assistantMessage,
+          token: estimateTokens(assistantMessage),
+          question: content,
+          prompt,
+          conversationId,
+        },
+      ],
+    }));
     setChatLoading(false);
     setCurrentAssistantMessage("");
     scrollToBottom();
@@ -317,7 +327,7 @@ export default function Page() {
     stopGenerate();
     setInputContent("");
     asrResultRef.current = "";
-    chatDataAtom.set([]);
+    chatDataStore.setState({ data: [] });
   }
 
   async function handleRegenerate(item: ChatMessage) {
@@ -328,15 +338,15 @@ export default function Page() {
   }
 
   function handleMessageDelete(item: ChatMessage) {
-    chatDataAtom.set(chatDataAtom.get().filter((v) => v.id !== item.id));
+    chatDataStore.setState((state) => ({ data: state.data.filter((v) => v.id !== item.id) }));
   }
 
   function updateSystemPrompt(prompt?: string) {
-    saveCurrentChatValue("systemMessage", prompt as string);
+    updateChat(currentChat.id, { systemMessage: prompt });
   }
 
   function updateConversationId(conversationId?: string) {
-    saveCurrentChatValue("conversationId", conversationId as string);
+    updateChat(currentChat.id, { conversationId: conversationId });
   }
 
   function handleConversationClick() {
@@ -411,10 +421,9 @@ export default function Page() {
           aria-label="SystemPrompt"
           title={currentChat.systemMessage}
           colorScheme={currentChat.systemMessage ? "telegram" : "gray"}
-          icon={currentChat.systemMessage ? <IconMessagePlus stroke={1.5} /> : <IconMessage stroke={1.5} />}
+          icon={currentChat.systemMessage ? <IconAdjustmentsPlus stroke={1.5} /> : <IconAdjustmentsAlt stroke={1.5} />}
           onClick={() => {
-            const values = visibleAtom.get();
-            visibleAtom.set({ ...values, promptVisible: !values.promptVisible });
+            visibleStore.setState((state) => ({ promptVisible: !state.promptVisible }));
           }}
         />
       </div>
