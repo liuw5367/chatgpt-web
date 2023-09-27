@@ -1,13 +1,11 @@
 import { useMemoizedFn } from 'ahooks';
-import React, { useEffect, useImperativeHandle, useState } from 'react';
-
-import { importRecorderLib } from '@/utils/Recorder';
+import React, { useImperativeHandle } from 'react';
 
 import type { ASRRef } from './ASRView';
-import ASRView, { ASRStatusEnum } from './ASRView';
+import { ASRView } from './ASRView';
 import { defaultSpeaker } from './Config';
 import type { TTSRef } from './TTSView';
-import TTSView, { TTSStatusEnum } from './TTSView';
+import { TTSView } from './TTSView';
 
 export interface VoiceRef {
   asr: () => void;
@@ -19,23 +17,14 @@ export interface VoiceRef {
 interface Props {
   chatLoading: boolean;
   onAsrResultChange: (v: string, changing: boolean) => void;
-  onAsrStatusChange: (v: ASRStatusEnum) => void;
-  onTtsStatusChange: (v: TTSStatusEnum) => void;
+  onAsrStatusChange: (recording: boolean) => void;
+  onTtsStatusChange: (playing: boolean) => void;
 }
 
 const View = React.forwardRef<VoiceRef, Props>((props, ref) => {
   const { onAsrResultChange, onTtsStatusChange, onAsrStatusChange } = props;
-  const [asrState, setAsrState] = useState<ASRStatusEnum>(ASRStatusEnum.NORMAL);
-  const [ttsState, setTtsState] = useState<TTSStatusEnum>(TTSStatusEnum.NORMAL);
   const asrRef = React.useRef<ASRRef | null>();
   const ttsRef = React.useRef<TTSRef | null>();
-
-  const [browserFlag, setBrowserFlag] = useState(false);
-
-  useEffect(() => {
-    importRecorderLib();
-    setBrowserFlag(true);
-  }, []);
 
   useImperativeHandle(
     ref,
@@ -62,37 +51,14 @@ const View = React.forwardRef<VoiceRef, Props>((props, ref) => {
     ttsRef.current?.start(content);
   });
 
-  function handleAsrStatus(status: ASRStatusEnum) {
-    setAsrState(status);
-    onAsrStatusChange?.(status);
-  }
-
-  function handleTtsStatus(status: TTSStatusEnum) {
-    setTtsState(status);
-    onTtsStatusChange?.(status);
-  }
-
-  const handleResultChange = useMemoizedFn((content: string, changing: boolean) => {
-    if (ttsState !== TTSStatusEnum.NORMAL) return;
-    onAsrResultChange?.(content, changing);
-  });
-
-  if (!browserFlag) return null;
-
   return (
     <>
       <ASRView
-        status={asrState}
-        onStatusChange={handleAsrStatus}
-        onResultChange={handleResultChange}
+        onStatusChange={onAsrStatusChange}
+        onResultChange={onAsrResultChange}
         ref={(ref) => (asrRef.current = ref)}
       />
-      <TTSView
-        speaker={defaultSpeaker}
-        status={ttsState}
-        onStatusChange={handleTtsStatus}
-        ref={(ref) => (ttsRef.current = ref)}
-      />
+      <TTSView speaker={defaultSpeaker} onStatusChange={onTtsStatusChange} ref={(ref) => (ttsRef.current = ref)} />
     </>
   );
 });

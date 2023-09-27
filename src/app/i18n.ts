@@ -8,6 +8,12 @@ import localeZh from '../locales/zh.json';
 interface State {
   language?: string;
 }
+
+function getLanguage() {
+  if (typeof navigator === 'undefined') return '';
+  return navigator.language;
+}
+
 export const i18nStore = create<State, [['zustand/persist', State]]>(
   persist(
     (set, get) => ({
@@ -20,21 +26,12 @@ export const i18nStore = create<State, [['zustand/persist', State]]>(
   ),
 );
 
-function getLanguage() {
-  if (typeof navigator === 'undefined') return '';
-  return navigator.language;
-}
-
 export function useTranslation() {
   const language = i18nStore((s) => s.language);
   const currentLanguage = language || getLanguage();
 
   const t = useMemoizedFn((key: string): string => {
-    const isZh = currentLanguage.toLowerCase().includes('zh');
-    if (isZh) {
-      return getValue(localeZh, key) || key;
-    }
-    return getValue(localeEn, key) || key;
+    return translate(key, language);
   });
 
   const changeLanguage = useMemoizedFn((language: string) => {
@@ -54,8 +51,7 @@ function getValue(data: any, key: string) {
   return value;
 }
 
-export function t(key: string) {
-  const language = i18nStore.getState().language;
+export function translate(key: string, language = i18nStore.getState().language) {
   const currentLanguage = language || getLanguage();
   const isZh = currentLanguage.toLowerCase().includes('zh');
   if (isZh) {

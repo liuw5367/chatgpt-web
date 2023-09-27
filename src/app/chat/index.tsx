@@ -19,13 +19,11 @@ import { AutoResizeTextarea } from '../../components';
 import { localDB } from '../../utils/LocalDB';
 import type { VoiceRef } from '../ai';
 import VoiceView from '../ai';
-import { ASRStatusEnum } from '../ai/ASRView';
 import { getUnisoundKeySecret, hasUnisoundConfig } from '../ai/Config';
-import { TTSStatusEnum } from '../ai/TTSView';
 import { useTranslation } from '../i18n';
 import { chatConfigStore, chatDataStore, chatListStore, visibleStore } from '../store';
 import type { ChatMessage } from '../types';
-import { getCurrentTime, removeLn, request, scrollToElement, uuid } from '../utils';
+import { getCurrentTime, moveCursorToEnd, removeLn, request, scrollToElement, uuid } from '../utils';
 import { Command } from './Command';
 import ErrorItem from './ErrorItem';
 import { MessageItem } from './MessageItem';
@@ -47,8 +45,8 @@ export default function Page() {
   const composingRef = useRef(false);
   const [currentAssistantMessage, setCurrentAssistantMessage] = useState('');
 
-  const [asrState, setAsrState] = useState<ASRStatusEnum>(ASRStatusEnum.NORMAL);
-  const [ttsState, setTtsState] = useState<TTSStatusEnum>(TTSStatusEnum.NORMAL);
+  const [recording, setRecording] = useState(false);
+  const [ttsPlaying, setTtsPlaying] = useState(false);
   const voiceRef = React.useRef<VoiceRef | null>();
 
   const [chatLoading, setChatLoading] = useState(false);
@@ -106,15 +104,15 @@ export default function Page() {
   function handleTTSClick() {
     if (checkUnisound()) return;
 
-    if (ttsState === TTSStatusEnum.NORMAL) {
+    if (ttsPlaying) {
+      stopTTS();
+    } else {
       const data = [...messageList].filter((v) => v.role === 'assistant').reverse();
       const content = data?.[0]?.content;
       if (content) {
         voiceRef.current?.stopAsr();
         playTTS(content);
       }
-    } else {
-      stopTTS();
     }
   }
 
@@ -122,7 +120,7 @@ export default function Page() {
     if (checkUnisound()) return;
 
     stopTTS();
-    if (asrState === ASRStatusEnum.RECORDING) {
+    if (recording) {
       voiceRef.current?.stopAsr();
     } else {
       voiceRef.current?.asr();
@@ -383,29 +381,17 @@ export default function Page() {
             <IconButton
               aria-label="ASR" //
               onClick={handleASRClick}
-              colorScheme={asrState === ASRStatusEnum.RECORDING ? 'red' : 'gray'}
-              variant={asrState === ASRStatusEnum.RECORDING ? 'outline' : 'solid'}
-              icon={
-                asrState === ASRStatusEnum.RECORDING ? (
-                  <IconMicrophoneOff stroke={1.5} />
-                ) : (
-                  <IconMicrophone stroke={1.5} />
-                )
-              }
+              colorScheme={recording ? 'red' : 'gray'}
+              variant={recording ? 'outline' : 'solid'}
+              icon={recording ? <IconMicrophoneOff stroke={1.5} /> : <IconMicrophone stroke={1.5} />}
             />
-            {ttsState === TTSStatusEnum.PLAYING && (
+            {ttsPlaying && (
               <IconButton
                 aria-label="TTS" //
                 onClick={handleTTSClick}
-                colorScheme={ttsState === TTSStatusEnum.PLAYING ? 'red' : 'gray'}
-                variant={ttsState === TTSStatusEnum.PLAYING ? 'outline' : 'solid'}
-                icon={
-                  ttsState === TTSStatusEnum.PLAYING ? (
-                    <IconPlayerPause stroke={1.5} />
-                  ) : (
-                    <IconPlayerPlay stroke={1.5} />
-                  )
-                }
+                colorScheme={ttsPlaying ? 'red' : 'gray'}
+                variant={ttsPlaying ? 'outline' : 'solid'}
+                icon={ttsPlaying ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />}
               />
             )}
           </>
@@ -509,7 +495,7 @@ export default function Page() {
             value={inputContent === '\n' ? '' : inputContent}
             onCompositionStart={() => (composingRef.current = true)}
             onCompositionEnd={() => (composingRef.current = false)}
-            placeholder={enterSend ? t('chat.enterPlaceholder') : t('chat.placeholder')}
+            placeholder={enterSend ? t('chat.enterPlaceholder') || '' : t('chat.placeholder') || ''}
             onChange={(e) => setInputContent(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'ArrowUp') {
@@ -517,6 +503,7 @@ export default function Page() {
                   const content = [...messageList].reverse().find((v) => v.role === 'user' && v.content)?.content;
                   if (content) {
                     setInputContent(content);
+                    moveCursorToEnd(e.target as HTMLTextAreaElement);
                   }
                 }
                 return;
@@ -540,8 +527,8 @@ export default function Page() {
         ref={(ref) => (voiceRef.current = ref)}
         chatLoading={chatLoading}
         onAsrResultChange={handleAsrResult}
-        onAsrStatusChange={setAsrState}
-        onTtsStatusChange={setTtsState}
+        onAsrStatusChange={setRecording}
+        onTtsStatusChange={setTtsPlaying}
       />
     </div>
   );
