@@ -1,12 +1,15 @@
 import Clipboard from 'clipboard';
 import { v4 as uuidFn } from 'uuid';
 
+import { chatConfigStore } from '@/app/store';
+
 export function request(url: string, config: RequestInit) {
+  const { accessCode } = chatConfigStore.getState();
   return fetch(url, {
     ...config,
     headers: {
       'Content-Type': 'application/json',
-      'access-code': localStorage.getItem('accessCode') || '',
+      'access-code': accessCode || '',
       ...config.headers,
     },
   });

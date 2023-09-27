@@ -1,12 +1,15 @@
+import { chatConfigStore } from '@/app/store';
+
 const ENV_KEY = process.env.NEXT_PUBLIC_UNISOUND_AI_KEY;
 
 export function getUnisoundKeySecret() {
   if (typeof window === 'undefined') {
     return { KEY: ENV_KEY };
   }
+  const { unisoundAppKey, unisoundSecret } = chatConfigStore.getState();
   return {
-    KEY: localStorage.getItem('unisoundAppKey') || ENV_KEY,
-    SECRET: localStorage.getItem('unisoundSecret') || undefined,
+    KEY: unisoundAppKey || ENV_KEY,
+    SECRET: unisoundSecret || undefined,
   };
 }
 

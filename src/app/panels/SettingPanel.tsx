@@ -103,13 +103,6 @@ export function SettingPanel() {
   function handleSaveClick() {
     const draft = chatConfigStore.getState();
     const result = { ...draft, ...config };
-    for (const [key, value] of Object.entries(result)) {
-      if (value == null || value.trim() === '') {
-        localStorage.removeItem(key);
-      } else {
-        localStorage.setItem(key, value.trim());
-      }
-    }
     chatConfigStore.setState(result);
     handleClose();
     toast({ status: 'success', title: t('Success'), duration: 1000 });
