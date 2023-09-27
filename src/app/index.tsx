@@ -9,17 +9,10 @@ import { loadCache } from './storage';
 import { visibleStore } from './store';
 import { addCodeCopy } from './utils';
 export default function App() {
-  const { t } = useTranslation();
   const theme = extendTheme({ initialColorMode: 'system', useSystemColorMode: true });
   const [loadFlag, setLoadFlag] = useState(false);
 
   useEffect(() => {
-    loadCache(t('New Chat'));
-    addCodeCopy();
-    const loading = document.querySelector('#app-loading');
-    if (loading && loading.parentNode) {
-      loading.remove();
-    }
     setLoadFlag(true);
   }, []);
 
@@ -28,10 +21,13 @@ export default function App() {
       {loadIcons()}
       <div className={`v-screen h-screen flex flex-col overflow-hidden`}>
         <Header />
-        {loadFlag && <Content />}
-
-        <ImagePanel />
-        <SettingPanel />
+        {loadFlag && (
+          <>
+            <Content />
+            <ImagePanel />
+            <SettingPanel />
+          </>
+        )}
       </div>
     </ChakraProvider>
   );
@@ -52,6 +48,16 @@ function Content() {
 
   const showChatSideRef = useRef(showChatSide);
   const showPromptSideRef = useRef(showPromptSide);
+
+  const { t } = useTranslation();
+  useEffect(() => {
+    loadCache(t('New Chat'));
+    addCodeCopy();
+    const loading = document.querySelector('#app-loading');
+    if (loading && loading.parentNode) {
+      loading.remove();
+    }
+  }, []);
 
   useEffect(() => {
     const lg = window.matchMedia('(min-width: 1023.9px)').matches;
