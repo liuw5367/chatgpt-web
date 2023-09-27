@@ -7,6 +7,5 @@ module.exports = {
   trailingComma: 'all',
   proseWrap: 'never',
   endOfLine: 'lf',
-  // 箭头函数单个参数的情况是否省略括号，always是总是带括号
   arrowParens: 'always',
 };

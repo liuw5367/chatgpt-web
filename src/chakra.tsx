@@ -1,6 +1,6 @@
 import { ChakraProvider, cookieStorageManagerSSR, extendTheme, localStorageManager } from '@chakra-ui/react';
-import { GetServerSidePropsContext } from 'next/types';
-import { ReactNode } from 'react';
+import type { GetServerSidePropsContext } from 'next/types';
+import type { ReactNode } from 'react';
 
 interface Props {
   cookies: string | number;

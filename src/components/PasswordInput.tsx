@@ -1,6 +1,7 @@
 import { IconButton, Input, InputGroup, InputRightElement } from '@chakra-ui/react';
 import { IconEye, IconEyeOff } from '@tabler/icons-react';
-import React, { ChangeEvent } from 'react';
+import type { ChangeEvent } from 'react';
+import React from 'react';
 
 interface Props {
   className?: string;

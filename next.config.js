@@ -1,12 +1,10 @@
 const UnoCSS = require('@unocss/webpack').default;
-const { i18n } = require('./next-i18next.config');
 const { version } = require('./package.json');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   publicRuntimeConfig: { version },
   reactStrictMode: true,
-  i18n,
   transpilePackages: ['ahooks'],
   webpack: (config, context) => {
     if (context.buildId !== 'development') {

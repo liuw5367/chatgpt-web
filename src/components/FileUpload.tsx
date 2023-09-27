@@ -1,4 +1,5 @@
-import React, { ChangeEvent, useRef } from 'react';
+import type { ChangeEvent } from 'react';
+import React, { useRef } from 'react';
 
 interface Props {
   accept?: string;

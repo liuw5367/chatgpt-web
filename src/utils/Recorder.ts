@@ -2,7 +2,7 @@ let Recorder: any;
 
 export async function importRecorderLib() {
   // 必须要先于 engine 导入
-  // eslint-disable-next-line simple-import-sort/imports
+  // eslint-disable-next-line simple-import-sort/imports,unicorn/no-await-expression-member
   const RecorderX = (await import('recorder-core')).default;
 
   // 注意：recorder-core会自动往window下挂载名称为Recorder对象，全局可调用window.Recorder，也许可自行调整相关源码清除全局污染
@@ -24,13 +24,13 @@ export async function importRecorderLib() {
 
 import type { AudioProcessFn, BufferStreamPlayerType, RecorderStatic, RecorderType } from './RecorderType';
 
-let SAMPLE_RATE = 48000;
-const TARGET_SAMPLE_RATE = 16000;
-const MAX_VOICE_PRINT_DURATION = 6_000;
+let SAMPLE_RATE = 48_000;
+const TARGET_SAMPLE_RATE = 16_000;
+const MAX_VOICE_PRINT_DURATION = 6000;
 
 export function createRecorder(onAudioProcess: AudioProcessFn): RecorderType {
   const onProcess: AudioProcessFn = (buffers, powerLevel, bufferDuration, bufferSampleRate, newBufferIdx) => {
-    SAMPLE_RATE = bufferSampleRate || 48000;
+    SAMPLE_RATE = bufferSampleRate || 48_000;
     onAudioProcess(buffers, powerLevel, bufferDuration, bufferSampleRate, newBufferIdx);
 
     // https://xiangyuecn.gitee.io/recorder/assets/%E5%B7%A5%E5%85%B7-%E4%BB%A3%E7%A0%81%E8%BF%90%E8%A1%8C%E5%92%8C%E9%9D%99%E6%80%81%E5%88%86%E5%8F%91Runtime.html?jsname=teach.realtime.encode_transfer
@@ -120,7 +120,7 @@ export function createStreamPlayer(onPlayEnd: () => void): BufferStreamPlayerTyp
     play: true,
     realtime: false,
     decode: false,
-    sampleRate: 16000,
+    sampleRate: 16_000,
     onPlayEnd,
     transform: (arrayBuffer, sampleRate, success) => {
       success(new Int16Array(arrayBuffer), sampleRate);

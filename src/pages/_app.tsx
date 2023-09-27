@@ -6,9 +6,8 @@ import 'highlight.js/styles/github-dark.css';
 import 'github-markdown-css';
 
 import type { AppProps } from 'next/app';
-import { appWithTranslation } from 'next-i18next';
 
-import { Chakra, getServerSideProps } from '../chakra';
+import { Chakra } from '../chakra';
 
 function App({ Component, pageProps }: AppProps) {
   return (
@@ -18,6 +17,6 @@ function App({ Component, pageProps }: AppProps) {
   );
 }
 
-export default appWithTranslation(App);
+export default App;
 
-export { getServerSideProps };
+export { getServerSideProps } from '../chakra';
