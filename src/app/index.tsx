@@ -1,3 +1,10 @@
+import 'uno.css';
+import '../app/markdown.css';
+import '../app/app.css';
+import 'katex/dist/katex.min.css';
+import 'highlight.js/styles/github-dark.css';
+import 'github-markdown-css';
+
 import { ChakraProvider, extendTheme, useMediaQuery } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -8,7 +15,6 @@ import { ChatPanel, ImagePanel, SettingPanel, SystemPromptPanel } from './panels
 import { loadCache } from './storage';
 import { visibleStore } from './store';
 import { addCodeCopy } from './utils';
-
 export default function App() {
   const { t } = useTranslation();
   const theme = extendTheme({ initialColorMode: 'system', useSystemColorMode: true });
