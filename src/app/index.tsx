@@ -14,12 +14,14 @@ import { useTranslation } from './i18n';
 import { ChatPanel, ImagePanel, SettingPanel, SystemPromptPanel } from './panels';
 import { loadCache } from './storage';
 import { visibleStore } from './store';
-import { addCodeCopy } from './utils';
+import { addCodeCopy, isWindows } from './utils';
+
 export default function App() {
   const { t } = useTranslation();
   const theme = extendTheme({ initialColorMode: 'system', useSystemColorMode: true });
 
   useEffect(() => {
+    loadScrollBarCss();
     loadCache(t('New Chat'));
     addCodeCopy();
     const loading = document.querySelector('#app-loading');
@@ -117,3 +119,9 @@ const loadIcons = () => (
     <div className="i-tabler-copy hidden" />
   </>
 );
+
+function loadScrollBarCss() {
+  if (isWindows()) {
+    document.write('<link rel="stylesheet" href="/scrollbar.css">');
+  }
+}

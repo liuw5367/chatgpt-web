@@ -432,26 +432,47 @@ export default function Page() {
     </>
   );
 
+  function renderItem(item: ChatMessage | undefined, index: number, isList = false) {
+    if (!item) return;
+
+    const length = messageList.length;
+
+    if (chatLoading) {
+      if (isList) {
+        // 列表：加载中并且最后一个是问题
+        if (index === length - 1 && item.role === 'user') return null;
+      } else if (index === length - 2) {
+        return null;
+      }
+    } else if (isList && index >= length - 2) {
+      return null;
+    }
+
+    return (
+      <MessageItem
+        key={item.id}
+        item={item}
+        onDelete={handleMessageDelete}
+        onPlay={(item) => playTTS(item.content)}
+        onRegenerate={handleRegenerate}
+        onRetry={(item) => {
+          setInputContent(item.content);
+          inputRef.current?.focus();
+          updateConversationId(item.conversationId);
+          updateSystemPrompt(item.prompt);
+        }}
+      />
+    );
+  }
+
   const renderMessageList = (
     <div className="w-full flex flex-1 flex-col items-center overflow-x-hidden overflow-y-auto p-4">
       <div className="relative w-full flex flex-col">
-        {messageList?.map((item) => (
-          <MessageItem
-            key={item.id}
-            item={item}
-            onDelete={handleMessageDelete}
-            onPlay={(item) => playTTS(item.content)}
-            onRegenerate={handleRegenerate}
-            onRetry={(item) => {
-              setInputContent(item.content);
-              inputRef.current?.focus();
-              updateConversationId(item.conversationId);
-              updateSystemPrompt(item.prompt);
-            }}
-          />
-        ))}
+        {messageList?.map((item, index) => renderItem(item, index, true))}
 
-        <div style={{ minHeight: isGenerated ? 'calc((100vh - 64px - 143px)/3 * 2)' : undefined }}>
+        <div style={{ minHeight: isGenerated ? 'calc(100vh - 64px - 143px - 64px)' : undefined }}>
+          {renderItem(messageList.at(-2), messageList.length - 2)}
+          {renderItem(messageList.at(-1), messageList.length - 1)}
           {currentAssistantMessage && (
             <MessageItem
               item={{
@@ -461,9 +482,9 @@ export default function Page() {
               }}
             />
           )}
+          <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
         </div>
 
-        <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
         <div id="chat-bottom" />
       </div>
     </div>

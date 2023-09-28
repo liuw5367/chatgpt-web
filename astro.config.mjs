@@ -48,5 +48,5 @@ export default defineConfig({
   output: "server",
   adapter: envAdapter(),
   server: { host: true },
-  integrations: [unocss(), react()]
+  integrations: [unocss(), react()],
 });

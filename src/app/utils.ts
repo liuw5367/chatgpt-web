@@ -97,3 +97,8 @@ export function moveCursorToEnd(element: HTMLTextAreaElement) {
     element.setSelectionRange(element.value.length, element.value.length);
   }, 0);
 }
+
+export function isWindows() {
+  if (typeof navigator === 'undefined') return false;
+  return /windows|win32/i.test(navigator.userAgent);
+}
