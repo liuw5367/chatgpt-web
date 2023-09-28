@@ -122,6 +122,9 @@ const loadIcons = () => (
 
 function loadScrollBarCss() {
   if (isWindows()) {
-    document.write('<link rel="stylesheet" href="/scrollbar.css">');
+    const link = document.createElement('link');
+    link.setAttribute('rel', 'stylesheet');
+    link.setAttribute('href', '/scrollbar.css');
+    document.head.append(link);
   }
 }
