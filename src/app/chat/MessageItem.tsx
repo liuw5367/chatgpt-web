@@ -27,7 +27,8 @@ import {
 } from '@tabler/icons-react';
 import { useState } from 'react';
 
-import { hasUnisoundConfig } from '../ai/Config';
+import { ENV_KEY } from '../ai/Config';
+import { chatConfigStore } from '../store.ts';
 import type { ChatMessage } from '../types';
 import { renderMarkdown } from './markdown';
 import { estimateTokens } from './token';
@@ -48,6 +49,7 @@ export function MessageItem(props: Props) {
   const { onCopy: onPromptCopy, hasCopied: hasPromptCopied } = useClipboard(item.prompt || '');
 
   const [showOriginContent, setShowOriginContent] = useState(false);
+  const hasUnisoundKey = chatConfigStore((s) => s.unisoundAppKey || ENV_KEY);
 
   const isUser = item.role === 'user';
   if (!isUser && !item.markdown) {
@@ -124,7 +126,7 @@ export function MessageItem(props: Props) {
             )
           }
         />
-        {hasUnisoundConfig() && (
+        {hasUnisoundKey && (
           <IconButton
             aria-label="TTS"
             variant="ghost"

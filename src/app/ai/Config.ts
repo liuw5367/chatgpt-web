@@ -1,6 +1,6 @@
 import { chatConfigStore } from '../store';
 
-const ENV_KEY = import.meta.env.PUBLIC_UNISOUND_AI_KEY;
+export const ENV_KEY = import.meta.env.PUBLIC_UNISOUND_AI_KEY;
 
 export function getUnisoundKeySecret() {
   const { unisoundAppKey, unisoundSecret } = chatConfigStore.getState();
@@ -8,11 +8,6 @@ export function getUnisoundKeySecret() {
     KEY: unisoundAppKey || ENV_KEY,
     SECRET: unisoundSecret || undefined,
   };
-}
-
-export function hasUnisoundConfig(): boolean {
-  const config = getUnisoundKeySecret();
-  return config.KEY != null && config.KEY !== '';
 }
 
 /** 官方 demo 中有这个。应该是区分用户的，可以随便填 */

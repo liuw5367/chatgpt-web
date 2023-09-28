@@ -12,14 +12,14 @@ import {
   IconPlayerPause,
   IconPlayerPlay,
 } from '@tabler/icons-react';
-import { useDebounceEffect, useDebounceFn, useMemoizedFn } from 'ahooks';
+import { useDebounceEffect, useMemoizedFn } from 'ahooks';
 import React, { createRef, useEffect, useRef, useState } from 'react';
 
 import { AutoResizeTextarea } from '../../components';
 import { localDB } from '../../utils/LocalDB';
 import type { VoiceRef } from '../ai';
 import VoiceView from '../ai';
-import { getUnisoundKeySecret, hasUnisoundConfig } from '../ai/Config';
+import { ENV_KEY } from '../ai/Config';
 import { useTranslation } from '../i18n';
 import { chatConfigStore, chatDataStore, chatListStore, visibleStore } from '../store';
 import type { ChatMessage } from '../types';
@@ -34,6 +34,7 @@ import { UsageTips } from './UsageTips';
 export default function Page() {
   const { t } = useTranslation();
   const toast = useToast({ position: 'top', isClosable: true });
+  const hasUnisoundKey = chatConfigStore((s) => s.unisoundAppKey || ENV_KEY);
   const messageList = chatDataStore((s) => s.data);
   const currentChat = chatListStore((s) => s.currentChat());
   const updateChat = chatListStore((s) => s.updateChat);
@@ -55,17 +56,15 @@ export default function Page() {
   const [errorInfo, setErrorInfo] = useState<{ code: string; message?: string }>();
 
   const asrResultRef = useRef('');
-  const { run: scrollToBottom } = useDebounceFn((options?: ScrollIntoViewOptions) => scrollToPageBottom(options), {
-    wait: 100,
-    maxWait: 300,
-  });
+  const [isGenerated, setGenerated] = useState(false);
 
   useEffect(() => {
+    setGenerated(false);
     stopGenerate();
   }, [currentChat.id]);
 
   useEffect(() => {
-    scrollToBottom({ behavior: 'auto' });
+    scrollToPageBottom({ behavior: 'auto' });
   }, []);
 
   useDebounceEffect(() => {
@@ -93,8 +92,7 @@ export default function Page() {
   }
 
   function checkUnisound() {
-    const config = getUnisoundKeySecret();
-    if (!config.KEY) {
+    if (!hasUnisoundKey) {
       toast({ status: 'error', title: t('please enter unisound AppKey') });
       return true;
     }
@@ -130,7 +128,6 @@ export default function Page() {
   const stopGenerate = useMemoizedFn(() => {
     chatAbortController?.abort();
     setChatLoading(false);
-    scrollToBottom();
   });
 
   async function handleSendClick(inputValue = inputContent) {
@@ -219,7 +216,8 @@ export default function Page() {
     chatDataStore.setState({ data: [...messageList, question] });
     setInputContent('');
     asrResultRef.current = '';
-    scrollToBottom();
+    scrollToElement(question.id, { block: 'start' });
+    setGenerated(true);
 
     setChatLoading(true);
 
@@ -234,7 +232,6 @@ export default function Page() {
         assistantMessage = draft + content;
         return assistantMessage;
       });
-      scrollToBottom();
     }
 
     try {
@@ -263,7 +260,6 @@ export default function Page() {
           const json = await response.json();
           if (json?.error?.code || json?.error?.message) {
             setErrorInfo(json.error as any);
-            scrollToBottom();
           } else {
             toast({ status: 'error', title: t('toast.error.request') });
           }
@@ -316,7 +312,6 @@ export default function Page() {
     }));
     setChatLoading(false);
     setCurrentAssistantMessage('');
-    scrollToBottom();
   }
 
   function handleClearClick() {
@@ -376,15 +371,8 @@ export default function Page() {
         <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
       </div>
       <div className="mb-4 flex flex-row items-center space-x-3">
-        {hasUnisoundConfig() && (
+        {hasUnisoundKey && (
           <>
-            <IconButton
-              aria-label="ASR" //
-              onClick={handleASRClick}
-              colorScheme={recording ? 'red' : 'gray'}
-              variant={recording ? 'outline' : 'solid'}
-              icon={recording ? <IconMicrophoneOff stroke={1.5} /> : <IconMicrophone stroke={1.5} />}
-            />
             {ttsPlaying && (
               <IconButton
                 aria-label="TTS" //
@@ -394,6 +382,13 @@ export default function Page() {
                 icon={ttsPlaying ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />}
               />
             )}
+            <IconButton
+              aria-label="ASR" //
+              onClick={handleASRClick}
+              colorScheme={recording ? 'red' : 'gray'}
+              variant={recording ? 'outline' : 'solid'}
+              icon={recording ? <IconMicrophoneOff stroke={1.5} /> : <IconMicrophone stroke={1.5} />}
+            />
           </>
         )}
         <IconButton
@@ -455,16 +450,19 @@ export default function Page() {
             }}
           />
         ))}
-        {currentAssistantMessage && (
-          <MessageItem
-            key={'-1'}
-            item={{
-              id: '-1',
-              role: 'assistant',
-              content: currentAssistantMessage,
-            }}
-          />
-        )}
+
+        <div style={{ minHeight: isGenerated ? 'calc((100vh - 64px - 143px)/3 * 2)' : undefined }}>
+          {currentAssistantMessage && (
+            <MessageItem
+              item={{
+                id: '-1',
+                role: 'assistant',
+                content: currentAssistantMessage,
+              }}
+            />
+          )}
+        </div>
+
         <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
         <div id="chat-bottom" />
       </div>
