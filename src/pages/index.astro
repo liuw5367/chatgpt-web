@@ -10,7 +10,6 @@ import { APP_NAME } from "../constants";
     <App client:only="react" />
     <div id="app-loading">
       <div>
-        <div class="spinner" />
         <img src="/favicon.svg" class="logo" alt="" />
       </div>
     </div>
@@ -30,17 +29,6 @@ import { APP_NAME } from "../constants";
     @media (prefers-color-scheme: dark) {
       background: #1A202C;
     }
-  }
-
-  .spinner {
-    height: 32px;
-    width: 32px;
-
-    border: 2px solid transparent;
-    border-top-color: teal;
-    border-radius: 50%;
-
-    animation: spinner 666ms linear infinite;
   }
 
   @keyframes spinner {

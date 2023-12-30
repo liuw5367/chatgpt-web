@@ -33,7 +33,7 @@ export type SettingItemType<T = string> = {
 
 const voiceList: SettingItemType[] = [
   { label: 'Unisound AppKey', value: 'unisoundAppKey', placeholder: 'https://ai.unisound.com' },
-  { label: 'Unisound SECRET', value: 'unisoundSecret', type: 'password', placeholder: 'https://ai.unisound.com' },
+  { label: 'Unisound SECRET', value: 'unisoundSecret', placeholder: 'https://ai.unisound.com' },
 ];
 
 export const modelList = [
@@ -136,11 +136,10 @@ export function SettingPanel() {
     {
       label: t('Access Code'),
       value: 'accessCode',
-      type: 'password',
       placeholder: t('please enter') + ' ' + t('Access Code'),
     },
-    { label: 'OpenAI Key', value: 'openAIKey', type: 'password', placeholder: t('please enter') + ' ' + 'OPENAI_KEY' },
     { label: 'OpenAI Host', value: 'openAIHost', placeholder: 'https://api.openai.com' },
+    { label: 'OpenAI Key', value: 'openAIKey',  placeholder: t('please enter') + ' ' + 'OPENAI_KEY' },
     { label: 'OpenAI Model', value: 'openAIModel', type: 'select', placeholder: 'gpt-3.5-turbo' },
     {
       type: 'number',
