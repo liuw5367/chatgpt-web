@@ -17,16 +17,14 @@ import React, { createRef, useEffect, useRef, useState } from 'react';
 
 import { AutoResizeTextarea } from '../../components';
 import { localDB } from '../../utils/LocalDB';
-import type { VoiceRef } from '../ai';
-import VoiceView from '../ai';
-import { ENV_KEY } from '../ai/Config';
 import { useTranslation } from '../i18n';
 import { chatConfigStore, chatDataStore, chatListStore, visibleStore } from '../store';
 import type { ChatMessage } from '../types';
-import { getCurrentTime, moveCursorToEnd, removeLn, request, scrollToElement, uuid } from '../utils';
+import { getCurrentTime, moveCursorToEnd, removeLn, request, scrollToElement, speakText, uuid } from '../utils';
 import { Command } from './Command';
 import ErrorItem from './ErrorItem';
 import { MessageItem } from './MessageItem';
+import { Recognition } from './Recognition';
 import { SearchSuggestions } from './SearchSuggestions';
 import { estimateTokens } from './token';
 import { UsageTips } from './UsageTips';
@@ -34,7 +32,6 @@ import { UsageTips } from './UsageTips';
 export default function Page() {
   const { t } = useTranslation();
   const toast = useToast({ position: 'top', isClosable: true });
-  const hasUnisoundKey = chatConfigStore((s) => s.unisoundAppKey || ENV_KEY);
   const messageList = chatDataStore((s) => s.data);
   const currentChat = chatListStore((s) => s.currentChat());
   const updateChat = chatListStore((s) => s.updateChat);
@@ -48,7 +45,7 @@ export default function Page() {
 
   const [recording, setRecording] = useState(false);
   const [ttsPlaying, setTtsPlaying] = useState(false);
-  const voiceRef = React.useRef<VoiceRef | null>();
+  const recognitionRef = React.useRef<Recognition>(new Recognition());
 
   const [chatLoading, setChatLoading] = useState(false);
   const [chatAbortController, setAbortController] = useState<AbortController>();
@@ -64,6 +61,7 @@ export default function Page() {
   }, [currentChat.id]);
 
   useEffect(() => {
+    recognitionRef.current?.setListener(handleAsrResult);
     scrollToPageBottom({ behavior: 'auto' });
   }, []);
 
@@ -77,52 +75,42 @@ export default function Page() {
   }, [currentChat.id]);
 
   function stopTTS() {
-    voiceRef.current?.stopTts();
+    setTtsPlaying(false);
+    window.speechSynthesis?.cancel();
   }
 
   function playTTS(content: string = '') {
-    voiceRef.current?.tts(content);
+    speakText(content, (value) => {
+      setTtsPlaying(value);
+    });
   }
 
-  function handleAsrResult(result: string, changing: boolean) {
-    setInputContent(asrResultRef.current + result);
-    if (!changing) {
-      asrResultRef.current += result;
-    }
-  }
-
-  function checkUnisound() {
-    if (!hasUnisoundKey) {
-      toast({ status: 'error', title: t('please enter unisound AppKey') });
-      return true;
-    }
-    return false;
+  function handleAsrResult(result: string) {
+    setInputContent(result);
+    asrResultRef.current = result;
   }
 
   function handleTTSClick() {
-    if (checkUnisound()) return;
-
     if (ttsPlaying) {
       stopTTS();
     } else {
       const data = [...messageList].filter((v) => v.role === 'assistant').reverse();
       const content = data?.[0]?.content;
       if (content) {
-        voiceRef.current?.stopAsr();
+        recognitionRef.current?.stop();
         playTTS(content);
       }
     }
   }
 
   function handleASRClick() {
-    if (checkUnisound()) return;
-
     stopTTS();
     if (recording) {
-      voiceRef.current?.stopAsr();
+      recognitionRef.current?.stop();
     } else {
-      voiceRef.current?.asr();
+      recognitionRef.current?.start();
     }
+    setRecording(!recording);
   }
 
   const stopGenerate = useMemoizedFn(() => {
@@ -316,7 +304,7 @@ export default function Page() {
 
   function handleClearClick() {
     stopTTS();
-    voiceRef.current?.stopAsr();
+    recognitionRef.current?.stop();
     stopGenerate();
     setInputContent('');
     asrResultRef.current = '';
@@ -371,26 +359,22 @@ export default function Page() {
         <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
       </div>
       <div className="mb-4 flex flex-row items-center space-x-3">
-        {hasUnisoundKey && (
-          <>
-            {ttsPlaying && (
-              <IconButton
-                aria-label="TTS" //
-                onClick={handleTTSClick}
-                colorScheme={ttsPlaying ? 'red' : 'gray'}
-                variant={ttsPlaying ? 'outline' : 'solid'}
-                icon={ttsPlaying ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />}
-              />
-            )}
-            <IconButton
-              aria-label="ASR" //
-              onClick={handleASRClick}
-              colorScheme={recording ? 'red' : 'gray'}
-              variant={recording ? 'outline' : 'solid'}
-              icon={recording ? <IconMicrophoneOff stroke={1.5} /> : <IconMicrophone stroke={1.5} />}
-            />
-          </>
+        {ttsPlaying && (
+          <IconButton
+            aria-label="TTS" //
+            onClick={handleTTSClick}
+            colorScheme={ttsPlaying ? 'red' : 'gray'}
+            variant={ttsPlaying ? 'outline' : 'solid'}
+            icon={ttsPlaying ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />}
+          />
         )}
+        <IconButton
+          aria-label="ASR" //
+          onClick={handleASRClick}
+          colorScheme={recording ? 'red' : 'gray'}
+          variant={recording ? 'outline' : 'solid'}
+          icon={recording ? <IconMicrophoneOff stroke={1.5} /> : <IconMicrophone stroke={1.5} />}
+        />
         <IconButton
           aria-label="Conversation"
           title="Continuous conversation"
@@ -471,8 +455,14 @@ export default function Page() {
         {messageList?.map((item, index) => renderItem(item, index, true))}
 
         <div style={{ minHeight: isGenerated ? 'calc(100vh - 64px - 143px - 64px)' : undefined }}>
-          {renderItem(messageList.at(-2), messageList.length - 2)}
-          {renderItem(messageList.at(-1), messageList.length - 1)}
+          {
+            // eslint-disable-next-line unicorn/prefer-at
+            renderItem(messageList[messageList.length - 2], messageList.length - 2)
+          }
+          {
+            // eslint-disable-next-line unicorn/prefer-at
+            renderItem(messageList[messageList.length - 1], messageList.length - 1)
+          }
           {currentAssistantMessage && (
             <MessageItem
               item={{
@@ -542,13 +532,6 @@ export default function Page() {
           {actions}
         </div>
       </div>
-      <VoiceView
-        ref={(ref) => (voiceRef.current = ref)}
-        chatLoading={chatLoading}
-        onAsrResultChange={handleAsrResult}
-        onAsrStatusChange={setRecording}
-        onTtsStatusChange={setTtsPlaying}
-      />
     </div>
   );
 }

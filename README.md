@@ -3,7 +3,7 @@
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/liuw5367/chatgpt-web)
 [![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/liuw5367/chatgpt-web)
 
-[Astro分支](https://github.com/liuw5367/chatgpt-web/tree/astro)和[主分支](https://github.com/liuw5367/chatgpt-web)代码同步，只是框架不同。Astro 服务端渲染不能完整支持 Emotion，所以使用的是客户端渲染。而 Next 分支使用服务端渲染，但 Next 与 Unocss 配合开发体验不好，所以现在都是在 Astro 分支上开发。
+[Astro分支](https://github.com/liuw5367/chatgpt-web/tree/astro)和[主分支](https://github.com/liuw5367/chatgpt-web)代码同步，只是框架不同。
 
 可自行选择部署的分支：
 
@@ -12,7 +12,7 @@
   - [Next 分支体验地址 Netlify](https://chatgpt-light.netlify.app)
 
 
-- Astro 分支首次加载时白屏时间长一点，但之后刷新页面时页面显示都挺快
+- Astro 分支首次加载时白屏时间长一点
   - [Astro 分支体验地址](https://chatgpt-astro.netlify.app)
 
 ## 功能
@@ -32,7 +32,7 @@
 - 支持代码复制
 - 输入 `/` 搜索 Prompt
 - 支持 i18n
-- 支持 ASR 和 TTS，可用但不完善，需[申请 key](https://ai.unisound.com)
+- 支持 语音识别ASR 和 语音合成TTS，使用浏览器自带的 api
 
 ![Dark](./screenshot-dark.png)
 
@@ -75,11 +75,6 @@
 设置访问密码：
 
 - `ACCESS_CODE`
-
-ASR、TTS：
-
-- `PUBLIC_UNISOUND_AI_KEY`
-- `UNISOUND_AI_SECRET`
 
 
 ## 感谢

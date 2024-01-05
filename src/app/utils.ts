@@ -102,3 +102,29 @@ export function isWindows() {
   if (typeof navigator === 'undefined') return false;
   return /windows|win32/i.test(navigator.userAgent);
 }
+
+export function sleep(time: number) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+
+export async function speakText(content: string, callback: (playing: boolean) => void) {
+  if (!window.speechSynthesis) return;
+  if (speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+    callback(false);
+  }
+
+  await sleep(300);
+
+  const msg = new SpeechSynthesisUtterance(content);
+  msg.lang = 'zh';
+  msg.rate = 1;
+  msg.addEventListener('end', () => {
+    callback(false);
+  });
+  msg.addEventListener('error', () => {
+    callback(false);
+  });
+  callback(true);
+  speechSynthesis.speak(msg);
+}
