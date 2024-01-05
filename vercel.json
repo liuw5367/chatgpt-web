@@ -1,3 +1,9 @@
 {
-  "buildCommand": "OUTPUT=vercel astro build"
+  "buildCommand": "OUTPUT=vercel astro build",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ]
 }
