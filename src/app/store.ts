@@ -18,8 +18,7 @@ export interface ChatConfigType {
   searchSuggestions?: string;
   enterSend?: string;
 
-  unisoundAppKey?: string;
-  unisoundSecret?: string;
+  asrLanguage?: string;
 }
 
 export const chatConfigStore = create<ChatConfigType, [['zustand/persist', ChatConfigType]]>(
@@ -27,6 +26,7 @@ export const chatConfigStore = create<ChatConfigType, [['zustand/persist', ChatC
     (set, get) => ({
       temperature: '0.6',
       top_p: '1',
+      asrLanguage: 'cmn-Hans-CN',
     }),
     {
       name: 'persist-chat-config',

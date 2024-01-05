@@ -12,21 +12,19 @@ import {
   IconPlayerPause,
   IconPlayerPlay,
 } from '@tabler/icons-react';
-import { useDebounceEffect, useDebounceFn, useMemoizedFn } from 'ahooks';
+import { useDebounceEffect, useMemoizedFn } from 'ahooks';
 import React, { createRef, useEffect, useRef, useState } from 'react';
 
 import { AutoResizeTextarea } from '../../components';
 import { localDB } from '../../utils/LocalDB';
-import type { VoiceRef } from '../ai';
-import VoiceView from '../ai';
-import { getUnisoundKeySecret, hasUnisoundConfig } from '../ai/Config';
 import { useTranslation } from '../i18n';
 import { chatConfigStore, chatDataStore, chatListStore, visibleStore } from '../store';
 import type { ChatMessage } from '../types';
-import { getCurrentTime, moveCursorToEnd, removeLn, request, scrollToElement, uuid } from '../utils';
+import { getCurrentTime, moveCursorToEnd, removeLn, request, scrollToElement, speakText, uuid } from '../utils';
 import { Command } from './Command';
 import ErrorItem from './ErrorItem';
 import { MessageItem } from './MessageItem';
+import { Recognition } from './Recognition';
 import { SearchSuggestions } from './SearchSuggestions';
 import { estimateTokens } from './token';
 import { UsageTips } from './UsageTips';
@@ -47,7 +45,7 @@ export default function Page() {
 
   const [recording, setRecording] = useState(false);
   const [ttsPlaying, setTtsPlaying] = useState(false);
-  const voiceRef = React.useRef<VoiceRef | null>();
+  const recognitionRef = React.useRef<Recognition>(new Recognition());
 
   const [chatLoading, setChatLoading] = useState(false);
   const [chatAbortController, setAbortController] = useState<AbortController>();
@@ -55,17 +53,16 @@ export default function Page() {
   const [errorInfo, setErrorInfo] = useState<{ code: string; message?: string }>();
 
   const asrResultRef = useRef('');
-  const { run: scrollToBottom } = useDebounceFn((options?: ScrollIntoViewOptions) => scrollToPageBottom(options), {
-    wait: 100,
-    maxWait: 300,
-  });
+  const [isGenerated, setGenerated] = useState(false);
 
   useEffect(() => {
+    setGenerated(false);
     stopGenerate();
   }, [currentChat.id]);
 
   useEffect(() => {
-    scrollToBottom({ behavior: 'auto' });
+    recognitionRef.current?.setListener(handleAsrResult);
+    scrollToPageBottom({ behavior: 'auto' });
   }, []);
 
   useDebounceEffect(() => {
@@ -78,59 +75,47 @@ export default function Page() {
   }, [currentChat.id]);
 
   function stopTTS() {
-    voiceRef.current?.stopTts();
+    setTtsPlaying(false);
+    window.speechSynthesis?.cancel();
   }
 
   function playTTS(content: string = '') {
-    voiceRef.current?.tts(content);
+    speakText(content, (value) => {
+      setTtsPlaying(value);
+    });
   }
 
-  function handleAsrResult(result: string, changing: boolean) {
-    setInputContent(asrResultRef.current + result);
-    if (!changing) {
-      asrResultRef.current += result;
-    }
-  }
-
-  function checkUnisound() {
-    const config = getUnisoundKeySecret();
-    if (!config.KEY) {
-      toast({ status: 'error', title: t('please enter unisound AppKey') });
-      return true;
-    }
-    return false;
+  function handleAsrResult(result: string) {
+    setInputContent(result);
+    asrResultRef.current = result;
   }
 
   function handleTTSClick() {
-    if (checkUnisound()) return;
-
     if (ttsPlaying) {
       stopTTS();
     } else {
       const data = [...messageList].filter((v) => v.role === 'assistant').reverse();
       const content = data?.[0]?.content;
       if (content) {
-        voiceRef.current?.stopAsr();
+        recognitionRef.current?.stop();
         playTTS(content);
       }
     }
   }
 
   function handleASRClick() {
-    if (checkUnisound()) return;
-
     stopTTS();
     if (recording) {
-      voiceRef.current?.stopAsr();
+      recognitionRef.current?.stop();
     } else {
-      voiceRef.current?.asr();
+      recognitionRef.current?.start();
     }
+    setRecording(!recording);
   }
 
   const stopGenerate = useMemoizedFn(() => {
     chatAbortController?.abort();
     setChatLoading(false);
-    scrollToBottom();
   });
 
   async function handleSendClick(inputValue = inputContent) {
@@ -219,7 +204,8 @@ export default function Page() {
     chatDataStore.setState({ data: [...messageList, question] });
     setInputContent('');
     asrResultRef.current = '';
-    scrollToBottom();
+    scrollToElement(question.id, { block: 'start' });
+    setGenerated(true);
 
     setChatLoading(true);
 
@@ -234,7 +220,6 @@ export default function Page() {
         assistantMessage = draft + content;
         return assistantMessage;
       });
-      scrollToBottom();
     }
 
     try {
@@ -263,7 +248,6 @@ export default function Page() {
           const json = await response.json();
           if (json?.error?.code || json?.error?.message) {
             setErrorInfo(json.error as any);
-            scrollToBottom();
           } else {
             toast({ status: 'error', title: t('toast.error.request') });
           }
@@ -316,12 +300,11 @@ export default function Page() {
     }));
     setChatLoading(false);
     setCurrentAssistantMessage('');
-    scrollToBottom();
   }
 
   function handleClearClick() {
     stopTTS();
-    voiceRef.current?.stopAsr();
+    recognitionRef.current?.stop();
     stopGenerate();
     setInputContent('');
     asrResultRef.current = '';
@@ -376,26 +359,22 @@ export default function Page() {
         <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
       </div>
       <div className="mb-4 flex flex-row items-center space-x-3">
-        {hasUnisoundConfig() && (
-          <>
-            <IconButton
-              aria-label="ASR" //
-              onClick={handleASRClick}
-              colorScheme={recording ? 'red' : 'gray'}
-              variant={recording ? 'outline' : 'solid'}
-              icon={recording ? <IconMicrophoneOff stroke={1.5} /> : <IconMicrophone stroke={1.5} />}
-            />
-            {ttsPlaying && (
-              <IconButton
-                aria-label="TTS" //
-                onClick={handleTTSClick}
-                colorScheme={ttsPlaying ? 'red' : 'gray'}
-                variant={ttsPlaying ? 'outline' : 'solid'}
-                icon={ttsPlaying ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />}
-              />
-            )}
-          </>
+        {ttsPlaying && (
+          <IconButton
+            aria-label="TTS" //
+            onClick={handleTTSClick}
+            colorScheme={ttsPlaying ? 'red' : 'gray'}
+            variant={ttsPlaying ? 'outline' : 'solid'}
+            icon={ttsPlaying ? <IconPlayerPause stroke={1.5} /> : <IconPlayerPlay stroke={1.5} />}
+          />
         )}
+        <IconButton
+          aria-label="ASR" //
+          onClick={handleASRClick}
+          colorScheme={recording ? 'red' : 'gray'}
+          variant={recording ? 'outline' : 'solid'}
+          icon={recording ? <IconMicrophoneOff stroke={1.5} /> : <IconMicrophone stroke={1.5} />}
+        />
         <IconButton
           aria-label="Conversation"
           title="Continuous conversation"
@@ -437,35 +416,65 @@ export default function Page() {
     </>
   );
 
+  function renderItem(item: ChatMessage | undefined, index: number, isList = false) {
+    if (!item) return;
+
+    const length = messageList.length;
+
+    if (chatLoading) {
+      if (isList) {
+        // 列表：加载中并且最后一个是问题
+        if (index === length - 1 && item.role === 'user') return null;
+      } else if (index === length - 2) {
+        return null;
+      }
+    } else if (isList && index >= length - 2) {
+      return null;
+    }
+
+    return (
+      <MessageItem
+        key={item.id}
+        item={item}
+        onDelete={handleMessageDelete}
+        onPlay={(item) => playTTS(item.content)}
+        onRegenerate={handleRegenerate}
+        onRetry={(item) => {
+          setInputContent(item.content);
+          inputRef.current?.focus();
+          updateConversationId(item.conversationId);
+          updateSystemPrompt(item.prompt);
+        }}
+      />
+    );
+  }
+
   const renderMessageList = (
     <div className="w-full flex flex-1 flex-col items-center overflow-x-hidden overflow-y-auto p-4">
       <div className="relative w-full flex flex-col">
-        {messageList?.map((item) => (
-          <MessageItem
-            key={item.id}
-            item={item}
-            onDelete={handleMessageDelete}
-            onPlay={(item) => playTTS(item.content)}
-            onRegenerate={handleRegenerate}
-            onRetry={(item) => {
-              setInputContent(item.content);
-              inputRef.current?.focus();
-              updateConversationId(item.conversationId);
-              updateSystemPrompt(item.prompt);
-            }}
-          />
-        ))}
-        {currentAssistantMessage && (
-          <MessageItem
-            key={'-1'}
-            item={{
-              id: '-1',
-              role: 'assistant',
-              content: currentAssistantMessage,
-            }}
-          />
-        )}
-        <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
+        {messageList?.map((item, index) => renderItem(item, index, true))}
+
+        <div style={{ minHeight: isGenerated ? 'calc(100vh - 64px - 143px - 64px)' : undefined }}>
+          {
+            // eslint-disable-next-line unicorn/prefer-at
+            renderItem(messageList[messageList.length - 2], messageList.length - 2)
+          }
+          {
+            // eslint-disable-next-line unicorn/prefer-at
+            renderItem(messageList[messageList.length - 1], messageList.length - 1)
+          }
+          {currentAssistantMessage && (
+            <MessageItem
+              item={{
+                id: '-1',
+                role: 'assistant',
+                content: currentAssistantMessage,
+              }}
+            />
+          )}
+          <ErrorItem error={errorInfo} onClose={() => setErrorInfo(undefined)} />
+        </div>
+
         <div id="chat-bottom" />
       </div>
     </div>
@@ -523,13 +532,6 @@ export default function Page() {
           {actions}
         </div>
       </div>
-      <VoiceView
-        ref={(ref) => (voiceRef.current = ref)}
-        chatLoading={chatLoading}
-        onAsrResultChange={handleAsrResult}
-        onAsrStatusChange={setRecording}
-        onTtsStatusChange={setTtsPlaying}
-      />
     </div>
   );
 }

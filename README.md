@@ -1,28 +1,27 @@
 # ChatGPT
 
-> 1.0 版本使用 astro 框架，2.0 开始改用 next 框架。如之前已使用部署 astro 版本，需在管理页面将框架从 astro 切换成 next，并使用默认的 build 命令
-
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/liuw5367/chatgpt-web) [![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/liuw5367/chatgpt-web)
 
-[Astro 分支](https://github.com/liuw5367/chatgpt-web/tree/astro)和[主分支](https://github.com/liuw5367/chatgpt-web)代码同步，只是框架不同。Astro 服务端渲染不能完整支持 Emotion，所以使用的是客户端渲染，而 Next 分支使用服务端渲染。Next 与 Unocss 配合开发体验不好，所以现在都是在 Astro 分支上开发。
+[Astro 分支](https://github.com/liuw5367/chatgpt-web/tree/astro)和[主分支](https://github.com/liuw5367/chatgpt-web)代码同步，只是框架不同。
 
 可自行选择部署的分支：
 
-- Next 分支首次加载时白屏时间短
-
+- Next 分支
   - [Next 分支体验地址 Vercel](https://chatgpt-six-lilac.vercel.app)
   - [Next 分支体验地址 Netlify](https://chatgpt-light.netlify.app)
 
-- Astro 分支首次加载时白屏时间长一点，但之后刷新页面时页面显示都挺快
+
+- Astro 分支首次加载时白屏时间长一点
   - [Astro 分支体验地址](https://chatgpt-astro.netlify.app)
 
 ## 功能
 
-- 页面样式移动端优先
 - 对话使用 OpenAI 官方 API `/v1/chat/completions`
 - 支持图片生成 `/v1/images/generations`
-- 支持设置 System Prompt，提供大量模版供选择
-- 支持 Prompt 收藏、导入、导出（浏览器本地缓存）
+- 支持设置 prompt，提供大量模版供选择
+- 页面样式移动端优先
+- 支持设置访问密码
+- 支持 prompt 收藏、导入、导出（浏览器本地缓存）
 - 支持多会话
 - 支持连续对话
 - 消息显示 token 使用数量
@@ -32,7 +31,7 @@
 - 支持代码复制
 - 输入 `/` 搜索 Prompt
 - 支持 i18n
-- 支持 ASR 和 TTS，可用但不完善，需[申请 key](https://ai.unisound.com)
+- 支持 语音识别ASR 和 语音合成TTS，使用浏览器自带的 api
 
 ![Dark](./screenshot-dark.png)
 
@@ -48,10 +47,10 @@
 ### System Prompt
 
 - 如果 prompt 最后一句带有问句，个人建议将该问句从 prompt 删除，将其填入消息内容框内，不然每次对话的时候，该问句都会跟随 system prompt 一起发送
-- 配置 System Prompt 后页面底部的设置按钮会高亮
+- 配置 system prompt 后页面底部的设置按钮会高亮
 - 消息和回复底部会显示`PROMPT`的标签，点击会复制并显示该 prompt
-- 击消息底部的重试按钮，会恢复对应的 System Prompt 并更新 localStorage 的值
-- 有 prompt 时未填写消息内容，可点击发送按钮。因内容为空，为便于查看，列表中内容区域会显示为 System Prompt
+- 击消息底部的重试按钮，会恢复对应的 system prompt 并更新 localStorage 的值
+- 有 prompt 时未填写消息内容，可点击发送按钮。因内容为空，为便于查看，列表中内容区域会显示为 system prompt
 
 ### 连续对话
 
@@ -76,29 +75,6 @@
 
 - `ACCESS_CODE`
 
-ASR、TTS：
-
-- `NEXT_PUBLIC_UNISOUND_AI_KEY`
-- `UNISOUND_AI_SECRET`
-
-## 问题
-
-### 启动时 Unocss 样式错误
-
-- 解决方案一：`next.config.js` 中设置 `cache = false`，但影响热更新
-  ```js
-  webpack: (config, context) => {
-    config.cache = false;
-  };
-  ```
-- 解决方案二：`package.json` 中添加命令启动时删除 `.next` 缓存，会导致应用启动时较慢
-  ```json
-  {
-    "scripts": {
-      "start": "rm -rf .next && next dev"
-    }
-  }
-  ```
 
 ## 感谢
 

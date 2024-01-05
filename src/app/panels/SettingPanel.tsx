@@ -17,6 +17,7 @@ import getConfig from 'next/config';
 import { useEffect, useState } from 'react';
 
 import { PasswordInput, SimpleDrawer } from '../../components';
+import { supportLanguages } from '../chat/Recognition';
 import { useTranslation } from '../i18n';
 import type { ChatConfigType } from '../store';
 import { chatConfigStore, visibleStore } from '../store';
@@ -31,11 +32,6 @@ export type SettingItemType<T = string> = {
   max?: number;
 };
 
-const voiceList: SettingItemType[] = [
-  { label: 'Unisound AppKey', value: 'unisoundAppKey', placeholder: 'https://ai.unisound.com' },
-  { label: 'Unisound SECRET', value: 'unisoundSecret', placeholder: 'https://ai.unisound.com' },
-];
-
 export const modelList = [
   { label: 'gpt-3.5-turbo', value: 'gpt-3.5-turbo' },
   { label: 'gpt-3.5-turbo-16k', value: 'gpt-3.5-turbo-16k' },
@@ -45,6 +41,8 @@ export const modelList = [
   { label: 'text-davinci-002', value: 'text-davinci-002' },
   { label: 'code-davinci-002', value: 'code-davinci-002' },
 ];
+
+const asrLanguageList = Object.entries(supportLanguages).map(([label, value]) => ({ label, value }));
 
 export function SettingPanel() {
   const { t } = useTranslation();
@@ -157,6 +155,12 @@ export function SettingPanel() {
       placeholder: '',
       desc: t('settings.top_p'),
     },
+    {
+      type: 'select',
+      label: '语音识别语言',
+      value: 'asrLanguage',
+      placeholder: '',
+    },
   ];
 
   return (
@@ -181,10 +185,7 @@ export function SettingPanel() {
         </>
       }
     >
-      <div className="flex flex-col space-y-4">
-        {chatConfigList.map((item) => renderItem(item))}
-        {voiceList.map((item) => renderItem(item))}
-      </div>
+      <div className="flex flex-col space-y-4">{chatConfigList.map((item) => renderItem(item))}</div>
     </SimpleDrawer>
   );
 }
@@ -221,7 +222,7 @@ export function SettingItem({ item, value, onChange, balance }: ItemProps) {
         />
       ) : item.type === 'select' ? (
         <Select value={value} onChange={(e) => onChange?.(e.target.value)}>
-          {modelList.map((item) => (
+          {(item.value === 'asrLanguage' ? asrLanguageList : modelList).map((item) => (
             <option key={item.label} value={item.label}>
               {item.value}
             </option>

@@ -27,7 +27,6 @@ import {
 } from '@tabler/icons-react';
 import { useState } from 'react';
 
-import { hasUnisoundConfig } from '../ai/Config';
 import type { ChatMessage } from '../types';
 import { renderMarkdown } from './markdown';
 import { estimateTokens } from './token';
@@ -124,7 +123,7 @@ export function MessageItem(props: Props) {
             )
           }
         />
-        {hasUnisoundConfig() && (
+        {window.speechSynthesis && (
           <IconButton
             aria-label="TTS"
             variant="ghost"
