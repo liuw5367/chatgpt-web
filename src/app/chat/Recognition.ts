@@ -39,7 +39,6 @@ export class Recognition {
       for (let index = 0; index < event.results.length; index++) {
         const item = event.results[index];
         // 中文添加逗号
-        console.log(transcript, lang);
         if (transcript && lang?.includes('Han')) transcript += '，';
 
         transcript += (item as unknown as SpeechRecognitionAlternative[])[0]?.transcript;
