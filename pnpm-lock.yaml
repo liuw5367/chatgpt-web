@@ -89,9 +89,6 @@ dependencies:
   react-textarea-autosize:
     specifier: ^8.5.3
     version: 8.5.3(@types/react@18.2.23)(react@18.2.0)
-  recorder-core:
-    specifier: ^1.2.23070100
-    version: 1.2.23070100
   uuid:
     specifier: ^9.0.1
     version: 9.0.1
@@ -5049,10 +5046,6 @@ packages:
     dependencies:
       picomatch: 2.3.1
     dev: true
-
-  /recorder-core@1.2.23070100:
-    resolution: {integrity: sha512-R9S2taKj8Q2aePJdoLzSD784WW++VIpWhOgYw+IiM03SdyOVZV2osYgGj/l6yD7BJ8uwo4bl75d3Pg+WMp3Z1A==}
-    dev: false
 
   /reflect.getprototypeof@1.0.4:
     resolution: {integrity: sha512-ECkTw8TmJwW60lOTR+ZkODISW6RQ8+2CL3COqtiJKLd6MmB45hN51HprHFziKLGkAuTGQhBb91V8cy+KHlaCjw==}
