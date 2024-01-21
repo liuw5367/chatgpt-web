@@ -110,7 +110,7 @@ export function ChatPanel(props: Props) {
         <div className="w-full flex flex-row items-center justify-between">
           <div className="flex flex-row items-center">
             <Link href="https://www.yuque.com/home-repo/zdl71c/mavy1dcmhfhtrkgr?singleDoc#" isExternal>
-            <Button variant="ghost">{t('about')}</Button>
+              <Button variant="ghost">{t('about')}</Button>
             </Link>
             <Button
               aria-label="ChangeLanguage"
