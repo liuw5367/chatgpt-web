@@ -1,5 +1,6 @@
 {
   "language": "中文",
+  "about": "关于我",
   "chat": {
     "placeholder": "Ctrl + Enter 发送，Enter 换行，/ 搜索提示词，↑ 上一问",
     "enterPlaceholder": "Enter 发送，Shift + Enter 换行，/ 搜索提示词，↑ 上一问"
