@@ -41,9 +41,6 @@ dependencies:
   astro:
     specifier: ^4.5.5
     version: 4.5.5(@types/node@20.7.0)(typescript@5.2.2)
-  astro-gpt:
-    specifier: 'link:'
-    version: 'link:'
   axios:
     specifier: ^1.5.1
     version: 1.5.1
