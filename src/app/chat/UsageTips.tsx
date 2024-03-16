@@ -10,7 +10,7 @@ export function UsageTips() {
     setTips(
       language?.toLowerCase()?.includes('zh')
         ? [
-            '输入 / 可激活 Prompt 搜索窗口',
+            '输入 / 可激活提示词搜索窗口',
             '输入框为空时，按上箭头将填充上一条消息内容',
             '提示词设置底部🌟可对提示词进行收藏',
             '提示词设置底部可对提示词进行导入导出',
@@ -19,7 +19,6 @@ export function UsageTips() {
             '默认开启搜索内容建议，可在设置中关闭',
             '默认未开启回车键发送，可在设置中开启',
             '消息底部统计数字为Token使用量',
-            '默认隐藏语音按钮，输入 KEY 后显示',
           ]
         : [
             'Enter / Activate Prompt search window',

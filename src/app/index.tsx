@@ -4,13 +4,21 @@ import { useEffect, useRef, useState } from 'react';
 import Chat from './chat';
 import { Header } from './Header';
 import { useTranslation } from './i18n';
-import { ChatPanel, ImagePanel, SettingPanel, SystemPromptPanel } from './panels';
+import {
+  ChatPanel,
+  ImagePanel,
+  SettingPanel,
+  SystemPromptPanel,
+} from './panels';
 import { loadCache } from './storage';
 import { visibleStore } from './store';
-import { addCodeCopy } from './utils';
+import { addCodeCopy, isWindows } from './utils';
 
 export default function App() {
-  const theme = extendTheme({ initialColorMode: 'system', useSystemColorMode: true });
+  const theme = extendTheme({
+    initialColorMode: 'system',
+    useSystemColorMode: true,
+  });
   const [loadFlag, setLoadFlag] = useState(false);
 
   useEffect(() => {
@@ -20,10 +28,10 @@ export default function App() {
   return (
     <ChakraProvider theme={theme}>
       {loadIcons()}
-      <div className="v-screen h-screen flex flex-col overflow-hidden">
-        <Header />
+      <div className="h-screen w-screen flex flex-col overflow-hidden">
         {loadFlag && (
           <>
+            <Header />
             <Content />
             <ImagePanel />
             <SettingPanel />
@@ -88,7 +96,10 @@ function Content() {
       className="w-full flex flex-1 overflow-hidden"
       style={{ backgroundColor: 'var(--chakra-colors-chakra-body-bg)' }}
     >
-      <ChatPanel chatVisible={chatVisibleState} type={leftSide ? 'side' : 'drawer'} />
+      <ChatPanel
+        chatVisible={chatVisibleState}
+        type={leftSide ? 'side' : 'drawer'}
+      />
       <div
         className="h-full w-full"
         style={{
@@ -120,4 +131,13 @@ function loadIcons() {
       <div className="i-tabler-copy hidden" />
     </>
   );
+}
+
+function loadScrollBarCss() {
+  if (isWindows()) {
+    const link = document.createElement('link');
+    link.setAttribute('rel', 'stylesheet');
+    link.setAttribute('href', '/scrollbar.css');
+    document.head.append(link);
+  }
 }

@@ -17,6 +17,7 @@
     "off": "已关闭连续对话",
     "desc": "该对话不会和之前的消息关联"
   },
+  "SpeechToText": "语音识别",
   "New Chat": "新的对话",
   "please enter content": "请输入内容",
   "please enter prompt": "请输入提示词",
@@ -31,7 +32,6 @@
   "Delete Favorite": "删除收藏",
   "Save To Favorite": "保存到收藏",
   "Import Error": "导入错误",
-  "Used this month": "本月已使用",
   "Access Code": "访问密码",
   "Chat Settings": "对话设置",
   "Setting": "设置",

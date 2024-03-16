@@ -22,7 +22,10 @@ export function uuid(replace = true) {
   return uuidFn().replaceAll('-', '');
 }
 
-export function scrollToElement(value: string | HTMLElement, option?: ScrollIntoViewOptions) {
+export function scrollToElement(
+  value: string | HTMLElement,
+  option?: ScrollIntoViewOptions,
+) {
   setTimeout(() => {
     let element;
     if (typeof value === 'string') {
@@ -32,7 +35,11 @@ export function scrollToElement(value: string | HTMLElement, option?: ScrollInto
       element = value;
     }
     if (element && element.scrollIntoView) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center', ...option });
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        ...option,
+      });
     }
   }, 40);
 }
@@ -60,7 +67,9 @@ export function removeLn(content?: string): string {
 export function addCodeCopy() {
   const clipboard = new Clipboard('.markdown-it-code-copy', {
     text(trigger) {
-      return decodeURIComponent(trigger.getAttribute('data-clipboard-text') || '');
+      return decodeURIComponent(
+        trigger.getAttribute('data-clipboard-text') || '',
+      );
     },
   });
   clipboard.on('success', (e) => {
@@ -94,7 +103,9 @@ export async function readFileAsString(file: Blob): Promise<string> {
 }
 
 export function isMobile() {
-  return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent);
+  return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
+    navigator.userAgent,
+  );
 }
 
 export function moveCursorToEnd(element: HTMLTextAreaElement) {
@@ -104,11 +115,21 @@ export function moveCursorToEnd(element: HTMLTextAreaElement) {
   }, 0);
 }
 
+export function isWindows() {
+  if (typeof navigator === 'undefined') {
+    return false;
+  }
+  return /windows|win32/i.test(navigator.userAgent);
+}
+
 export function sleep(time: number) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
 
-export async function speakText(content: string, callback: (playing: boolean) => void) {
+export async function speakText(
+  content: string,
+  callback: (playing: boolean) => void,
+) {
   if (!window.speechSynthesis) {
     return;
   }

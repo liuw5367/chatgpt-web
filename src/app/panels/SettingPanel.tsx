@@ -21,7 +21,6 @@ import { supportLanguages } from '../chat/Recognition';
 import { useTranslation } from '../i18n';
 import type { ChatConfigType } from '../store';
 import { chatConfigStore, visibleStore } from '../store';
-import { request } from '../utils';
 
 export interface SettingItemType<T = string> {
   type?: 'password' | 'number' | 'switch' | 'select';
@@ -51,50 +50,12 @@ export function SettingPanel() {
   const settingVisible = visibleStore((s) => s.settingVisible);
 
   const [config, setConfig] = useState({ ...chatConfig });
-  const [balance, setBalance] = useState('');
-  const [abortController, setAbortController] = useState<AbortController>();
-
-  useEffect(() => {
-    return () => {
-      abortController?.abort();
-    };
-  }, [abortController]);
 
   useEffect(() => {
     if (settingVisible) {
       setConfig({ ...chatConfigStore.getState() });
     }
   }, [settingVisible]);
-
-  async function requestUsage() {
-    try {
-      const controller = new AbortController();
-      setAbortController(controller);
-
-      const response = await request('/api/usage', {
-        method: 'POST',
-        signal: controller.signal,
-        body: JSON.stringify({
-          apiKey: chatConfig.openAIKey,
-        }),
-      });
-
-      const json = await response.json();
-      if (json.error?.code) {
-        // toast({ status: "error", title: json.error.code, description: json.error.message });
-      }
-      else {
-        const { total_usage } = json;
-        if (total_usage != null && total_usage !== '') {
-          setBalance(`$${(total_usage / 100).toFixed(5)}`);
-        }
-      }
-    }
-    catch {
-      // toast({ status: "error", title: e.toString() });
-    }
-    setAbortController(undefined);
-  }
 
   function handleClose() {
     visibleStore.setState({ settingVisible: false });
@@ -113,7 +74,6 @@ export function SettingPanel() {
       <SettingItem
         key={item.value}
         item={item}
-        balance={balance}
         value={config[item.value as keyof ChatConfigType] || ''}
         onChange={(value) => setConfig((draft) => ({ ...draft, [item.value]: value }))}
       />
@@ -159,7 +119,7 @@ export function SettingPanel() {
     },
     {
       type: 'select',
-      label: '语音识别语言',
+      label: t('SpeechToText'),
       value: 'asrLanguage',
       placeholder: '',
     },
@@ -199,25 +159,15 @@ interface ItemProps {
   item: SettingItemType;
   value: string;
   onChange?: (v: string) => void;
-  balance?: string;
 }
 
-export function SettingItem({ item, value, onChange, balance }: ItemProps) {
+export function SettingItem({ item, value, onChange }: ItemProps) {
   const horizontal = item.type === 'switch';
-  const { t } = useTranslation();
 
   return (
     <FormControl className={`${horizontal && 'flex flex-row'}`}>
       <FormLabel className={`${horizontal && 'flex-1'}`}>
         <span>{item.label}</span>
-        {item.label === 'OpenAI Key' && balance && (
-          <span className="text-sm text-gray-500">
-            &nbsp;
-            {t('Used this month')}
-            {': '}
-            {balance}
-          </span>
-        )}
       </FormLabel>
       {item.type === 'password'
         ? (
