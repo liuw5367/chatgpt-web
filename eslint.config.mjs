@@ -12,6 +12,7 @@ export default antfu(
   },
   {
     rules: {
+      'node/prefer-global/process': 'off',
       'curly': ['error', 'all'],
       'style/jsx-indent': ['error', 2],
       'style/arrow-parens': ['error', 'always'],
