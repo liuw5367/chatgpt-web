@@ -10,24 +10,28 @@ interface Props {
 export default function ErrorItem(props: Props) {
   const { error, onClose } = props;
 
-  if (!error) return null;
+  if (!error) {
+    return null;
+  }
 
   return (
     <Alert status="error" className="relative mb-4 rounded">
-      {error?.message ? (
-        <>
-          <Box>
-            <AlertTitle>{error?.code || ''}</AlertTitle>
-            <AlertDescription>{error?.message}</AlertDescription>
-          </Box>
-          <CloseButton onClick={onClose} className="absolute !right-2 !top-2" />
-        </>
-      ) : (
-        <>
-          {error?.code || ''}
-          <CloseButton onClick={onClose} className="absolute !right-2" />
-        </>
-      )}
+      {error?.message
+        ? (
+          <>
+            <Box>
+              <AlertTitle>{error?.code || ''}</AlertTitle>
+              <AlertDescription>{error?.message}</AlertDescription>
+            </Box>
+            <CloseButton onClick={onClose} className="absolute !right-2 !top-2" />
+          </>
+          )
+        : (
+          <>
+            {error?.code || ''}
+            <CloseButton onClick={onClose} className="absolute !right-2" />
+          </>
+          )}
     </Alert>
   );
 }

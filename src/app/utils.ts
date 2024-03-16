@@ -16,7 +16,9 @@ export function request(url: string, config: RequestInit) {
 }
 
 export function uuid(replace = true) {
-  if (!replace) return uuidFn();
+  if (!replace) {
+    return uuidFn();
+  }
   return uuidFn().replaceAll('-', '');
 }
 
@@ -25,7 +27,8 @@ export function scrollToElement(value: string | HTMLElement, option?: ScrollInto
     let element;
     if (typeof value === 'string') {
       element = document.getElementById(value);
-    } else if (value) {
+    }
+    else if (value) {
       element = value;
     }
     if (element && element.scrollIntoView) {
@@ -40,7 +43,9 @@ export function getCurrentTime() {
 
 export function removeLn(content?: string): string {
   let result = content?.trim();
-  if (!result) return '';
+  if (!result) {
+    return '';
+  }
   while (result.startsWith('\n') || result.endsWith('\n')) {
     if (result.startsWith('\n')) {
       result = result.slice(2);
@@ -54,12 +59,11 @@ export function removeLn(content?: string): string {
 
 export function addCodeCopy() {
   const clipboard = new Clipboard('.markdown-it-code-copy', {
-    text: function (trigger) {
-      // eslint-disable-next-line unicorn/prefer-dom-node-dataset
+    text(trigger) {
       return decodeURIComponent(trigger.getAttribute('data-clipboard-text') || '');
     },
   });
-  clipboard.on('success', function (e) {
+  clipboard.on('success', (e) => {
     const element = e.trigger?.getElementsByClassName('code-copy-content')?.[0];
     if (element) {
       element.innerHTML = 'Copied!';
@@ -73,15 +77,17 @@ export async function readFileAsString(file: Blob): Promise<string> {
     try {
       const reader = new FileReader();
       reader.readAsText(file, 'utf8');
-      reader.addEventListener('load', function (event) {
+      reader.addEventListener('load', (event) => {
         const result = event.target?.result;
         if (typeof result === 'string') {
           resolve(result);
-        } else {
-          reject();
+        }
+        else {
+          reject(new Error('error'));
         }
       });
-    } catch (error) {
+    }
+    catch (error) {
       reject(error);
     }
   });
@@ -99,7 +105,9 @@ export function moveCursorToEnd(element: HTMLTextAreaElement) {
 }
 
 export function isWindows() {
-  if (typeof navigator === 'undefined') return false;
+  if (typeof navigator === 'undefined') {
+    return false;
+  }
   return /windows|win32/i.test(navigator.userAgent);
 }
 
@@ -108,7 +116,9 @@ export function sleep(time: number) {
 }
 
 export async function speakText(content: string, callback: (playing: boolean) => void) {
-  if (!window.speechSynthesis) return;
+  if (!window.speechSynthesis) {
+    return;
+  }
   if (speechSynthesis.speaking) {
     speechSynthesis.cancel();
     callback(false);

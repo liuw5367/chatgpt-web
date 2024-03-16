@@ -34,7 +34,7 @@ export type TagType =
 // prettier-ignore
 const Users = shortcutsJson as User[];
 
-export type User = {
+export interface User {
   title: string;
   description: string;
   desc_cn: string;
@@ -48,7 +48,7 @@ export type User = {
   tags: TagType[];
   id: number;
   weight: number;
-};
+}
 
 const promptsShortcut = Users.map((item) => ({
   act: item.title,

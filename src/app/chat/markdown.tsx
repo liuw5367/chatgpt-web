@@ -1,6 +1,6 @@
 import MarkdownIt from 'markdown-it';
 import mdHighlight from 'markdown-it-highlightjs';
-// @ts-ignore
+// @ts-expect-error types
 import mdKatex from 'markdown-it-katex';
 
 export function renderMarkdown(content: string) {

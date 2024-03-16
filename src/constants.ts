@@ -1,5 +1,5 @@
 export const APP_NAME = 'AI Chat';
-export const APP_VERSION = 'v' + __APP_VERSION__;
+export const APP_VERSION = `v${__APP_VERSION__}`;
 
 export const CacheKeys = {
   CHAT_LIST: 'chat-list',

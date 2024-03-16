@@ -22,12 +22,12 @@ export default class LocalDB {
 
       const request = window.indexedDB.open(this.dbName, 1);
       request.onsuccess = (event) => {
-        // @ts-ignore
+        // @ts-expect-error types
         this.db = event.target.result;
         resolve(this.db as IDBDatabase);
       };
       request.onupgradeneeded = (event) => {
-        // @ts-ignore
+        // @ts-expect-error types
         const db = event.target.result;
         if (!db.objectStoreNames.contains(this.objectStoreName)) {
           db.createObjectStore(this.objectStoreName);

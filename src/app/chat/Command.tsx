@@ -38,8 +38,12 @@ export function Command(props: Props) {
         scrollToTop();
         return;
       }
-      if (!command || command.length <= 1) return;
-      if (!command.startsWith('/')) return;
+      if (!command || command.length <= 1) {
+        return;
+      }
+      if (!command.startsWith('/')) {
+        return;
+      }
       command = command.slice(1).toLowerCase();
 
       const prompts = allPrompts.filter((item) => {
@@ -52,13 +56,18 @@ export function Command(props: Props) {
     { wait: 100, maxWait: 300 },
   );
 
-  if (promptList.length === 0) return null;
-  if (!value.startsWith('/')) return null;
+  if (promptList.length === 0) {
+    return null;
+  }
+
+  if (!value.startsWith('/')) {
+    return null;
+  }
 
   return (
-    <div className={`w-full flex flex-col justify-end`}>
+    <div className="w-full flex flex-col justify-end">
       <div
-        className={`rounded-lg w-full max-h-[40vh] overflow-x-hidden overflow-y-auto p-1`}
+        className="max-h-[40vh] w-full overflow-x-hidden overflow-y-auto rounded-lg p-1"
         style={{
           backgroundColor: 'var(--chakra-colors-chakra-body-bg)',
           border: '1px solid var(--chakra-colors-chakra-border-color)',

@@ -30,7 +30,8 @@ export function checkAccessCode(code?: string | null): [Response | null, boolean
   if (accessCode) {
     if (code) {
       return accessCode === code ? [null, true] : [buildError({ code: 'Access Code Error' }, 401), false];
-    } else {
+    }
+    else {
       return [null, false];
     }
   }

@@ -6,7 +6,7 @@ export interface Props {
 const { title } = Astro.props;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -18,7 +18,7 @@ const { title } = Astro.props;
     <title>{title}</title>
     <meta name="description" content={title} />
     <link rel="manifest" href="/manifest.json" />
-    <script src="/swRegister.js" defer />
+    <script src="/swRegister.js" defer></script>
   </head>
   <body>
     <slot />

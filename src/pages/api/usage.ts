@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 
-import { buildError, checkAccessCode, ENV_KEY, getEnv } from '../../utils';
+import { ENV_KEY, buildError, checkAccessCode, getEnv } from '../../utils';
 
 export const POST: APIRoute = async (context) => {
   const body = await context.request.json();
@@ -23,27 +23,30 @@ export const POST: APIRoute = async (context) => {
     const current = new Date();
     const year = current.getFullYear();
     const month = current.getMonth() + 1;
-    const startDate = year + '-' + formatMonth(month) + '-01';
-    const endDate = year + '-' + formatMonth(month + 1) + '-01';
+    const startDate = `${year}-${formatMonth(month)}-01`;
+    const endDate = `${year}-${formatMonth(month + 1)}-01`;
 
     const param = `?end_date=${endDate}&start_date=${startDate}`;
 
-    const response = await fetch(host + '/dashboard/billing/usage' + param, {
+    const response = await fetch(`${host}/dashboard/billing/usage${param}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
     });
     const json = await response.json();
     return new Response(JSON.stringify(json));
-  } catch (error: any) {
+  }
+  catch (error: any) {
     console.log('usage error:', error);
     return buildError({ code: error.name, message: error.message }, 500);
   }
 };
 
 function formatMonth(month: number) {
-  if (month < 10) return '0' + month;
+  if (month < 10) {
+    return `0${month}`;
+  }
   return month;
 }

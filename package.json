@@ -1,7 +1,7 @@
 {
   "name": "astro-gpt",
-  "version": "1.16.0",
   "type": "module",
+  "version": "1.16.0",
   "private": true,
   "engines": {
     "node": ">=18.14.1"
@@ -14,8 +14,7 @@
     "build:vercel": "OUTPUT=vercel astro build",
     "build:netlify": "OUTPUT=netlify astro build",
     "astro": "astro",
-    "eslint": "eslint src --quiet --ext .js,.jsx,.ts,.tsx",
-    "eslint:fix": "eslint src --quiet --fix --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint . --fix --quiet",
     "type-check": "tsc"
   },
   "dependencies": {
@@ -56,6 +55,7 @@
     "zustand": "^4.4.1"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^2.8.3",
     "@types/lodash": "^4.14.199",
     "@types/markdown-it": "^12.2.3",
     "@types/papaparse": "^5.3.9",
@@ -67,14 +67,12 @@
     "@typescript-eslint/parser": "^7.2.0",
     "@unocss/eslint-config": "^0.58.6",
     "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-astro": "^0.31.4",
+    "eslint-plugin-format": "^0.1.0",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-simple-import-sort": "^12.0.0",
-    "eslint-plugin-unicorn": "^51.0.1",
-    "eslint-plugin-unused-imports": "^3.1.0",
-    "prettier": "^3.2.5",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "prettier-plugin-astro": "^0.13.0",
     "punycode": "^2.3.0",
     "typescript": "^5.2.2",
     "unocss": "^0.58.6"

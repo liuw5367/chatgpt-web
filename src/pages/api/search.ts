@@ -14,11 +14,12 @@ export const POST: APIRoute = async (context) => {
   }
 
   try {
-    const url = 'https://www.baidu.com/sugrec?json=1&prod=pc&wd=' + encodeURIComponent(content);
+    const url = `https://www.baidu.com/sugrec?json=1&prod=pc&wd=${encodeURIComponent(content)}`;
     const response = await fetch(url, { method: 'GET' });
     const json = await response.json();
     return new Response(JSON.stringify(json.g?.map((v: any) => v.q) || []));
-  } catch (error: any) {
+  }
+  catch (error: any) {
     console.log('images generations error:', error);
     return buildError({ code: error.name, message: error.message }, 500);
   }

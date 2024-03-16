@@ -1,3 +1,4 @@
+import process from 'node:process';
 import netlify from '@astrojs/netlify';
 import node from '@astrojs/node';
 import react from '@astrojs/react';
@@ -7,30 +8,33 @@ import unocss from 'unocss/astro';
 
 import app from './package.json';
 
-const envAdapter = () => {
+function envAdapter() {
   if (process.env.OUTPUT === 'vercel') {
     return vercel({ edgeMiddleware: true });
-  } else if (process.env.OUTPUT === 'netlify') {
+  }
+  else if (process.env.OUTPUT === 'netlify') {
     return netlify({ edgeMiddleware: true, imageCDN: false });
-  } else {
+  }
+  else {
     return node({ mode: 'standalone' });
   }
-};
+}
 
-const output = () => {
+function output() {
   if (process.env.OUTPUT === 'vercel' || process.env.OUTPUT === 'netlify') {
     return {
       manualChunks(id: string) {
         if (id.includes('node_modules/.pnpm/')) {
           return id.toString().split('node_modules/.pnpm/')[1].split('/')[0].toString();
-        } else if (id.includes('node_modules/')) {
+        }
+        else if (id.includes('node_modules/')) {
           return id.toString().split('node_modules/')[1].split('/')[0].toString();
         }
       },
     };
   }
   return {};
-};
+}
 
 // https://astro.build/config
 export default defineConfig({

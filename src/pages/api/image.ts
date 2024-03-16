@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 
-import { buildError, checkAccessCode, ENV_KEY, getEnv } from '../../utils';
+import { ENV_KEY, buildError, checkAccessCode, getEnv } from '../../utils';
 
 export const POST: APIRoute = async (context) => {
   const body = await context.request.json();
@@ -23,11 +23,11 @@ export const POST: APIRoute = async (context) => {
   }
 
   try {
-    const response = await fetch(host + '/v1/images/generations', {
+    const response = await fetch(`${host}/v1/images/generations`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         n: 2,
@@ -37,7 +37,8 @@ export const POST: APIRoute = async (context) => {
     });
     const json = await response.json();
     return new Response(JSON.stringify(json));
-  } catch (error: any) {
+  }
+  catch (error: any) {
     console.log('images generations error:', error);
     return buildError({ code: error.name, message: error.message }, 500);
   }

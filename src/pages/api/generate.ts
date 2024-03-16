@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import type { ParsedEvent, ReconnectInterval } from 'eventsource-parser';
 import { createParser } from 'eventsource-parser';
 
-import { buildError, checkAccessCode, ENV_KEY, getEnv } from '../../utils';
+import { ENV_KEY, buildError, checkAccessCode, getEnv } from '../../utils';
 
 export const POST: APIRoute = async (context) => {
   const body = await context.request.json();
@@ -30,11 +30,11 @@ export const POST: APIRoute = async (context) => {
     return buildError({ code: 'No Prompt' });
   }
 
-  const response = await fetch(host + '/v1/chat/completions', {
+  const response = await fetch(`${host}/v1/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
+      'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
       model,
@@ -50,7 +50,7 @@ export const POST: APIRoute = async (context) => {
   return parseOpenAIStream(response);
 };
 
-const parseOpenAIStream = (rawResponse: Response) => {
+function parseOpenAIStream(rawResponse: Response) {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
   if (!rawResponse.ok) {
@@ -83,7 +83,8 @@ const parseOpenAIStream = (rawResponse: Response) => {
             const text = json.choices[0].delta?.content || '';
             const queue = encoder.encode(text);
             controller.enqueue(queue);
-          } catch (error) {
+          }
+          catch (error) {
             controller.error(error);
           }
         }
@@ -97,4 +98,4 @@ const parseOpenAIStream = (rawResponse: Response) => {
   });
 
   return new Response(stream);
-};
+}

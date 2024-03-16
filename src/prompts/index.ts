@@ -4,18 +4,18 @@ import promptsOther from './other.json';
 import { promptsShortcut, promptsShortcutEn } from './shortcuts';
 import promptsZh from './zh.json';
 
-export type OptionType = {
+export interface OptionType {
   id?: string;
   act: string;
   prompt: string;
   desc?: string;
   remark?: string;
-};
+}
 
-type TemplateType = {
+interface TemplateType {
   label: string;
   value: OptionType[];
-};
+}
 
 export const templateOptions: TemplateType[] = [
   { label: 'Shortcut', value: promptsShortcut },
@@ -28,7 +28,7 @@ export const templateOptions: TemplateType[] = [
 
 export const allPrompts: OptionType[] = templateOptions.flatMap(({ label, value }) =>
   value.map(({ act, prompt, desc, remark }) => ({
-    id: label + '-' + act,
+    id: `${label}-${act}`,
     act,
     prompt,
     desc,

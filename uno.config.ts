@@ -30,7 +30,7 @@ export default defineConfig({
       // https://tabler-icons.io/
       collections: { tabler: () => import('@iconify-json/tabler/icons.json').then((i) => i.default) },
       extraProperties: {
-        display: 'inline-block',
+        'display': 'inline-block',
         'vertical-align': 'middle',
       },
     }),

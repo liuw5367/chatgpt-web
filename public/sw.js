@@ -1,15 +1,15 @@
-const CHATGPT_NEXT_WEB_CACHE = "chatgpt-next-web-cache";
+const CHATGPT_NEXT_WEB_CACHE = 'chatgpt-next-web-cache';
 
-self.addEventListener("activate", function (event) {
-  console.log("ServiceWorker activated.");
+globalThis.addEventListener('activate', (event) => {
+  console.log('ServiceWorker activated.');
 });
 
-self.addEventListener("install", function (event) {
+globalThis.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CHATGPT_NEXT_WEB_CACHE).then(function (cache) {
+    caches.open(CHATGPT_NEXT_WEB_CACHE).then((cache) => {
       return cache.addAll([]);
     }),
   );
 });
 
-self.addEventListener("fetch", (e) => {});
+globalThis.addEventListener('fetch', (e) => {});

@@ -6,12 +6,11 @@ import localeEn from '../locales/en.json';
 import localeZh from '../locales/zh.json';
 
 interface State {
-  language?: string;
+  language?: string | undefined;
 }
 export const i18nStore = create<State, [['zustand/persist', State]]>(
   persist(
-    (set, get) => ({
-      language: undefined,
+    () => ({
     }),
     {
       name: 'persist-i18n',
@@ -39,7 +38,6 @@ function getValue(data: any, key: string) {
   const keys = key.split('.');
   let value = data;
   for (const key_ of keys) {
-    // @ts-ignore
     value = value[key_];
   }
   return value;

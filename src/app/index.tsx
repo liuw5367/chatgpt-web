@@ -33,7 +33,7 @@ export default function App() {
   return (
     <ChakraProvider theme={theme}>
       {loadIcons()}
-      <div className={`v-screen h-screen flex flex-col overflow-hidden`}>
+      <div className="v-screen h-screen flex flex-col overflow-hidden">
         <Header />
         <Content />
 
@@ -96,10 +96,10 @@ function Content() {
             leftSide && chatVisibleState && rightSide && promptVisibleState
               ? 'calc(100% - 45rem)'
               : leftSide && chatVisibleState
-              ? 'calc(100% - 20rem)'
-              : rightSide && promptVisibleState
-              ? 'calc(100% - 25rem)'
-              : '100%',
+                ? 'calc(100% - 20rem)'
+                : rightSide && promptVisibleState
+                  ? 'calc(100% - 25rem)'
+                  : '100%',
         }}
       >
         <Chat />
@@ -114,11 +114,13 @@ function Content() {
 }
 
 /** 代码复制使用的图标。这里加载一下，不然无法显示 */
-const loadIcons = () => (
-  <>
-    <div className="i-tabler-copy hidden" />
-  </>
-);
+function loadIcons() {
+  return (
+    <>
+      <div className="i-tabler-copy hidden" />
+    </>
+  );
+}
 
 function loadScrollBarCss() {
   if (isWindows()) {

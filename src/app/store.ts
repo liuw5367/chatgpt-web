@@ -80,7 +80,7 @@ export const chatListStore = create<ChatState & ChatAction, [['zustand/persist',
         }
         if (!chat) {
           const id = uuid();
-          const item: ChatItem = { id, name: translate('New Chat') + ' ' + id.slice(0, 6) };
+          const item: ChatItem = { id, name: `${translate('New Chat')} ${id.slice(0, 6)}` };
           set({ chatList: [item] });
           chat = item;
         }
