@@ -7,9 +7,9 @@
 可自行选择部署的分支：
 
 - Next 分支
+
   - [Next 分支体验地址 Vercel](https://chatgpt-six-lilac.vercel.app)
   - [Next 分支体验地址 Netlify](https://chatgpt-light.netlify.app)
-
 
 - Astro 分支首次加载时白屏时间长一点
   - [Astro 分支体验地址](https://chatgpt-astro.netlify.app)
@@ -74,7 +74,6 @@
 设置访问密码：
 
 - `ACCESS_CODE`
-
 
 ## 感谢
 

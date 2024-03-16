@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 
-import { buildError, checkAccessCode, ENV_KEY, getEnv } from '@/utils';
+import { ENV_KEY, buildError, checkAccessCode, getEnv } from '@/utils';
 
 export const config = { runtime: 'edge' };
 
@@ -25,11 +25,11 @@ export default async function handler(request: NextRequest) {
   }
 
   try {
-    return await fetch(host + '/v1/images/generations', {
+    return await fetch(`${host}/v1/images/generations`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         n: 2,
@@ -37,7 +37,8 @@ export default async function handler(request: NextRequest) {
         ...config,
       }),
     });
-  } catch (error: any) {
+  }
+  catch (error: any) {
     console.log('images generations error:', error);
     return buildError({ code: error.name, message: error.message }, 500);
   }

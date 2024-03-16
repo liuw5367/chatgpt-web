@@ -27,7 +27,10 @@ import { useTranslation } from '../i18n';
 import { chatConfigStore, visibleStore } from '../store';
 import { request } from '../utils';
 
-type ImageItem = { prompt: string; url: string };
+interface ImageItem {
+  prompt: string;
+  url: string;
+}
 
 export function ImagePanel() {
   const { t } = useTranslation();
@@ -80,14 +83,16 @@ export function ImagePanel() {
       const json = await response.json();
       if (json.error?.code) {
         toast({ status: 'error', title: json.error.code, description: json.error.message });
-      } else {
+      }
+      else {
         if (json.data && Array.isArray(json.data)) {
           const data = json.data.map(({ url }: any) => ({ prompt, url }));
           setImageList(data);
           addToHistory(data);
         }
       }
-    } catch (error: any) {
+    }
+    catch (error: any) {
       toast({ status: 'error', title: error.name, description: error.message });
     }
     setLoading(false);

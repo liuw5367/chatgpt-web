@@ -1,9 +1,12 @@
-import '@/styles/globals.css';
-import '@/styles/markdown.css';
-import 'uno.css';
 import 'katex/dist/katex.min.css';
 import 'highlight.js/styles/github-dark.css';
 import 'github-markdown-css';
+
+import '@unocss/reset/tailwind.css';
+import 'uno.css';
+
+import '@/styles/markdown.css';
+import '@/styles/globals.css';
 
 import type { AppProps } from 'next/app';
 

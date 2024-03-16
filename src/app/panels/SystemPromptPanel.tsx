@@ -25,7 +25,7 @@ import { chatConfigStore, chatListStore, visibleStore } from '../store';
 import type { ChatItem } from '../types';
 import { readFileAsString, uuid } from '../utils';
 import { PromptFormModal } from './PromptForm';
-import { modelList, type SettingItemType } from './SettingPanel';
+import { type SettingItemType, modelList } from './SettingPanel';
 import { SettingItem } from './SettingPanel';
 
 interface Props {
@@ -69,13 +69,17 @@ export function SystemPromptPanel(props: Props) {
   const [panelTabIndex, setPanelTabIndex] = useState(0);
 
   useEffect(() => {
-    if (!promptVisible) return;
+    if (!promptVisible) {
+      return;
+    }
     handleClear();
     setPrompt(chatListStore.getState().currentChat().systemMessage || '');
   }, [promptVisible]);
 
   useEffect(() => {
-    if (!promptVisible) return;
+    if (!promptVisible) {
+      return;
+    }
     handleClear();
     setPrompt(systemMessage || '');
   }, [systemMessage]);
@@ -86,7 +90,9 @@ export function SystemPromptPanel(props: Props) {
 
   useEffect(() => {
     const key = tabList[tabIndex]?.value;
-    if (!key) return;
+    if (!key) {
+      return;
+    }
     setOptions(
       allData[key]?.map((item) => {
         return { label: item.act, value: item.id || '' };
@@ -100,7 +106,9 @@ export function SystemPromptPanel(props: Props) {
 
   async function load() {
     // 从缓存中加载收藏的数据
-    if (!promptVisible) return;
+    if (!promptVisible) {
+      return;
+    }
     const favoriteOptions = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_FAVORITE) || '[]') as OptionType[];
     setFavoriteOptions(favoriteOptions);
 
@@ -139,7 +147,9 @@ export function SystemPromptPanel(props: Props) {
 
   function handleSelectedChange(id: string) {
     const item = allData[currentTab?.value].find((item) => item.id === id);
-    if (!item) return;
+    if (!item) {
+      return;
+    }
     setSelectedPrompt(item);
     setPrompt(item.prompt);
   }
@@ -151,12 +161,15 @@ export function SystemPromptPanel(props: Props) {
     }
     const item = favoriteOptions.find((v) => v.id === selectedPrompt?.id);
     if (item) {
-      if (item.prompt === prompt) return;
+      if (item.prompt === prompt) {
+        return;
+      }
       item.prompt = prompt;
       setFavoriteOptions([...favoriteOptions]);
       localStorage.setItem(CacheKeys.PROMPT_FAVORITE, JSON.stringify(favoriteOptions));
       toast({ status: 'success', title: t('Updated'), duration: 1000 });
-    } else {
+    }
+    else {
       setModalOpen(true);
     }
   }
@@ -189,7 +202,8 @@ export function SystemPromptPanel(props: Props) {
       let list = JSON.parse(localStorage.getItem(CacheKeys.PROMPT_LIST) || '[]') as LabelValue[];
       list = list.filter((v) => v.value !== currentTab.value);
       localStorage.setItem(CacheKeys.PROMPT_LIST, JSON.stringify(list));
-    } else {
+    }
+    else {
       localDB.setItem(currentTab.value, options);
     }
     setDataRefreshKey(Date.now());
@@ -198,7 +212,9 @@ export function SystemPromptPanel(props: Props) {
   }
 
   function handleClose() {
-    if (type === 'side') return;
+    if (type === 'side') {
+      return;
+    }
     visibleStore.setState({ promptVisible: false });
   }
 
@@ -243,7 +259,8 @@ export function SystemPromptPanel(props: Props) {
           return { id: uuid(), act: name, prompt, desc };
         });
         saveToCache(fileName, options);
-      } else if (fileName.endsWith('.csv')) {
+      }
+      else if (fileName.endsWith('.csv')) {
         parseCsv(file, {
           complete(results) {
             const data = results.data as string[][];
@@ -255,13 +272,16 @@ export function SystemPromptPanel(props: Props) {
           },
         });
       }
-    } catch {
+    }
+    catch {
       toast({ status: 'error', title: t('Import Error') });
     }
   }
 
   function saveToCache(name: string, options: OptionType[]) {
-    if (!options || options.length === 0) return;
+    if (!options || options.length === 0) {
+      return;
+    }
 
     const fileName = name.replace('.json', '').replace('.csv', '');
     const cache = localStorage.getItem(CacheKeys.PROMPT_LIST) || '[]';
@@ -285,7 +305,7 @@ export function SystemPromptPanel(props: Props) {
         const { act, prompt, desc } = item;
         return { name: act, prompt, desc };
       });
-      const data = 'data:text/plain;charset=utf-8,' + JSON.stringify(content);
+      const data = `data:text/plain;charset=utf-8,${JSON.stringify(content)}`;
       download(`${currentTab?.label}.json`, data);
       return;
     }
@@ -298,7 +318,7 @@ export function SystemPromptPanel(props: Props) {
       data: content,
     });
 
-    const data = 'data:text/csv;charset=utf-8,' + result;
+    const data = `data:text/csv;charset=utf-8,${result}`;
     download(`${currentTab?.label}.csv`, data);
   }
 
@@ -320,8 +340,8 @@ export function SystemPromptPanel(props: Props) {
 
   function renderPromptContent() {
     return (
-      <div className={`w-full h-full flex flex-col space-y-3`}>
-        <div className={`flex flex-col space-y-3`}>
+      <div className="h-full w-full flex flex-col space-y-3">
+        <div className="flex flex-col space-y-3">
           <Tabs
             variant="soft-rounded"
             colorScheme="green"
@@ -346,11 +366,12 @@ export function SystemPromptPanel(props: Props) {
               options={options}
               value={selectedOption}
               onChange={(option) => {
-                if (!option) return;
+                if (!option) {
+                  return;
+                }
                 setSelectedOption(option);
                 handleSelectedChange(option.value);
               }}
-              // @ts-ignore
               focusBorderColor="teal.600"
               chakraStyles={chakraStyles}
             />
@@ -387,13 +408,17 @@ export function SystemPromptPanel(props: Props) {
               title={t('Favorite') || ''}
               onClick={handleFavorite}
               icon={
-                prompt === favoriteOptions.find((v) => v.id === selectedPrompt?.id)?.prompt ? (
-                  <IconStarFilled size="1rem" stroke={1.5} />
-                ) : favoriteOptions.some((v) => v.id === selectedPrompt?.id) ? (
-                  <IconStarHalfFilled size="1rem" stroke={1.5} />
-                ) : (
-                  <IconStar size="1rem" stroke={1.5} />
-                )
+                prompt === favoriteOptions.find((v) => v.id === selectedPrompt?.id)?.prompt
+                  ? (
+                    <IconStarFilled size="1rem" stroke={1.5} />
+                    )
+                  : favoriteOptions.some((v) => v.id === selectedPrompt?.id)
+                    ? (
+                      <IconStarHalfFilled size="1rem" stroke={1.5} />
+                      )
+                    : (
+                      <IconStar size="1rem" stroke={1.5} />
+                      )
               }
             />
             {selectedPrompt != null && favoriteOptions.find((v) => v.id === selectedPrompt.id) && (
@@ -405,18 +430,18 @@ export function SystemPromptPanel(props: Props) {
                 onClick={handleFavoriteDelete}
               />
             )}
-            {selectedPrompt != null &&
-              currentTab?.value != null &&
-              currentTab.value !== 'default' &&
-              currentTab.value !== 'favorite' && (
-                <IconButton
-                  size="xs"
-                  aria-label="Delete"
-                  title={t('Delete Favorite') || ''}
-                  icon={<IconTrash size="1rem" stroke={1.5} />}
-                  onClick={handleDelete}
-                />
-              )}
+            {selectedPrompt != null
+            && currentTab?.value != null
+            && currentTab.value !== 'default'
+            && currentTab.value !== 'favorite' && (
+            <IconButton
+              size="xs"
+              aria-label="Delete"
+              title={t('Delete Favorite') || ''}
+              icon={<IconTrash size="1rem" stroke={1.5} />}
+              onClick={handleDelete}
+            />
+            )}
           </div>
           <div className="flex flex-row space-x-2">
             <FileUpload
@@ -459,7 +484,7 @@ export function SystemPromptPanel(props: Props) {
       isOpen={promptVisible}
       onClose={handleClose}
       size="md"
-      header={
+      header={(
         <Tabs
           variant="enclosed"
           colorScheme="green"
@@ -476,29 +501,33 @@ export function SystemPromptPanel(props: Props) {
             ))}
           </TabList>
         </Tabs>
-      }
+      )}
       footer={
-        panelTabIndex === 1 ? null : (
-          <div className="w-full flex flex-row justify-between">
-            <Button colorScheme="blue" onClick={handleRemoveClick}>
-              {t('Remove')}
-            </Button>
-            <div className="flex flex-row">
-              {type === 'side' ? (
-                <Button variant="outline" mr={3} onClick={handlePromptReset}>
-                  {t('Reset')}
-                </Button>
-              ) : (
-                <Button variant="outline" mr={3} onClick={handleClose}>
-                  {t('Cancel')}
-                </Button>
-              )}
-              <Button colorScheme="teal" onClick={handleSaveClick}>
-                {t('Save')}
+        panelTabIndex === 1
+          ? null
+          : (
+            <div className="w-full flex flex-row justify-between">
+              <Button colorScheme="blue" onClick={handleRemoveClick}>
+                {t('Remove')}
               </Button>
+              <div className="flex flex-row">
+                {type === 'side'
+                  ? (
+                    <Button variant="outline" mr={3} onClick={handlePromptReset}>
+                      {t('Reset')}
+                    </Button>
+                    )
+                  : (
+                    <Button variant="outline" mr={3} onClick={handleClose}>
+                      {t('Cancel')}
+                    </Button>
+                    )}
+                <Button colorScheme="teal" onClick={handleSaveClick}>
+                  {t('Save')}
+                </Button>
+              </div>
             </div>
-          </div>
-        )
+            )
       }
     >
       {panelTabIndex === 0 && renderPromptContent()}
@@ -548,7 +577,7 @@ function ChatSetting(props: ChatSettingProps) {
   return (
     <div className="space-y-2">
       {list.map((item) => {
-        // @ts-ignore key
+        // @ts-expect-error key
         let value = chat[item.value] || config[item.value];
         if (item.value === 'openAIModel' && !value) {
           value = modelList[0].value;

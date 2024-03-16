@@ -23,14 +23,14 @@ import type { ChatConfigType } from '../store';
 import { chatConfigStore, visibleStore } from '../store';
 import { request } from '../utils';
 
-export type SettingItemType<T = string> = {
+export interface SettingItemType<T = string> {
   type?: 'password' | 'number' | 'switch' | 'select';
   label: string;
   value: T;
   placeholder: string;
   desc?: string | null;
   max?: number;
-};
+}
 
 export const modelList = [
   { label: 'gpt-3.5-turbo', value: 'gpt-3.5-turbo' },
@@ -82,13 +82,15 @@ export function SettingPanel() {
       const json = await response.json();
       if (json.error?.code) {
         // toast({ status: "error", title: json.error.code, description: json.error.message });
-      } else {
+      }
+      else {
         const { total_usage } = json;
         if (total_usage != null && total_usage !== '') {
-          setBalance('$' + (total_usage / 100).toFixed(5));
+          setBalance(`$${(total_usage / 100).toFixed(5)}`);
         }
       }
-    } catch {
+    }
+    catch {
       // toast({ status: "error", title: e.toString() });
     }
     setAbortController(undefined);
@@ -134,10 +136,10 @@ export function SettingPanel() {
     {
       label: t('Access Code'),
       value: 'accessCode',
-      placeholder: t('please enter') + ' ' + t('Access Code'),
+      placeholder: `${t('please enter')} ${t('Access Code')}`,
     },
     { label: 'OpenAI Host', value: 'openAIHost', placeholder: 'https://api.openai.com' },
-    { label: 'OpenAI Key', value: 'openAIKey', placeholder: t('please enter') + ' ' + 'OPENAI_KEY' },
+    { label: 'OpenAI Key', value: 'openAIKey', placeholder: `${t('please enter')} ` + `OPENAI_KEY` },
     { label: 'OpenAI Model', value: 'openAIModel', type: 'select', placeholder: 'gpt-3.5-turbo' },
     {
       type: 'number',
@@ -168,13 +170,16 @@ export function SettingPanel() {
       isOpen={settingVisible}
       onClose={handleClose}
       size="md"
-      header={
+      header={(
         <div className="space-x-4">
           <span>{t('Settings')}</span>
-          <span className="text-sm font-normal">v{getConfig().publicRuntimeConfig?.version}</span>
+          <span className="text-sm font-normal">
+            v
+            {getConfig().publicRuntimeConfig?.version}
+          </span>
         </div>
-      }
-      footer={
+      )}
+      footer={(
         <>
           <Button variant="outline" mr={3} onClick={handleClose}>
             {t('Cancel')}
@@ -183,7 +188,7 @@ export function SettingPanel() {
             {t('Save')}
           </Button>
         </>
-      }
+      )}
     >
       <div className="flex flex-col space-y-4">{chatConfigList.map((item) => renderItem(item))}</div>
     </SimpleDrawer>
@@ -207,50 +212,59 @@ export function SettingItem({ item, value, onChange, balance }: ItemProps) {
         <span>{item.label}</span>
         {item.label === 'OpenAI Key' && balance && (
           <span className="text-sm text-gray-500">
-            &nbsp;{t('Used this month')}
+            &nbsp;
+            {t('Used this month')}
             {': '}
             {balance}
           </span>
         )}
       </FormLabel>
-      {item.type === 'password' ? (
-        <PasswordInput
-          className="flex-1"
-          placeholder={item.placeholder}
-          value={value}
-          onChange={(e) => onChange?.(e.target.value)}
-        />
-      ) : item.type === 'select' ? (
-        <Select value={value} onChange={(e) => onChange?.(e.target.value)}>
-          {(item.value === 'asrLanguage' ? asrLanguageList : modelList).map((item) => (
-            <option key={item.label} value={item.label}>
-              {item.value}
-            </option>
-          ))}
-        </Select>
-      ) : item.type === 'number' ? (
-        <NumberInput className="flex-1" min={0} max={item.max} step={0.1} value={value} onChange={(v) => onChange?.(v)}>
-          <NumberInputField placeholder={item.placeholder} />
-          <NumberInputStepper>
-            <NumberIncrementStepper />
-            <NumberDecrementStepper />
-          </NumberInputStepper>
-        </NumberInput>
-      ) : item.type === 'switch' ? (
-        <Switch
-          colorScheme="teal"
-          isChecked={value === '1'}
-          onChange={(e) => onChange?.(e.target.checked ? '1' : '0')}
-        />
-      ) : (
-        <Input
-          className="flex-1"
-          focusBorderColor="teal.600"
-          placeholder={item.placeholder}
-          value={value}
-          onChange={(e) => onChange?.(e.target.value)}
-        />
-      )}
+      {item.type === 'password'
+        ? (
+          <PasswordInput
+            className="flex-1"
+            placeholder={item.placeholder}
+            value={value}
+            onChange={(e) => onChange?.(e.target.value)}
+          />
+          )
+        : item.type === 'select'
+          ? (
+            <Select value={value} onChange={(e) => onChange?.(e.target.value)}>
+              {(item.value === 'asrLanguage' ? asrLanguageList : modelList).map((item) => (
+                <option key={item.label} value={item.label}>
+                  {item.value}
+                </option>
+              ))}
+            </Select>
+            )
+          : item.type === 'number'
+            ? (
+              <NumberInput className="flex-1" min={0} max={item.max} step={0.1} value={value} onChange={(v) => onChange?.(v)}>
+                <NumberInputField placeholder={item.placeholder} />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+              )
+            : item.type === 'switch'
+              ? (
+                <Switch
+                  colorScheme="teal"
+                  isChecked={value === '1'}
+                  onChange={(e) => onChange?.(e.target.checked ? '1' : '0')}
+                />
+                )
+              : (
+                <Input
+                  className="flex-1"
+                  focusBorderColor="teal.600"
+                  placeholder={item.placeholder}
+                  value={value}
+                  onChange={(e) => onChange?.(e.target.value)}
+                />
+                )}
       {item.desc && <FormHelperText>{item.desc}</FormHelperText>}
     </FormControl>
   );

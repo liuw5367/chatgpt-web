@@ -55,6 +55,11 @@ export default function Page() {
   const asrResultRef = useRef('');
   const [isGenerated, setGenerated] = useState(false);
 
+  const stopGenerate = useMemoizedFn(() => {
+    chatAbortController?.abort();
+    setChatLoading(false);
+  });
+
   useEffect(() => {
     setGenerated(false);
     stopGenerate();
@@ -93,7 +98,8 @@ export default function Page() {
   function handleTTSClick() {
     if (ttsPlaying) {
       stopTTS();
-    } else {
+    }
+    else {
       const data = [...messageList].filter((v) => v.role === 'assistant').reverse();
       const content = data?.[0]?.content;
       if (content) {
@@ -107,16 +113,12 @@ export default function Page() {
     stopTTS();
     if (recording) {
       recognitionRef.current?.stop();
-    } else {
+    }
+    else {
       recognitionRef.current?.start();
     }
     setRecording(!recording);
   }
-
-  const stopGenerate = useMemoizedFn(() => {
-    chatAbortController?.abort();
-    setChatLoading(false);
-  });
 
   async function handleSendClick(inputValue = inputContent) {
     if (chatLoading) {
@@ -142,11 +144,13 @@ export default function Page() {
       const maxResponseTokens = 8192;
       maxModelTokens = 32_768;
       maxTokens = maxModelTokens - maxResponseTokens;
-    } else if (model.toLowerCase().includes('16k')) {
+    }
+    else if (model.toLowerCase().includes('16k')) {
       const maxResponseTokens = 4086;
       maxModelTokens = 16_384;
       maxTokens = maxModelTokens - maxResponseTokens;
-    } else if (model.toLowerCase().includes('gpt-4')) {
+    }
+    else if (model.toLowerCase().includes('gpt-4')) {
       const maxResponseTokens = 2048;
       maxModelTokens = 8192;
       maxTokens = maxModelTokens - maxResponseTokens;
@@ -215,7 +219,9 @@ export default function Page() {
     let assistantMessage = '';
 
     function onProgress(content: string) {
-      if (!content || (content === '\n' && assistantMessage.endsWith('\n'))) return;
+      if (!content || (content === '\n' && assistantMessage.endsWith('\n'))) {
+        return;
+      }
       setCurrentAssistantMessage((draft) => {
         assistantMessage = draft + content;
         return assistantMessage;
@@ -248,11 +254,13 @@ export default function Page() {
           const json = await response.json();
           if (json?.error?.code || json?.error?.message) {
             setErrorInfo(json.error as any);
-          } else {
+          }
+          else {
             toast({ status: 'error', title: t('toast.error.request') });
           }
-        } catch {
-          setErrorInfo({ code: response.status + '', message: response.statusText });
+        }
+        catch {
+          setErrorInfo({ code: `${response.status}`, message: response.statusText });
         }
         setChatLoading(false);
         return;
@@ -273,7 +281,8 @@ export default function Page() {
         onProgress(decoder.decode(value));
       }
       addResultItem(content, assistantMessage, systemMessage, currentChat.conversationId);
-    } catch (error) {
+    }
+    catch (error) {
       console.log(error);
       addResultItem(content, assistantMessage, systemMessage, currentChat.conversationId);
     }
@@ -282,7 +291,9 @@ export default function Page() {
   function addResultItem(content: string, assistantMessage: string, prompt: string = '', conversationId?: string) {
     // 完整的返回值
     console.log([assistantMessage]);
-    if (!assistantMessage) return;
+    if (!assistantMessage) {
+      return;
+    }
 
     chatDataStore.setState((state) => ({
       data: [
@@ -327,7 +338,7 @@ export default function Page() {
   }
 
   function updateConversationId(conversationId?: string) {
-    updateChat(currentChat.id, { conversationId: conversationId });
+    updateChat(currentChat.id, { conversationId });
   }
 
   function handleConversationClick() {
@@ -335,7 +346,8 @@ export default function Page() {
       updateConversationId();
       toast.closeAll();
       toast({ status: 'info', title: t('conversation.off') });
-    } else {
+    }
+    else {
       updateConversationId(uuid());
       toast.closeAll();
       toast({ status: 'success', title: t('conversation.on'), description: t('conversation.desc') });
@@ -350,11 +362,9 @@ export default function Page() {
           colorScheme={chatLoading ? 'red' : 'teal'}
           variant={chatLoading ? 'outline' : 'solid'}
         >
-          {chatLoading ? ( //
-            <IconLoader3 stroke={1.5} className="rotate-img" />
-          ) : (
-            <IconBrandTelegram stroke={1.5} />
-          )}
+          {chatLoading
+            ? (<IconLoader3 stroke={1.5} className="rotate-img" />)
+            : (<IconBrandTelegram stroke={1.5} />)}
         </Button>
         <IconButton aria-label="Clear" onClick={handleClearClick} icon={<IconClearAll stroke={1.5} />} />
       </div>
@@ -417,18 +427,24 @@ export default function Page() {
   );
 
   function renderItem(item: ChatMessage | undefined, index: number, isList = false) {
-    if (!item) return;
+    if (!item) {
+      return;
+    }
 
     const length = messageList.length;
 
     if (chatLoading) {
       if (isList) {
         // 列表：加载中并且最后一个是问题
-        if (index === length - 1 && item.role === 'user') return null;
-      } else if (index === length - 2) {
+        if (index === length - 1 && item.role === 'user') {
+          return null;
+        }
+      }
+      else if (index === length - 2) {
         return null;
       }
-    } else if (isList && index >= length - 2) {
+    }
+    else if (isList && index >= length - 2) {
       return null;
     }
 
@@ -456,11 +472,11 @@ export default function Page() {
 
         <div style={{ minHeight: isGenerated ? 'calc(100vh - 64px - 143px - 64px)' : undefined }}>
           {
-            // eslint-disable-next-line unicorn/prefer-at
+
             renderItem(messageList[messageList.length - 2], messageList.length - 2)
           }
           {
-            // eslint-disable-next-line unicorn/prefer-at
+
             renderItem(messageList[messageList.length - 1], messageList.length - 1)
           }
           {currentAssistantMessage && (
@@ -482,15 +498,17 @@ export default function Page() {
 
   return (
     <div className="h-full w-full flex flex-col">
-      {messageList && messageList.length > 0 ? (
-        <>{renderMessageList}</>
-      ) : (
-        <div className="h-full flex flex-col items-center justify-end overflow-y-auto">
-          <div className="w-full py-4 pl-8 pr-4">
-            <UsageTips />
+      {messageList && messageList.length > 0
+        ? (
+          <>{renderMessageList}</>
+          )
+        : (
+          <div className="h-full flex flex-col items-center justify-end overflow-y-auto">
+            <div className="w-full py-4 pl-8 pr-4">
+              <UsageTips />
+            </div>
           </div>
-        </div>
-      )}
+          )}
       {chatLoading && <Progress size="xs" isIndeterminate />}
       <div id="chat-bottom-wrapper" className="flex flex-col items-center border-t px-6 pt-3">
         <div className="w-full flex flex-col justify-end space-y-3">

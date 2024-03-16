@@ -9,6 +9,7 @@ interface Props {
 
 export function Chakra({ cookies, children }: Props) {
   const colorModeManager = typeof cookies === 'string' ? cookieStorageManagerSSR(cookies) : localStorageManager;
+  const theme = extendTheme({ initialColorMode: 'system', useSystemColorMode: true });
 
   return (
     <ChakraProvider colorModeManager={colorModeManager} theme={theme}>
@@ -24,5 +25,3 @@ export function getServerSideProps({ req }: GetServerSidePropsContext) {
     },
   };
 }
-
-export const theme = extendTheme({ initialColorMode: 'system', useSystemColorMode: true });

@@ -13,10 +13,12 @@ export class Recognition {
 
   public start() {
     this.isStop = false;
-    // @ts-ignore
-    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) return;
+    // @ts-expect-error types
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      return;
+    }
     if (!this.recognition) {
-      // @ts-ignore
+      // @ts-expect-error types
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       this.recognition = recognition;
     }
@@ -39,18 +41,24 @@ export class Recognition {
       for (let index = 0; index < event.results.length; index++) {
         const item = event.results[index];
         // 中文添加逗号
-        if (transcript && lang?.includes('Han')) transcript += '，';
+        if (transcript && lang?.includes('Han')) {
+          transcript += '，';
+        }
 
         transcript += (item as unknown as SpeechRecognitionAlternative[])[0]?.transcript;
       }
-      if (!transcript) return;
+      if (!transcript) {
+        return;
+      }
       this.listener?.(transcript);
     });
 
     // 当识别结束时触发该事件
     recognition.addEventListener('end', () => {
       console.log('recognition onEnd');
-      if (this.isStop) return;
+      if (this.isStop) {
+        return;
+      }
       // 继续监听
       recognition.start();
     });

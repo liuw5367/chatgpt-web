@@ -7,10 +7,9 @@
     "start": "rm -rf .next && next dev",
     "preview": "next start",
     "build": "next build",
-    "lint": "next lint",
-    "eslint": "eslint src --quiet --ext .js,.jsx,.ts,.tsx",
-    "eslint-fix": "eslint src --quiet --fix --ext .js,.jsx,.ts,.tsx",
-    "type-check": "tsc"
+    "lint": "eslint . --fix --quiet",
+    "type-check": "tsc",
+    "postinstall": "npx simple-git-hooks"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.1",
@@ -45,6 +44,9 @@
     "zustand": "^4.4.1"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^2.8.3",
+    "@commitlint/cli": "^19.2.0",
+    "@commitlint/config-conventional": "^19.1.0",
     "@types/lodash": "^4.14.199",
     "@types/markdown-it": "^12.2.3",
     "@types/node": "^18.18.0",
@@ -52,21 +54,28 @@
     "@types/react": "^18.2.23",
     "@types/react-dom": "^18.2.7",
     "@types/uuid": "^9.0.4",
-    "@typescript-eslint/eslint-plugin": "^6.7.3",
-    "@typescript-eslint/parser": "^6.7.3",
-    "@unocss/eslint-config": "^0.56.4",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "@unocss/eslint-config": "^0.58.6",
     "@unocss/webpack": "^0.56.4",
-    "eslint": "^8.50.0",
-    "eslint-config-prettier": "^8.10.0",
-    "eslint-plugin-prettier": "^5.0.0",
-    "eslint-plugin-react": "^7.33.2",
+    "eslint": "^8.57.0",
+    "eslint-plugin-astro": "^0.31.4",
+    "eslint-plugin-format": "^0.1.0",
+    "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-simple-import-sort": "^10.0.0",
-    "eslint-plugin-unicorn": "^48.0.1",
-    "eslint-plugin-unused-imports": "^3.0.0",
-    "prettier": "^3.0.3",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "lint-staged": "^15.2.2",
+    "prettier-plugin-astro": "^0.13.0",
     "punycode": "^2.3.0",
-    "typescript": "5.0.4",
-    "unocss": "^0.56.4"
+    "simple-git-hooks": "^2.11.0",
+    "typescript": "^5.2.2",
+    "unocss": "^0.58.6"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged",
+    "commit-msg": "npx --no-install commitlint --edit \"${1}\""
+  },
+  "lint-staged": {
+    "*": "eslint --fix"
   }
 }

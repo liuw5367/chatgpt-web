@@ -40,13 +40,15 @@ export function ChatPanel(props: Props) {
   }
 
   function handleClose() {
-    if (type === 'side') return;
+    if (type === 'side') {
+      return;
+    }
     visibleStore.setState({ chatVisible: false });
   }
 
   function handleChatAddClick() {
     const id = uuid();
-    const item: ChatItem = { id, name: t('New Chat') + ' ' + id.slice(0, 6) };
+    const item: ChatItem = { id, name: `${t('New Chat')} ${id.slice(0, 6)}` };
     chatListStore.setState(({ chatList }) => ({ chatList: [item, ...chatList] }));
   }
 
@@ -61,7 +63,8 @@ export function ChatPanel(props: Props) {
       chatListStore.setState({ chatList: [item] });
       updateChatMessage(item);
       handleClose();
-    } else {
+    }
+    else {
       const list = chatList.filter((chat) => chat.id !== item.id);
       if (item.id === currentChat.id) {
         list[0].selected = true;
@@ -74,7 +77,9 @@ export function ChatPanel(props: Props) {
   function handleItemClick(item: ChatItem) {
     console.log(item, currentChat);
     handleClose();
-    if (item.id === currentChat.id) return;
+    if (item.id === currentChat.id) {
+      return;
+    }
 
     chatListStore.setState(({ chatList }) => ({
       chatList: produce(chatList, (draft) => {
@@ -100,13 +105,15 @@ export function ChatPanel(props: Props) {
       placement="left"
       onClose={handleClose}
       header={
-        type === 'side' ? null : (
-          <div className="flex items-center font-medium space-x-2">
-            <Logo />
-          </div>
-        )
+        type === 'side'
+          ? null
+          : (
+            <div className="flex items-center font-medium space-x-2">
+              <Logo />
+            </div>
+            )
       }
-      footer={
+      footer={(
         <div className="w-full flex flex-row items-center justify-between">
           <div className="flex flex-row items-center">
             <Link href="https://github.com/liuw5367/chatgpt-web" isExternal>
@@ -131,7 +138,7 @@ export function ChatPanel(props: Props) {
             {t('New Chat')}
           </Button>
         </div>
-      }
+      )}
     >
       <div className="w-full flex flex-col gap-3">
         {chatList.map((chat) => {
@@ -186,82 +193,86 @@ function ChatItemView(props: ItemProps) {
         selected && 'border-teal-700 text-teal-700 border-2 font-medium bg-teal-700/5'
       }`}
     >
-      {isEditing ? (
-        <div className="flex-1">
-          <Input
-            size="sm"
-            value={changed}
-            focusBorderColor="teal.600"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+      {isEditing
+        ? (
+          <div className="flex-1">
+            <Input
+              size="sm"
+              value={changed}
+              focusBorderColor="teal.600"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  handleSave();
+                }
+              }}
+              onChange={(e) => setChanged(e.target.value)}
+              onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
-                handleSave();
-              }
-            }}
-            onChange={(e) => setChanged(e.target.value)}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-          />
-        </div>
-      ) : (
-        <div className={`flex-1 truncate`}>{chat.name}</div>
-      )}
+              }}
+            />
+          </div>
+          )
+        : (
+          <div className="flex-1 truncate">{chat.name}</div>
+          )}
       {((selected && hovered) || isEditing) && (
         <div className="flex flex-row space-x-1">
-          {isEditing ? (
-            <>
-              <IconButton
-                aria-label="Save"
-                variant="ghost"
-                icon={<IconCheck size="1.0rem" className="opacity-64" />}
-                size="xs"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleSave();
-                }}
-              />
-              <IconButton
-                aria-label="Cancel"
-                variant="ghost"
-                icon={<IconX size="1.0rem" className="opacity-64" />}
-                size="xs"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleCancel();
-                }}
-              />
-            </>
-          ) : (
-            <>
-              <IconButton
-                aria-label="Edit"
-                variant="ghost"
-                icon={<IconEdit size="0.90rem" className="opacity-64" />}
-                size="xs"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setEditing(true);
-                }}
-              />
-              <IconButton
-                aria-label="Delete"
-                variant="ghost"
-                icon={<IconTrash size="0.90rem" className="opacity-64" />}
-                size="xs"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onDelete(chat);
-                }}
-              />
-            </>
-          )}
+          {isEditing
+            ? (
+              <>
+                <IconButton
+                  aria-label="Save"
+                  variant="ghost"
+                  icon={<IconCheck size="1.0rem" className="opacity-64" />}
+                  size="xs"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSave();
+                  }}
+                />
+                <IconButton
+                  aria-label="Cancel"
+                  variant="ghost"
+                  icon={<IconX size="1.0rem" className="opacity-64" />}
+                  size="xs"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleCancel();
+                  }}
+                />
+              </>
+              )
+            : (
+              <>
+                <IconButton
+                  aria-label="Edit"
+                  variant="ghost"
+                  icon={<IconEdit size="0.90rem" className="opacity-64" />}
+                  size="xs"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setEditing(true);
+                  }}
+                />
+                <IconButton
+                  aria-label="Delete"
+                  variant="ghost"
+                  icon={<IconTrash size="0.90rem" className="opacity-64" />}
+                  size="xs"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onDelete(chat);
+                  }}
+                />
+              </>
+              )}
         </div>
       )}
     </div>

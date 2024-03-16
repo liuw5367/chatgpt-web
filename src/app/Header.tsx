@@ -46,17 +46,19 @@ export function Header() {
         />
       </div>
 
-      {colorMode === 'light' ? (
-        <Head>
-          <meta name="apple-mobile-web-app-status-bar-style" content="#FFFFFF" />
-          <meta name="theme-color" content="#FFFFFF" />
-        </Head>
-      ) : (
-        <Head>
-          <meta name="apple-mobile-web-app-status-bar-style" content="#1A202C" />
-          <meta name="theme-color" content="#1A202C" />
-        </Head>
-      )}
+      {colorMode === 'light'
+        ? (
+          <Head>
+            <meta name="apple-mobile-web-app-status-bar-style" content="#FFFFFF" />
+            <meta name="theme-color" content="#FFFFFF" />
+          </Head>
+          )
+        : (
+          <Head>
+            <meta name="apple-mobile-web-app-status-bar-style" content="#1A202C" />
+            <meta name="theme-color" content="#1A202C" />
+          </Head>
+          )}
     </div>
   );
 }

@@ -40,7 +40,8 @@ export function PromptFormModal(props: Props) {
   useEffect(() => {
     if (open) {
       disclosure.onOpen();
-    } else {
+    }
+    else {
       disclosure.onClose();
     }
   }, [open, disclosure]);

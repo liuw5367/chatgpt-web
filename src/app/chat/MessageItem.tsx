@@ -56,7 +56,7 @@ export function MessageItem(props: Props) {
   const renderPrompt = (placement: 'top' | 'top-start' = 'top-start') => (
     <Popover placement={placement}>
       <PopoverTrigger>
-        <Badge colorScheme="green" title={item.prompt} className={`text-[14px] cursor-pointer`} onClick={onPromptCopy}>
+        <Badge colorScheme="green" title={item.prompt} className="cursor-pointer text-[14px]" onClick={onPromptCopy}>
           Prompt
         </Badge>
       </PopoverTrigger>
@@ -65,7 +65,11 @@ export function MessageItem(props: Props) {
         {/* <PopoverArrow /> */}
         <PopoverCloseButton />
         <PopoverBody className="text-[14px]">
-          {item.prompt} Tokens: [{estimateTokens(item.prompt)}]
+          {item.prompt}
+          {' '}
+          Tokens: [
+          {estimateTokens(item.prompt)}
+          ]
         </PopoverBody>
       </PopoverContent>
     </Popover>
@@ -74,15 +78,15 @@ export function MessageItem(props: Props) {
   const renderConversation = (conversationId: string) => (
     <Tooltip
       placement="top-start"
-      label={'conversationId: ' + conversationId}
+      label={`conversationId: ${conversationId}`}
       aria-label="tooltip"
       bg="gray.600"
       className="rounded"
     >
       <Badge
         colorScheme="teal"
-        title={'conversationId: ' + conversationId}
-        className={`text-[14px] cursor-pointer !flex flex-row items-center gap-1`}
+        title={`conversationId: ${conversationId}`}
+        className="flex-row cursor-pointer items-center gap-1 text-[14px] !flex"
       >
         <IconMessages size="0.8rem" />
         {conversationId.slice(-4, conversationId.length)}
@@ -102,11 +106,13 @@ export function MessageItem(props: Props) {
             size="xs"
             onClick={() => setShowOriginContent(!showOriginContent)}
             icon={
-              showOriginContent ? (
-                <IconMarkdown size="1rem" className="opacity-64" />
-              ) : (
-                <IconCode size="1rem" className="opacity-64" />
-              )
+              showOriginContent
+                ? (
+                  <IconMarkdown size="1rem" className="opacity-64" />
+                  )
+                : (
+                  <IconCode size="1rem" className="opacity-64" />
+                  )
             }
           />
         )}
@@ -116,11 +122,13 @@ export function MessageItem(props: Props) {
           size="xs"
           onClick={onContentCopy}
           icon={
-            hasContentCopied || hasPromptCopied ? (
-              <IconClipboardCheck size="1rem" className="opacity-64" />
-            ) : (
-              <IconClipboard size="1rem" className="opacity-64" />
-            )
+            hasContentCopied || hasPromptCopied
+              ? (
+                <IconClipboardCheck size="1rem" className="opacity-64" />
+                )
+              : (
+                <IconClipboard size="1rem" className="opacity-64" />
+                )
           }
         />
         {window.speechSynthesis && (
@@ -141,7 +149,8 @@ export function MessageItem(props: Props) {
             onClick={() => {
               if (item.role === 'user') {
                 onRetry?.(item);
-              } else {
+              }
+              else {
                 onRegenerate?.(item);
               }
             }}
@@ -170,9 +179,9 @@ export function MessageItem(props: Props) {
       className={`mb-10 flex flex-col ${isUser && 'items-end'} space-y-1`}
     >
       {item.time && <span className="text-xs text-gray-500">{item.time}</span>}
-      <div className={`flex flex-row space-x-2 relative`} style={{ maxWidth: 'calc(100vw - 2rem)' }}>
+      <div className="relative flex flex-row space-x-2" style={{ maxWidth: 'calc(100vw - 2rem)' }}>
         {!isUser && (
-          <Avatar size="sm" className={`mt-1 !bg-teal-600`} icon={<IconRobot size="1.3rem" stroke={1.5} />} />
+          <Avatar size="sm" className="mt-1 !bg-teal-600" icon={<IconRobot size="1.3rem" stroke={1.5} />} />
         )}
 
         <div
@@ -180,11 +189,13 @@ export function MessageItem(props: Props) {
             colorMode === 'light' ? 'bg-[#EDF2F7]' : 'bg-[#021627]'
           }`}
         >
-          {isUser || showOriginContent ? (
-            <div className="whitespace-pre-wrap">{item.content || item.prompt}</div>
-          ) : (
-            <div className="markdown-body" dangerouslySetInnerHTML={{ __html: item.markdown || '' }} />
-          )}
+          {isUser || showOriginContent
+            ? (
+              <div className="whitespace-pre-wrap">{item.content || item.prompt}</div>
+              )
+            : (
+              <div className="markdown-body" dangerouslySetInnerHTML={{ __html: item.markdown || '' }} />
+              )}
         </div>
 
         {isUser && (

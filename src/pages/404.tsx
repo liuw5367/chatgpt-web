@@ -2,9 +2,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
-import { APP_NAME } from '@/constants';
-
 import Layout from '../layouts/Layout';
+import { APP_NAME } from '@/constants';
 
 export default function NotFound() {
   const router = useRouter();

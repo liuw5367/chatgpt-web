@@ -42,7 +42,9 @@ export function SearchSuggestions(props: Props) {
     }
 
     const content = value?.trim();
-    if (content === lastContentRef.current) return;
+    if (content === lastContentRef.current) {
+      return;
+    }
     lastContentRef.current = '';
 
     try {
@@ -62,17 +64,20 @@ export function SearchSuggestions(props: Props) {
         setPromptList(json.reverse());
         scrollToTop();
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.log(error);
     }
   }
 
-  if (promptList.length === 0) return null;
+  if (promptList.length === 0) {
+    return null;
+  }
 
   return (
-    <div className={`w-full flex flex-col justify-end`}>
+    <div className="w-full flex flex-col justify-end">
       <div
-        className={`relative rounded-lg w-full max-h-[35vh] flex flex-col items-end overflow-x-hidden overflow-y-auto p-1`}
+        className="relative max-h-[35vh] w-full flex flex-col items-end overflow-x-hidden overflow-y-auto rounded-lg p-1"
         style={{
           backgroundColor: 'var(--chakra-colors-chakra-body-bg)',
           border: '1px solid var(--chakra-colors-chakra-border-color)',

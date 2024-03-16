@@ -10,7 +10,9 @@ interface State {
 }
 
 function getLanguage() {
-  if (typeof navigator === 'undefined') return '';
+  if (typeof navigator === 'undefined') {
+    return '';
+  }
   return navigator.language;
 }
 
@@ -45,7 +47,6 @@ function getValue(data: any, key: string) {
   const keys = key.split('.');
   let value = data;
   for (const key_ of keys) {
-    // @ts-ignore
     value = value[key_];
   }
   return value;

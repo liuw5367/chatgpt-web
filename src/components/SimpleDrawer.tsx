@@ -38,11 +38,11 @@ export function SimpleDrawer(props: Props) {
             : { borderLeft: '1px solid var(--chakra-colors-chakra-border-color)' }
         }
       >
-        {header && <div className={'px-6 py-4 font-bold'}>{header}</div>}
+        {header && <div className="px-6 py-4 font-bold">{header}</div>}
         <div className={`px-6 pb-4 w-full flex-1 overflow-y-auto overflow-x-hidden ${header ? 'pt-0' : 'pt-4'}`}>
           {children}
         </div>
-        {footer && <div className={'px-6 py-4'}>{footer}</div>}
+        {footer && <div className="px-6 py-4">{footer}</div>}
       </div>
     );
   }

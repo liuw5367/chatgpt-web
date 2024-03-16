@@ -37,7 +37,7 @@ export function UsageTips() {
       {tips.map((item) => {
         return (
           <div key={item} className="flex flex-row text-[13px] text-gray-400 space-x-1">
-            <div className="font-bold">{'•'}</div>
+            <div className="font-bold">•</div>
             <div>{item}</div>
           </div>
         );

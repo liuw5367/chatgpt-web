@@ -1,6 +1,8 @@
-export const ENV_KEY = process.env.OPENAI_API_KEY || process.env.PUBLIC_OPENAI_API_KEY;
-const ENV_HOST = process.env.OPENAI_API_HOST || process.env.PUBLIC_OPENAI_API_HOST || 'https://api.openai.com';
-const ENV_MODEL = process.env.OPENAI_API_MODEL || process.env.PUBLIC_OPENAI_API_MODEL || 'gpt-3.5-turbo';
+import process from 'node:process';
+
+export const ENV_KEY = process.env.OPENAI_API_KEY;
+const ENV_HOST = process.env.OPENAI_API_HOST || 'https://api.openai.com';
+const ENV_MODEL = process.env.OPENAI_API_MODEL || 'gpt-3.5-turbo';
 
 export const ENV_ACCESS_CODE = process.env.ACCESS_CODE;
 
@@ -31,7 +33,8 @@ export function checkAccessCode(code?: string | null): [Response | null, boolean
   if (accessCode) {
     if (code) {
       return accessCode === code ? [null, true] : [buildError({ code: 'Access Code Error' }, 401), false];
-    } else {
+    }
+    else {
       return [null, false];
     }
   }
