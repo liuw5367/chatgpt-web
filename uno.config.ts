@@ -5,7 +5,7 @@ import {
   presetUno,
   transformerDirectives,
   transformerVariantGroup,
-} from "unocss";
+} from 'unocss';
 
 /**
  * https://unocss.dev/interactive/
@@ -24,14 +24,14 @@ export default defineConfig({
     presetUno(),
     presetIcons({
       // 添加前缀防止冲突
-      prefix: "i-",
+      prefix: 'i-',
       // 选择需要的图库导入 https://icon-sets.iconify.design https://icones.js.org
       // 导入时需添加依赖库 @iconify-json/{name}
       // https://tabler-icons.io/
-      collections: { tabler: () => import("@iconify-json/tabler/icons.json").then((i) => i.default) },
+      collections: { tabler: () => import('@iconify-json/tabler/icons.json').then((i) => i.default) },
       extraProperties: {
-        display: "inline-block",
-        "vertical-align": "middle",
+        display: 'inline-block',
+        'vertical-align': 'middle',
       },
     }),
   ],

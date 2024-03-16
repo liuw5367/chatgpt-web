@@ -65,10 +65,13 @@ export class Recognition {
   }
 }
 
+/**
+ * https://stackoverflow.com/questions/23733537/what-are-the-supported-languages-for-web-speech-api-in-html5
+ */
 export const supportLanguages: Record<string, string> = {
   'cmn-Hans-CN': '普通话 (中国大陆)',
-  'cmn-Hans-HK': '普通话 (香港)',
-  'yue-Hant-HK': '粵語 (香港)',
+  'cmn-Hans-HK': '普通话 (中国香港)',
+  'yue-Hant-HK': '粵語 (中国香港)',
   'en-US': 'English(United States)',
   'en-GB': 'English(United Kingdom)',
   'en-IN': 'English(India)',

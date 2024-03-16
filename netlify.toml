@@ -1,16 +1,10 @@
 [build.environment]
   NETLIFY_USE_PNPM = "true"
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
 
 [build]
   command = "OUTPUT=netlify astro build"
   publish = "dist"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = true
 
 [[headers]]
   for = "/manifest.webmanifest"

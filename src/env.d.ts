@@ -6,13 +6,6 @@ interface ImportMetaEnv {
   readonly OPENAI_API_MODEL: string;
 
   readonly ACCESS_CODE: string;
-
-  /** @deprecated */
-  readonly PUBLIC_OPENAI_API_KEY: string;
-  /** @deprecated */
-  readonly PUBLIC_OPENAI_API_HOST: string;
-  /** @deprecated */
-  readonly PUBLIC_OPENAI_API_MODEL: string;
 }
 
 interface ImportMeta {
