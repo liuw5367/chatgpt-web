@@ -24,16 +24,13 @@ export default function App() {
     loadScrollBarCss();
     loadCache(t('New Chat'));
     addCodeCopy();
-    const loading = document.querySelector('#app-loading');
-    if (loading && loading.parentNode) {
-      loading.remove();
-    }
+    document.querySelector('#app-loading')?.remove();
   }, []);
 
   return (
     <ChakraProvider theme={theme}>
       {loadIcons()}
-      <div className="v-screen h-screen flex flex-col overflow-hidden">
+      <div className="h-screen w-screen flex flex-col overflow-hidden">
         <Header />
         <Content />
 

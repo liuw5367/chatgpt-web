@@ -1,12 +1,33 @@
 import { IconButton, useColorMode } from '@chakra-ui/react';
-import { IconMenu2, IconMoonStars, IconPhoto, IconSettings, IconSun } from '@tabler/icons-react';
+import { IconMenu2, IconMoonStars, IconPhoto, IconSettings, IconSun, IconSunMoon } from '@tabler/icons-react';
 import { Helmet } from 'react-helmet';
 
+import { useEffect } from 'react';
 import { Logo } from './Logo';
 import { visibleStore } from './store';
+import { getSystemColorMode, useThemeStore } from './theme';
 
 export function Header() {
-  const { colorMode, toggleColorMode } = useColorMode();
+  const theme = useThemeStore((s) => s.theme);
+  const setTheme = useThemeStore((s) => s.setTheme);
+  const { setColorMode } = useColorMode();
+  const colorMode = theme === 'system' ? getSystemColorMode() : theme;
+
+  useEffect(() => {
+    setColorMode(theme);
+  }, [theme, setColorMode]);
+
+  function updateTheme() {
+    if (theme === 'light') {
+      setTheme('dark');
+    }
+    else if (theme === 'dark') {
+      setTheme('system');
+    }
+    else {
+      setTheme('light');
+    }
+  }
 
   return (
     <div
@@ -41,8 +62,12 @@ export function Header() {
         <IconButton
           aria-label="ColorMode"
           variant="ghost"
-          onClick={toggleColorMode}
-          icon={colorMode === 'light' ? <IconMoonStars stroke={1.5} /> : <IconSun stroke={1.5} />}
+          onClick={updateTheme}
+          icon={theme === 'light'
+            ? <IconSun stroke={1.5} />
+            : theme === 'dark'
+              ? <IconMoonStars stroke={1.5} />
+              : <IconSunMoon stroke={1.5} />}
         />
       </div>
 
