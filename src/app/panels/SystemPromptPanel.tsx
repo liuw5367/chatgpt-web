@@ -481,6 +481,7 @@ export function SystemPromptPanel(props: Props) {
       size="md"
       header={(
         <Tabs
+          className="mr-6"
           variant="enclosed"
           colorScheme="green"
           index={panelTabIndex}
@@ -490,7 +491,7 @@ export function SystemPromptPanel(props: Props) {
         >
           <TabList className="flex-wrap">
             {panelTabList.map((item) => (
-              <Tab key={item.value} className="whitespace-nowrap">
+              <Tab key={item.value} className="whitespace-nowrap !border-b-none">
                 {item.label}
               </Tab>
             ))}

@@ -17,10 +17,9 @@
 
 ## 功能
 
-- 对话使用 OpenAI 官方 API `/v1/chat/completions`
-- 支持图片生成 `/v1/images/generations`
+- 对话使用 OpenAI API `/v1/chat/completions`
+- 图片生成 OpenAI API `/v1/images/generations`
 - 支持设置 prompt，提供大量模版供选择
-- 页面样式移动端优先
 - 支持设置访问密码
 - 支持 prompt 收藏、导入、导出（浏览器本地缓存）
 - 支持多会话
@@ -32,7 +31,7 @@
 - 支持代码复制
 - 输入 `/` 搜索 Prompt
 - 支持 i18n
-- 支持 语音识别ASR 和 语音合成TTS，使用浏览器自带的 api
+- 支持 语音识别ASR 和 语音合成TTS，使用浏览器API
 
 ![Dark](./screenshot-dark.png)
 
@@ -40,12 +39,12 @@
 
 ## 使用介绍
 
-- 页面中保存的 OPENAI KEY 会明文保存在 localstorage
+- 页面中保存的 OpenAI KEY 会明文保存在 localstorage
 - 消息列表以 json 形式保存在 localstorage
 - 页面中保存的 API KEY 会明文传输进行请求
 - 输入框为空时，按上箭头将填充上一条消息内容
 
-### Prompt
+### 提示词
 
 - 如果 prompt 最后一句带有问句，个人建议将该问句从 prompt 删除，将其填入消息内容框内，不然每次对话的时候，该问句都会跟随 system prompt 一起发送
 - 配置 prompt 后页面底部的设置按钮会高亮
@@ -78,25 +77,20 @@
 
 ## 感谢
 
-项目创建参考
-
 - [ddiu8081 / chatgpt-demo](https://github.com/ddiu8081/chatgpt-demo)
-
-prompt 模版来自：
-
 - [rockbenben / ChatGPT-Shortcut](https://github.com/rockbenben/ChatGPT-Shortcut)
 - [PlexPt / awesome-chatgpt-prompts-zh](https://github.com/PlexPt/awesome-chatgpt-prompts-zh)
 - [f/awesome-chatgpt-prompts](https://github.com/f/awesome-chatgpt-prompts)
 - [timqian/openprompt.co](https://github.com/timqian/openprompt.co)
 - [GaiZhenbiao / ChuanhuChatGPT](https://github.com/GaiZhenbiao/ChuanhuChatGPT)
 
-依赖库
+依赖库：
 
 - astro
 - react
 - chakra-ui
 - tabler icon
-- nanostores
+- zustand
 - unocss
 - markdown-it
 - github-markdown-css
