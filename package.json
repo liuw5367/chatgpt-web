@@ -26,7 +26,6 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@iconify-json/tabler": "^1.1.92",
     "@tabler/icons-react": "^2.35.0",
     "@unocss/reset": "^0.58.6",
     "ahooks": "^3.7.8",
