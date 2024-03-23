@@ -14,6 +14,13 @@
 - Astro 分支首次加载时白屏时间长一点
   - [Astro 分支体验地址](https://chatgpt-astro.netlify.app)
 
+## 截图
+
+<div style="display:flex; justify-content:space-around;">
+    <img src="./screenshot-dark.png" alt="Screenshot 1" style="width:45%;">
+    <img src="./screenshot-light.png" alt="Screenshot 2" style="width:45%;">
+</div>
+
 ## 功能
 
 - 对话使用 OpenAI API `/v1/chat/completions`
@@ -32,10 +39,6 @@
 - 输入 `/` 搜索 Prompt
 - 支持 i18n
 - 支持 语音识别ASR 和 语音合成TTS，使用浏览器API
-
-![Dark](./screenshot-dark.png)
-
-![Light](./screenshot-light.png)
 
 ## 使用介绍
 
