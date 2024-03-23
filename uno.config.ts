@@ -1,6 +1,5 @@
 import {
   defineConfig,
-  presetAttributify,
   presetIcons,
   presetUno,
   transformerDirectives,
@@ -8,7 +7,7 @@ import {
 } from 'unocss';
 
 /**
- * https://uno.antfu.me 用来查询支持的属性
+ * https://unocss.dev/
  */
 export default defineConfig({
   transformers: [
@@ -20,15 +19,11 @@ export default defineConfig({
     transformerVariantGroup(),
   ],
   presets: [
-    presetAttributify(),
     presetUno(),
     presetIcons({
       // 添加前缀防止冲突
+      cdn: 'https://esm.sh/',
       prefix: 'i-',
-      // 选择需要的图库导入 https://icon-sets.iconify.design https://icones.js.org
-      // 导入时需添加依赖库 @iconify-json/{name}
-      // https://tabler-icons.io/
-      collections: { tabler: () => import('@iconify-json/tabler/icons.json').then((i) => i.default) },
       extraProperties: {
         'display': 'inline-block',
         'vertical-align': 'middle',

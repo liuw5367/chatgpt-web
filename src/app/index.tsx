@@ -27,7 +27,6 @@ export default function App() {
 
   return (
     <ChakraProvider theme={theme}>
-      {loadIcons()}
       <div className="h-screen w-screen flex flex-col overflow-hidden">
         {loadFlag && (
           <>
