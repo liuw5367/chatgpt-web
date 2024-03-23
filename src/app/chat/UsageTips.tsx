@@ -12,8 +12,8 @@ export function UsageTips() {
         ? [
             '输入 / 可激活提示词搜索窗口',
             '输入框为空时，按上箭头将填充上一条消息内容',
-            '提示词设置底部🌟可对提示词进行收藏',
-            '提示词设置底部可对提示词进行导入导出',
+            '提示词设置底部点击🌟进行收藏',
+            '提示词设置底部可进行导入导出',
             '默认非连续对话，需点击底部按钮开启',
             '连续对话消息底部会显示编码用来定位属于哪个对话',
             '默认开启搜索内容建议，可在设置中关闭',
@@ -26,7 +26,6 @@ export function UsageTips() {
             'Search content suggestions are enabled by default and can be disabled in settings',
             'Enter key sending is not enabled by default, but can be enabled in settings',
             'Non-continuous conversation is enabled by default and requires clicking the bottom button to activate',
-            'The voice button is hidden by default and will be displayed after typing KEY',
           ],
     );
   }, [language]);
