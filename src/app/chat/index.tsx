@@ -23,6 +23,7 @@ import type { ChatMessage } from '../types';
 import { getCurrentTime, moveCursorToEnd, removeLn, request, scrollToElement, speakText, uuid } from '../utils';
 import { modelList } from '../panels';
 import { defaultModel } from '../../constants';
+import type { ModelSettings } from '../../pages/api/generate';
 import { Command } from './Command';
 import ErrorItem from './ErrorItem';
 import { MessageItem } from './MessageItem';
@@ -178,7 +179,7 @@ export default function Page() {
     list.push(question);
     const messages = list.map(({ role, content }) => ({ role, content }));
     if (systemMessage) {
-      messages.unshift({ role: 'system', content: systemMessage });
+      // messages.unshift({ role: 'system', content: systemMessage });
     }
     return { messages };
   }
@@ -234,18 +235,24 @@ export default function Page() {
       const top_p = currentChat.top_p ?? chatConfig.top_p;
 
       const { messages } = buildRequestMessages(messageList, question, currentChat.conversationId, systemMessage);
+
+      const settings: ModelSettings = {
+        system: systemMessage,
+        // prompt: question.content,
+        messages: messages as any,
+
+        temperature: temperature ? Number(temperature) : undefined,
+        topP: top_p ? Number(top_p) : undefined,
+      };
+
       const response = await request('/api/generate', {
         method: 'POST',
         signal: abortController.signal,
         body: JSON.stringify({
-          messages,
           apiKey: chatConfig.openAIKey,
-          host: chatConfig.openAIHost,
+          baseURL: chatConfig.openAIHost,
           model,
-          config: {
-            temperature: temperature ? Number(temperature) : undefined,
-            top_p: top_p ? Number(top_p) : undefined,
-          },
+          settings,
         }),
       });
 
@@ -278,7 +285,8 @@ export default function Page() {
       while (!done) {
         const { value, done: readerDone } = await reader.read();
         done = readerDone;
-        onProgress(decoder.decode(value));
+        const text = decoder.decode(value);
+        onProgress(text);
       }
       addResultItem(content, assistantMessage, systemMessage, currentChat.conversationId);
     }

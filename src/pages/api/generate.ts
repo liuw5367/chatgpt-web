@@ -1,17 +1,25 @@
 import type { APIRoute } from 'astro';
-import type { ParsedEvent, ReconnectInterval } from 'eventsource-parser';
-import { createParser } from 'eventsource-parser';
+
+import { streamText } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
+import { createAnthropic } from '@ai-sdk/anthropic';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { createMistral } from '@ai-sdk/mistral';
+import { createOllama } from 'ollama-ai-provider';
 
 import { ENV_KEY, buildError, checkAccessCode, getEnv } from '../../utils';
+
+export type ModelSettings = Omit<Parameters<typeof streamText>[0], 'model'>;
 
 export const POST: APIRoute = async (context) => {
   const body = await context.request.json();
   const env = getEnv();
-  const host = body.host || env.HOST;
+  const provider = body.provider || 'openai';
+  const baseURL = body.baseURL || body.host || env.HOST;
   let apiKey = body.apiKey || env.KEY;
-  const model = body.model || env.MODEL;
-  const messages = body.messages;
-  const config = body.config || {};
+  const modelId = body.model || env.MODEL;
+
+  const settings: ModelSettings = body.settings || {};
 
   const accessCode = context.request.headers.get('access-code');
   const [accessCodeError, accessCodeSuccess] = checkAccessCode(accessCode);
@@ -22,80 +30,46 @@ export const POST: APIRoute = async (context) => {
     apiKey = body.apiKey || ENV_KEY;
   }
 
-  if (!apiKey) {
-    return buildError({ code: 'No Api Key' }, 401);
-  }
+  try {
+    const model = createModel(provider, apiKey, baseURL)(modelId);
 
-  if (!messages) {
-    return buildError({ code: 'No Prompt' });
-  }
+    const result = await streamText({ model, ...settings });
 
-  const response = await fetch(`${host}/v1/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages,
-      stream: true,
-      ...config,
-    }),
-  }).catch((error: Error) => {
+    return result.toTextStreamResponse();
+  }
+  catch (error: any) {
     console.error('chat completions error:', error);
     return buildError({ code: error.name, message: error.message }, 500);
-  });
-
-  return parseOpenAIStream(response);
+  }
 };
 
-function parseOpenAIStream(rawResponse: Response) {
-  const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
-  if (!rawResponse.ok) {
-    return new Response(rawResponse.body, {
-      status: rawResponse.status,
-      statusText: rawResponse.statusText,
-    });
+function createModel(
+  provider: string,
+  apiKey: string,
+  baseURL?: string,
+  headers?: Record<string, string>,
+) {
+  const settings = { baseURL, apiKey, headers };
+
+  if (provider === 'openai') {
+    return createOpenAI(settings);
   }
 
-  const stream = new ReadableStream({
-    async start(controller) {
-      const streamParser = (event: ParsedEvent | ReconnectInterval) => {
-        if (event.type === 'event') {
-          const data = event.data;
-          if (data === '[DONE]') {
-            controller.close();
-            return;
-          }
-          try {
-            // response = {
-            //   id: 'chatcmpl-6pULPSegWhFgi0XQ1DtgA3zTa1WR6',
-            //   object: 'chat.completion.chunk',
-            //   created: 1000000000,
-            //   model: 'gpt-3.5-turbo',
-            //   choices: [
-            //     { delta: { content: '你' }, index: 0, finish_reason: null }
-            //   ],
-            // }
-            const json = JSON.parse(data);
-            const text = json.choices[0].delta?.content || '';
-            const queue = encoder.encode(text);
-            controller.enqueue(queue);
-          }
-          catch (error) {
-            controller.error(error);
-          }
-        }
-      };
+  if (provider === 'anthropic') {
+    return createAnthropic(settings);
+  }
 
-      const parser = createParser(streamParser);
-      for await (const chunk of rawResponse.body as any) {
-        parser.feed(decoder.decode(chunk));
-      }
-    },
-  });
+  if (provider === 'google') {
+    return createGoogleGenerativeAI(settings);
+  }
 
-  return new Response(stream);
+  if (provider === 'mistral') {
+    return createMistral(settings);
+  }
+
+  if (provider === 'ollama') {
+    return createOllama(settings);
+  }
+
+  return createOpenAI(settings);
 }
