@@ -150,6 +150,11 @@ export default function Page() {
       maxModelTokens = 16_384;
       maxTokens = maxModelTokens - maxResponseTokens;
     }
+    else if (model.toLowerCase().includes('gpt-4o') || model.toLowerCase().includes('gpt-4-turbo')) {
+      const maxResponseTokens = 32_000;
+      maxModelTokens = 128_000;
+      maxTokens = maxModelTokens - maxResponseTokens;
+    }
     else if (model.toLowerCase().includes('gpt-4')) {
       const maxResponseTokens = 2048;
       maxModelTokens = 8192;
