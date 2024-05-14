@@ -32,9 +32,12 @@ export interface SettingItemType<T = string> {
 }
 
 export const modelList = [
+  { label: 'gpt-4o', value: 'gpt-4o' },
+  { label: 'gpt-4o-2024-05-13', value: 'gpt-4o-2024-05-13' },
   { label: 'gpt-3.5-turbo', value: 'gpt-3.5-turbo' },
   { label: 'gpt-3.5-turbo-16k', value: 'gpt-3.5-turbo-16k' },
   { label: 'gpt-4', value: 'gpt-4' },
+  { label: 'gpt-4-turbo', value: 'gpt-4-turbo' },
   { label: 'gpt-4-32k', value: 'gpt-4-32k' },
   { label: 'text-davinci-003', value: 'text-davinci-003' },
   { label: 'text-davinci-002', value: 'text-davinci-002' },
