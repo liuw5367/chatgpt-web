@@ -21,6 +21,7 @@ import { useTranslation } from '../i18n';
 import { chatConfigStore, chatDataStore, chatListStore, visibleStore } from '../store';
 import type { ChatMessage } from '../types';
 import { getCurrentTime, moveCursorToEnd, removeLn, request, scrollToElement, speakText, uuid } from '../utils';
+import { modelList } from '../panels';
 import { Command } from './Command';
 import ErrorItem from './ErrorItem';
 import { MessageItem } from './MessageItem';
@@ -134,48 +135,41 @@ export default function Page() {
     conversationId: string | undefined,
     systemMessage?: string,
   ) {
-    let maxModelTokens = 4095;
-    /** 发送出去的内容最多可使用的 token */
-    let maxTokens = 3000;
-
-    const model = chatConfig.openAIModel || '';
-
-    if (model.toLowerCase().includes('32k')) {
-      const maxResponseTokens = 8192;
-      maxModelTokens = 32_768;
-      maxTokens = maxModelTokens - maxResponseTokens;
-    }
-    else if (model.toLowerCase().includes('16k')) {
-      const maxResponseTokens = 4086;
-      maxModelTokens = 16_384;
-      maxTokens = maxModelTokens - maxResponseTokens;
-    }
-    else if (model.toLowerCase().includes('gpt-4o') || model.toLowerCase().includes('gpt-4-turbo')) {
-      const maxResponseTokens = 32_000;
-      maxModelTokens = 128_000;
-      maxTokens = maxModelTokens - maxResponseTokens;
-    }
-    else if (model.toLowerCase().includes('gpt-4')) {
-      const maxResponseTokens = 2048;
-      maxModelTokens = 8192;
-      maxTokens = maxModelTokens - maxResponseTokens;
-    }
-
     let tokenCount = estimateTokens(question.content) + estimateTokens(systemMessage);
     const list: ChatMessage[] = [];
-    if (conversationId) {
-      const conversationList = messageList.filter((v) => v.conversationId === conversationId).reverse();
-      conversationList.some((item) => {
-        const token = tokenCount + (item.token || 0);
-        if (token > maxTokens) {
-          // 已超出 token 数量限制，跳出
-          return true;
-        }
-        list.push(item);
-        tokenCount = token;
-        return false;
-      });
+    const conversationList = conversationId ? messageList.filter((v) => v.conversationId === conversationId).reverse() : [];
+
+    const modelId = chatConfig.openAIModel || 'gpt-3.5-turbo';
+    const target = modelList.find((v) => v.value === modelId);
+    if (target) {
+      const maxModelTokens = target.token;
+
+      if (maxModelTokens != null) {
+        /** 发送出去的内容最多可使用的 token */
+        const maxTokens = Math.floor(maxModelTokens / 4 * 3);
+
+        conversationList.some((item) => {
+          const token = tokenCount + (item.token || 0);
+          if (token > maxTokens) {
+            if (tokenCount > maxModelTokens) {
+              // 已超出 token 数量限制，跳出
+              return true;
+            }
+            // 没超出全部 token 数量限制，将剩余的内容放入列表，跳出
+            list.push(item);
+            tokenCount = token;
+            return true;
+          }
+          list.push(item);
+          tokenCount = token;
+          return false;
+        });
+      }
     }
+    else {
+      list.push(...conversationList);
+    }
+
     list.reverse();
 
     console.log('messages token：', [tokenCount]);
