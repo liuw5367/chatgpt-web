@@ -22,6 +22,7 @@ import { chatConfigStore, chatDataStore, chatListStore, visibleStore } from '../
 import type { ChatMessage } from '../types';
 import { getCurrentTime, moveCursorToEnd, removeLn, request, scrollToElement, speakText, uuid } from '../utils';
 import { modelList } from '../panels';
+import { defaultModel } from '../../constants';
 import { Command } from './Command';
 import ErrorItem from './ErrorItem';
 import { MessageItem } from './MessageItem';
@@ -139,7 +140,7 @@ export default function Page() {
     const list: ChatMessage[] = [];
     const conversationList = conversationId ? messageList.filter((v) => v.conversationId === conversationId).reverse() : [];
 
-    const modelId = chatConfig.openAIModel || 'gpt-3.5-turbo';
+    const modelId = chatConfig.openAIModel || defaultModel;
     const target = modelList.find((v) => v.value === modelId);
     if (target) {
       const maxModelTokens = target.token;

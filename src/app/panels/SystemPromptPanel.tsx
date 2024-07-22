@@ -15,7 +15,7 @@ import { parse as parseCsv, unparse as unparseCsv } from 'papaparse';
 import React, { useEffect, useState } from 'react';
 
 import { FileUpload, SimpleDrawer } from '../../components';
-import { CacheKeys } from '../../constants';
+import { CacheKeys, defaultModel } from '../../constants';
 import type { OptionType } from '../../prompts';
 import { allPrompts } from '../../prompts';
 import { localDB } from '../../utils/LocalDB';
@@ -551,7 +551,7 @@ function ChatSetting(props: ChatSettingProps) {
 
   const list: SettingItemType[] = [
     { label: t('Name'), value: 'name', placeholder: '' },
-    { label: 'model', value: 'openAIModel', type: 'select', placeholder: 'gpt-3.5-turbo' },
+    { label: 'model', value: 'openAIModel', type: 'select', placeholder: defaultModel },
     {
       type: 'number',
       label: 'temperature',
