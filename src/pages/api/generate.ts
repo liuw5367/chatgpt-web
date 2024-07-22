@@ -6,6 +6,7 @@ import { createAnthropic } from '@ai-sdk/anthropic';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createMistral } from '@ai-sdk/mistral';
 import { createOllama } from 'ollama-ai-provider';
+import { createAzure } from '@ai-sdk/azure';
 
 import { ENV_KEY, buildError, checkAccessCode, getEnv } from '../../utils';
 
@@ -52,7 +53,11 @@ function createModel(
   const settings = { baseURL, apiKey, headers };
 
   if (provider === 'openai') {
-    return createOpenAI(settings);
+    return createOpenAI({ compatibility: 'strict', ...settings });
+  }
+
+  if (provider === 'azure') {
+    return createAzure(settings);
   }
 
   if (provider === 'anthropic') {
@@ -71,5 +76,5 @@ function createModel(
     return createOllama(settings);
   }
 
-  return createOpenAI(settings);
+  return createOpenAI({ compatibility: 'compatible', ...settings });
 }

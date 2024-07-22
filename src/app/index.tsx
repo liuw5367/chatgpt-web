@@ -4,18 +4,18 @@ import 'github-markdown-css';
 
 import 'uno.css';
 
-import '../app/markdown.css';
-import '../app/app.css';
+import './styles/markdown.css';
+import './styles/app.css';
 
 import { ChakraProvider, extendTheme, useMediaQuery } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 
 import Chat from './chat';
-import { Header } from './Header';
-import { useTranslation } from './i18n';
-import { ChatPanel, ImagePanel, SettingPanel, SystemPromptPanel } from './panels';
-import { loadCache } from './storage';
-import { visibleStore } from './store';
+import { Header } from './components';
+import { useTranslation } from './utils/i18n';
+import { AppSettingPanel, ChatListPanel, ChatSettingPanel, ImagePanel } from './panels';
+import { loadCache } from './utils/storage';
+import { usePanelVisibleStore } from './stores';
 import { addCodeCopy, isWindows } from './utils';
 
 export default function App() {
@@ -36,7 +36,7 @@ export default function App() {
         <Content />
 
         <ImagePanel />
-        <SettingPanel />
+        <AppSettingPanel />
       </div>
     </ChakraProvider>
   );
@@ -46,8 +46,8 @@ function Content() {
   // 和 tailwind 保持一致
   const [lg] = useMediaQuery('(min-width: 1023.9px)');
   const [xl] = useMediaQuery('(min-width: 1279.9px)');
-  const chatVisible = visibleStore((s) => s.chatVisible);
-  const promptVisible = visibleStore((s) => s.promptVisible);
+  const chatVisible = usePanelVisibleStore((s) => s.chatListVisible);
+  const promptVisible = usePanelVisibleStore((s) => s.chatSettingVisible);
 
   const [chatVisibleState, setChatVisibleState] = useState(chatVisible);
   const [promptVisibleState, setPromptVisibleState] = useState(promptVisible);
@@ -61,7 +61,7 @@ function Content() {
   useEffect(() => {
     const lg = window.matchMedia('(min-width: 1023.9px)').matches;
     if (lg) {
-      visibleStore.setState({ chatVisible: true });
+      usePanelVisibleStore.setState({ chatListVisible: true });
     }
   }, []);
 
@@ -80,29 +80,24 @@ function Content() {
 
   const leftSide = xl || (lg && showChatSide);
   const rightSide = xl || (lg && showPromptSide);
+  const maxWidth = leftSide && chatVisibleState && rightSide && promptVisibleState
+    ? 'calc(100% - 45rem)'
+    : leftSide && chatVisibleState
+      ? 'calc(100% - 20rem)'
+      : rightSide && promptVisibleState
+        ? 'calc(100% - 25rem)'
+        : '100%';
 
   return (
     <div
       className="w-full flex flex-1 overflow-hidden"
       style={{ backgroundColor: 'var(--chakra-colors-chakra-body-bg)' }}
     >
-      <ChatPanel chatVisible={chatVisibleState} type={leftSide ? 'side' : 'drawer'} />
-      <div
-        className="h-full w-full"
-        style={{
-          maxWidth:
-            leftSide && chatVisibleState && rightSide && promptVisibleState
-              ? 'calc(100% - 45rem)'
-              : leftSide && chatVisibleState
-                ? 'calc(100% - 20rem)'
-                : rightSide && promptVisibleState
-                  ? 'calc(100% - 25rem)'
-                  : '100%',
-        }}
-      >
+      <ChatListPanel chatVisible={chatVisibleState} type={leftSide ? 'side' : 'drawer'} />
+      <div className="h-full w-full" style={{ maxWidth }}>
         <Chat />
       </div>
-      <SystemPromptPanel
+      <ChatSettingPanel
         promptVisible={promptVisibleState}
         sideWidth="min-w-100 max-w-100"
         type={rightSide ? 'side' : 'drawer'}
@@ -111,7 +106,6 @@ function Content() {
   );
 }
 
-/** 代码复制使用的图标。这里加载一下，不然无法显示 */
 function loadIcons() {
   return (
     <>

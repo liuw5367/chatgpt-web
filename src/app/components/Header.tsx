@@ -3,9 +3,8 @@ import { IconMenu2, IconMoonStars, IconPhoto, IconSettings, IconSun, IconSunMoon
 import { Helmet } from 'react-helmet';
 
 import { useEffect } from 'react';
+import { getSystemColorMode, usePanelVisibleStore, useThemeStore } from '../stores';
 import { Logo } from './Logo';
-import { visibleStore } from './store';
-import { getSystemColorMode, useThemeStore } from './theme';
 
 export function Header() {
   const theme = useThemeStore((s) => s.theme);
@@ -41,7 +40,7 @@ export function Header() {
           variant="ghost"
           icon={<IconMenu2 stroke={1.5} />}
           onClick={() => {
-            visibleStore.setState((state) => ({ chatVisible: !state.chatVisible }));
+            usePanelVisibleStore.setState((state) => ({ chatListVisible: !state.chatListVisible }));
           }}
         />
       </div>
@@ -51,13 +50,13 @@ export function Header() {
           aria-label="Settings"
           variant="ghost"
           icon={<IconSettings stroke={1.5} />}
-          onClick={() => visibleStore.setState({ settingVisible: true })}
+          onClick={() => usePanelVisibleStore.setState({ settingVisible: true })}
         />
         <IconButton
           aria-label="ImageCreate"
           variant="ghost"
           icon={<IconPhoto stroke={1.5} />}
-          onClick={() => visibleStore.setState({ imageVisible: true })}
+          onClick={() => usePanelVisibleStore.setState({ imageVisible: true })}
         />
         <IconButton
           aria-label="ColorMode"

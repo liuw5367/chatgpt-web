@@ -1,4 +1,4 @@
-import { chatConfigStore } from '../store';
+import { useAppSettingStore } from '../stores';
 
 export class Recognition {
   private recognition: any;
@@ -27,7 +27,7 @@ export class Recognition {
     // 返回实时识别结果
     recognition.interimResults = true;
     // 设置语言
-    const lang = chatConfigStore.getState().asrLanguage;
+    const lang = useAppSettingStore.getState().asrLanguage;
     recognition.lang = lang;
 
     // 设置是否连续识别

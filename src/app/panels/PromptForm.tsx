@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
-import { useTranslation } from '../i18n';
+import { useTranslation } from '../utils/i18n';
 
 interface Props {
   open?: boolean;

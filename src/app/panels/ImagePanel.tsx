@@ -23,8 +23,8 @@ import React, { useEffect, useState } from 'react';
 
 import { AutoResizeTextarea, SimpleDrawer } from '../../components';
 import { CacheKeys } from '../../constants';
-import { useTranslation } from '../i18n';
-import { chatConfigStore, visibleStore } from '../store';
+import { useTranslation } from '../utils/i18n';
+import { useAppSettingStore, usePanelVisibleStore } from '../stores';
 import { request } from '../utils';
 
 interface ImageItem {
@@ -36,8 +36,8 @@ export function ImagePanel() {
   const { t } = useTranslation();
   const toast = useToast({ position: 'top', isClosable: true });
 
-  const chatConfig = chatConfigStore();
-  const imageVisible = visibleStore((s) => s.imageVisible);
+  const chatConfig = useAppSettingStore();
+  const imageVisible = usePanelVisibleStore((s) => s.imageVisible);
 
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
@@ -58,7 +58,7 @@ export function ImagePanel() {
   }, [abortController]);
 
   function handleClose() {
-    visibleStore.setState({ imageVisible: false });
+    usePanelVisibleStore.setState({ imageVisible: false });
   }
 
   async function handleSend() {

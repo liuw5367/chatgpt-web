@@ -12,21 +12,22 @@ import {
 import type { ChakraStylesConfig } from 'chakra-react-select';
 import { Select as SearchSelect } from 'chakra-react-select';
 import { parse as parseCsv, unparse as unparseCsv } from 'papaparse';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { FileUpload, SimpleDrawer } from '../../components';
 import { CacheKeys, defaultModel } from '../../constants';
 import type { OptionType } from '../../prompts';
 import { allPrompts } from '../../prompts';
-import { localDB } from '../../utils/LocalDB';
-import { estimateTokens } from '../chat/token';
-import { useTranslation } from '../i18n';
-import { chatConfigStore, chatListStore, visibleStore } from '../store';
+import { localDB } from '../utils/LocalDB';
+import { estimateTokens } from '../utils/token';
+import { useTranslation } from '../utils/i18n';
+import { useChatListStore, usePanelVisibleStore } from '../stores';
 import type { ChatItem } from '../types';
 import { readFileAsString, uuid } from '../utils';
+import { allProviders, supportModels } from '../model';
+import { SettingItem } from '../components';
 import { PromptFormModal } from './PromptForm';
-import type { SettingItemType } from './SettingPanel';
-import { SettingItem, modelList } from './SettingPanel';
+import type { SettingItemType } from './AppSettingPanel';
 
 interface Props {
   type?: 'side' | 'drawer';
@@ -39,11 +40,11 @@ interface LabelValue {
   value: string;
 }
 
-export function SystemPromptPanel(props: Props) {
+export function ChatSettingPanel(props: Props) {
   const { promptVisible, type, sideWidth } = props;
   const { t, language } = useTranslation();
   const toast = useToast({ position: 'top', isClosable: true });
-  const currentChat = chatListStore((s) => s.currentChat());
+  const currentChat = useChatListStore((s) => s.currentChat());
   const { id: chatId, systemMessage = '' } = currentChat;
   const [token, setToken] = useState(0);
 
@@ -66,14 +67,19 @@ export function SystemPromptPanel(props: Props) {
     { label: t('System Prompt'), value: 'prompt' },
     { label: t('Chat Settings'), value: 'setting' },
   ];
-  const [panelTabIndex, setPanelTabIndex] = useState(0);
+
+  const chatTab = usePanelVisibleStore((s) => s.chatTab);
+
+  function setChatTab(index: number) {
+    usePanelVisibleStore.setState({ chatTab: index === 1 ? 'info' : 'prompt' });
+  }
 
   useEffect(() => {
     if (!promptVisible) {
       return;
     }
     handleClear();
-    setPrompt(chatListStore.getState().currentChat().systemMessage || '');
+    setPrompt(useChatListStore.getState().currentChat().systemMessage || '');
   }, [promptVisible]);
 
   useEffect(() => {
@@ -215,7 +221,7 @@ export function SystemPromptPanel(props: Props) {
     if (type === 'side') {
       return;
     }
-    visibleStore.setState({ promptVisible: false });
+    usePanelVisibleStore.setState({ chatSettingVisible: false });
   }
 
   function handlePromptReset() {
@@ -230,7 +236,7 @@ export function SystemPromptPanel(props: Props) {
   }
 
   function updateSystemPrompt(prompt?: string) {
-    chatListStore.getState().updateChat(chatId, { systemMessage: prompt });
+    useChatListStore.getState().updateChat(chatId, { systemMessage: prompt });
   }
 
   function handleSaveClick() {
@@ -484,9 +490,9 @@ export function SystemPromptPanel(props: Props) {
           className="mr-6"
           variant="enclosed"
           colorScheme="green"
-          index={panelTabIndex}
+          index={chatTab === 'info' ? 1 : 0}
           onChange={(index) => {
-            setPanelTabIndex(index);
+            setChatTab(index);
           }}
         >
           <TabList className="flex-wrap">
@@ -499,7 +505,7 @@ export function SystemPromptPanel(props: Props) {
         </Tabs>
       )}
       footer={
-        panelTabIndex === 1
+        chatTab === 'info'
           ? null
           : (
             <div className="w-full flex flex-row justify-between">
@@ -526,8 +532,8 @@ export function SystemPromptPanel(props: Props) {
             )
       }
     >
-      {panelTabIndex === 0 && renderPromptContent()}
-      {panelTabIndex === 1 && <ChatSetting chat={currentChat} />}
+      {chatTab === 'prompt' && renderPromptContent()}
+      {chatTab === 'info' && <ChatSetting chat={currentChat} />}
       <PromptFormModal
         open={modalOpen}
         name={selectedPrompt?.act}
@@ -545,18 +551,18 @@ interface ChatSettingProps {
 
 function ChatSetting(props: ChatSettingProps) {
   const { chat } = props;
-  const config = chatConfigStore();
-  const updateChat = chatListStore((s) => s.updateChat);
   const { t } = useTranslation();
+  const updateChat = useChatListStore((s) => s.updateChat);
+  const setCurrentChat = useChatListStore((s) => s.setCurrentChat);
 
   const list: SettingItemType[] = [
     { label: t('Name'), value: 'name', placeholder: '' },
-    { label: 'model', value: 'openAIModel', type: 'select', placeholder: defaultModel },
+    { type: 'select', label: t('Provider'), value: 'provider', placeholder: '' },
+    { type: 'select', label: 'model', value: 'modelId', placeholder: defaultModel },
     {
       type: 'number',
       label: 'temperature',
       value: 'temperature',
-      max: 2,
       placeholder: '',
       desc: t('settings.temperature'),
     },
@@ -564,30 +570,58 @@ function ChatSetting(props: ChatSettingProps) {
       type: 'number',
       label: 'top_p',
       value: 'top_p',
-      max: 1,
       placeholder: '',
       desc: t('settings.top_p'),
     },
   ];
 
+  function handleClose() {
+    usePanelVisibleStore.setState({ chatSettingVisible: false });
+  }
+
+  function handleDelete() {
+    const { chatList } = useChatListStore.getState();
+    if (chatList.length === 1) {
+      const item: ChatItem = { id: uuid(), name: t('New Chat'), selected: true };
+      useChatListStore.setState({ chatList: [item] });
+      setCurrentChat(item.id);
+      handleClose();
+    }
+    else {
+      const list = chatList.filter((item) => item.id !== chat.id);
+      useChatListStore.setState({ chatList: list });
+      const [item] = list;
+      setCurrentChat(item!.id);
+      handleClose();
+    }
+  }
+
   return (
     <div className="space-y-2">
       {list.map((item) => {
         // @ts-expect-error key
-        let value = chat[item.value] || config[item.value];
-        if (item.value === 'openAIModel' && !value) {
-          value = modelList[0].value;
-        }
+        const value = chat[item.value];
+
+        const options = item.value === 'provider'
+          ? allProviders
+          : item.value === 'model' && chat.provider
+            ? supportModels[chat.provider].models
+            : undefined;
 
         return (
           <SettingItem
             key={item.value}
             item={item}
+            options={options}
             onChange={(value) => updateChat(chat.id, { [item.value]: value })}
             value={value}
           />
         );
       })}
+
+      <div>
+        <Button colorScheme="red" onClick={handleDelete}>{t('Delete')}</Button>
+      </div>
     </div>
   );
 }

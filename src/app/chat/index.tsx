@@ -16,30 +16,30 @@ import { useDebounceEffect, useMemoizedFn } from 'ahooks';
 import React, { createRef, useEffect, useRef, useState } from 'react';
 
 import { AutoResizeTextarea } from '../../components';
-import { localDB } from '../../utils/LocalDB';
-import { useTranslation } from '../i18n';
-import { chatConfigStore, chatDataStore, chatListStore, visibleStore } from '../store';
+import { localDB } from '../utils/LocalDB';
+import { useTranslation } from '../utils/i18n';
+import { useAppSettingStore, useChatDataStore, useChatListStore, usePanelVisibleStore } from '../stores';
 import type { ChatMessage } from '../types';
 import { getCurrentTime, moveCursorToEnd, removeLn, request, scrollToElement, speakText, uuid } from '../utils';
-import { modelList } from '../panels';
 import { defaultModel } from '../../constants';
 import type { ModelSettings } from '../../pages/api/generate';
+import { allModels } from '../model';
+import { Recognition } from '../utils/Recognition';
+import { estimateTokens } from '../utils/token';
 import { Command } from './Command';
 import ErrorItem from './ErrorItem';
 import { MessageItem } from './MessageItem';
-import { Recognition } from './Recognition';
 import { SearchSuggestions } from './SearchSuggestions';
-import { estimateTokens } from './token';
 import { UsageTips } from './UsageTips';
 
 export default function Page() {
   const { t } = useTranslation();
   const toast = useToast({ position: 'top', isClosable: true });
-  const messageList = chatDataStore((s) => s.data);
-  const currentChat = chatListStore((s) => s.currentChat());
-  const updateChat = chatListStore((s) => s.updateChat);
+  const messageList = useChatDataStore((s) => s.data);
+  const currentChat = useChatListStore((s) => s.currentChat());
+  const updateChat = useChatListStore((s) => s.updateChat);
 
-  const chatConfig = chatConfigStore();
+  const chatConfig = useAppSettingStore();
   const enterSend = chatConfig.enterSend === '1';
   const inputRef = createRef<HTMLTextAreaElement>();
   const [inputContent, setInputContent] = useState('');
@@ -74,7 +74,7 @@ export default function Page() {
   }, []);
 
   useDebounceEffect(() => {
-    const chatId = chatListStore.getState().currentChat().id;
+    const chatId = useChatListStore.getState().currentChat().id;
     localDB.setItem(chatId, messageList);
   }, [messageList]);
 
@@ -142,7 +142,7 @@ export default function Page() {
     const conversationList = conversationId ? messageList.filter((v) => v.conversationId === conversationId).reverse() : [];
 
     const modelId = chatConfig.openAIModel || defaultModel;
-    const target = modelList.find((v) => v.value === modelId);
+    const target = allModels.find((v) => v.value === modelId);
     if (target) {
       const maxModelTokens = target.token;
 
@@ -206,7 +206,7 @@ export default function Page() {
       prompt: systemMessage,
       conversationId: currentChat.conversationId,
     };
-    chatDataStore.setState({ data: [...messageList, question] });
+    useChatDataStore.setState({ data: [...messageList, question] });
     setInputContent('');
     asrResultRef.current = '';
     scrollToElement(question.id, { block: 'start' });
@@ -230,7 +230,7 @@ export default function Page() {
     }
 
     try {
-      const model = currentChat.openAIModel ?? chatConfig.openAIModel;
+      const model = currentChat.modelId ?? chatConfig.modelId;
       const temperature = currentChat.temperature ?? chatConfig.temperature;
       const top_p = currentChat.top_p ?? chatConfig.top_p;
 
@@ -303,7 +303,7 @@ export default function Page() {
       return;
     }
 
-    chatDataStore.setState((state) => ({
+    useChatDataStore.setState((state) => ({
       data: [
         ...state.data,
         {
@@ -327,7 +327,7 @@ export default function Page() {
     stopGenerate();
     setInputContent('');
     asrResultRef.current = '';
-    chatDataStore.setState({ data: [] });
+    useChatDataStore.setState({ data: [] });
   }
 
   async function handleRegenerate(item: ChatMessage) {
@@ -338,7 +338,7 @@ export default function Page() {
   }
 
   function handleMessageDelete(item: ChatMessage) {
-    chatDataStore.setState((state) => ({ data: state.data.filter((v) => v.id !== item.id) }));
+    useChatDataStore.setState((state) => ({ data: state.data.filter((v) => v.id !== item.id) }));
   }
 
   function updateSystemPrompt(prompt?: string) {
@@ -406,7 +406,7 @@ export default function Page() {
           colorScheme={currentChat.systemMessage ? 'telegram' : 'gray'}
           icon={currentChat.systemMessage ? <IconAdjustmentsPlus stroke={1.5} /> : <IconAdjustmentsAlt stroke={1.5} />}
           onClick={() => {
-            visibleStore.setState((state) => ({ promptVisible: !state.promptVisible }));
+            usePanelVisibleStore.setState((state) => ({ chatSettingVisible: !state.chatSettingVisible }));
           }}
         />
       </div>

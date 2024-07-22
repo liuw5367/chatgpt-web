@@ -1,10 +1,10 @@
 import Clipboard from 'clipboard';
 import { v4 as uuidFn } from 'uuid';
 
-import { chatConfigStore } from '../app/store';
+import { useAppSettingStore } from '../stores';
 
 export function request(url: string, config: RequestInit) {
-  const { accessCode } = chatConfigStore.getState();
+  const { accessCode } = useAppSettingStore.getState();
   return fetch(url, {
     ...config,
     headers: {

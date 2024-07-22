@@ -33,6 +33,10 @@ export function Command(props: Props) {
   useDebounceEffect(
     () => {
       let command = value?.trim();
+      if (!command.startsWith('/')) {
+        return;
+      }
+
       if (command === '/') {
         setPromptList(getPrompts());
         scrollToTop();
@@ -41,10 +45,8 @@ export function Command(props: Props) {
       if (!command || command.length <= 1) {
         return;
       }
-      if (!command.startsWith('/')) {
-        return;
-      }
-      command = command.slice(1).toLowerCase();
+
+      command = command.slice(1).toLowerCase().trimStart();
 
       const prompts = allPrompts.filter((item) => {
         return item.act.toLowerCase().includes(command) || item.prompt.toLowerCase().includes(command);

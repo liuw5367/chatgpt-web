@@ -1,12 +1,17 @@
-import type { ChatConfigType } from './store';
+import type { ModelSettingState } from './stores';
 
-export interface ChatItem extends Pick<ChatConfigType, 'openAIModel' | 'temperature' | 'top_p'> {
+export interface ChatItem {
   id: string;
   name: string;
   selected?: boolean;
 
   systemMessage?: string;
   conversationId?: string;
+
+  provider?: keyof ModelSettingState;
+  modelId?: string;
+  temperature?: string;
+  top_p?: string;
 }
 
 export interface ChatMessage {

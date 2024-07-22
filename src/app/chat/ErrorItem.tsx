@@ -14,24 +14,22 @@ export default function ErrorItem(props: Props) {
     return null;
   }
 
+  if (error?.message) {
+    return (
+      <Alert status="error" className="relative mb-4 rounded">
+        <Box>
+          <AlertTitle>{error?.code || ''}</AlertTitle>
+          <AlertDescription>{error?.message}</AlertDescription>
+        </Box>
+        <CloseButton onClick={onClose} className="absolute !right-2 !top-2" />
+      </Alert>
+    );
+  }
+
   return (
     <Alert status="error" className="relative mb-4 rounded">
-      {error?.message
-        ? (
-          <>
-            <Box>
-              <AlertTitle>{error?.code || ''}</AlertTitle>
-              <AlertDescription>{error?.message}</AlertDescription>
-            </Box>
-            <CloseButton onClick={onClose} className="absolute !right-2 !top-2" />
-          </>
-          )
-        : (
-          <>
-            {error?.code || ''}
-            <CloseButton onClick={onClose} className="absolute !right-2" />
-          </>
-          )}
+      {error?.code || ''}
+      <CloseButton onClick={onClose} className="absolute !right-2" />
     </Alert>
   );
 }

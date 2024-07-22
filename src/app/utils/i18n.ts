@@ -1,23 +1,8 @@
 import { useMemoizedFn } from 'ahooks';
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
 
-import localeEn from '../locales/en.json';
-import localeZh from '../locales/zh.json';
-
-interface State {
-  language?: string | undefined;
-}
-export const i18nStore = create<State, [['zustand/persist', State]]>(
-  persist(
-    () => ({
-    }),
-    {
-      name: 'persist-i18n',
-      storage: createJSONStorage(() => localStorage),
-    },
-  ),
-);
+import localeEn from '../../locales/en.json';
+import localeZh from '../../locales/zh.json';
+import { i18nStore } from '../stores';
 
 export function useTranslation() {
   const language = i18nStore((s) => s.language);

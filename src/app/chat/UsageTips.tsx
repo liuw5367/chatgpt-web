@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { useTranslation } from '../i18n';
+import { useTranslation } from '../utils/i18n';
 
 export function UsageTips() {
   const { language } = useTranslation();

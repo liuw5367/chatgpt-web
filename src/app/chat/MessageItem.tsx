@@ -28,8 +28,8 @@ import {
 import { useState } from 'react';
 
 import type { ChatMessage } from '../types';
-import { renderMarkdown } from './markdown';
-import { estimateTokens } from './token';
+import { estimateTokens } from '../utils/token';
+import { renderMarkdown } from '../components';
 
 interface Props {
   item: ChatMessage;
