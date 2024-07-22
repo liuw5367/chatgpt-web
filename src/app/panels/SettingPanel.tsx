@@ -21,6 +21,7 @@ import { supportLanguages } from '../chat/Recognition';
 import { useTranslation } from '../i18n';
 import type { ChatConfigType } from '../store';
 import { chatConfigStore, visibleStore } from '../store';
+import { defaultModel } from '@/constants';
 
 export interface SettingItemType<T = string> {
   type?: 'password' | 'number' | 'switch' | 'select';
@@ -34,6 +35,7 @@ export interface SettingItemType<T = string> {
 export const modelList = [
   { label: 'gpt-3.5-turbo', value: 'gpt-3.5-turbo', token: 16385 },
   { label: 'gpt-4o', value: 'gpt-4o', token: 128000 },
+  { label: 'gpt-4o-mini', value: 'gpt-4o-mini', token: 128000 },
   { label: 'gpt-4', value: 'gpt-4', token: 8192 },
   { label: 'gpt-4-turbo', value: 'gpt-4-turbo', token: 128000 },
   { label: 'gpt-4-32k', value: 'gpt-4-32k', token: 32768 },
@@ -98,7 +100,7 @@ export function SettingPanel() {
     },
     { label: 'OpenAI Host', value: 'openAIHost', placeholder: 'https://api.openai.com' },
     { label: 'OpenAI Key', value: 'openAIKey', placeholder: `${t('please enter')} ` + `OPENAI_KEY` },
-    { label: 'OpenAI Model', value: 'openAIModel', type: 'select', placeholder: 'gpt-3.5-turbo' },
+    { label: 'OpenAI Model', value: 'openAIModel', type: 'select', placeholder: defaultModel },
     {
       type: 'number',
       label: 'temperature',

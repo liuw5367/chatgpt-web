@@ -29,6 +29,7 @@ import { Recognition } from './Recognition';
 import { SearchSuggestions } from './SearchSuggestions';
 import { estimateTokens } from './token';
 import { UsageTips } from './UsageTips';
+import { defaultModel } from '@/constants';
 
 export default function Page() {
   const { t } = useTranslation();
@@ -139,7 +140,7 @@ export default function Page() {
     const list: ChatMessage[] = [];
     const conversationList = conversationId ? messageList.filter((v) => v.conversationId === conversationId).reverse() : [];
 
-    const modelId = chatConfig.openAIModel || 'gpt-3.5-turbo';
+    const modelId = chatConfig.openAIModel || defaultModel;
     const target = modelList.find((v) => v.value === modelId);
     if (target) {
       const maxModelTokens = target.token;
