@@ -18,7 +18,7 @@ import React, { createRef, useEffect, useRef, useState } from 'react';
 import { AutoResizeTextarea } from '../../components';
 import { localDB } from '../utils/LocalDB';
 import { useTranslation } from '../utils/i18n';
-import { useAppSettingStore, useChatDataStore, useChatListStore, usePanelVisibleStore } from '../stores';
+import { useAppSettingStore, useChatDataStore, useChatListStore, useModelSettingStore, usePanelVisibleStore } from '../stores';
 import type { ChatMessage } from '../types';
 import { getCurrentTime, moveCursorToEnd, removeLn, request, scrollToElement, speakText, uuid } from '../utils';
 import { defaultModel } from '../../constants';
@@ -39,8 +39,9 @@ export default function Page() {
   const currentChat = useChatListStore((s) => s.currentChat());
   const updateChat = useChatListStore((s) => s.updateChat);
 
-  const chatConfig = useAppSettingStore();
-  const enterSend = chatConfig.enterSend === '1';
+  const appSetting = useAppSettingStore();
+  const providerSetting = useModelSettingStore((s) => s[appSetting.provider] || {});
+  const enterSend = appSetting.enterSend === '1';
   const inputRef = createRef<HTMLTextAreaElement>();
   const [inputContent, setInputContent] = useState('');
   const composingRef = useRef(false);
@@ -141,7 +142,7 @@ export default function Page() {
     const list: ChatMessage[] = [];
     const conversationList = conversationId ? messageList.filter((v) => v.conversationId === conversationId).reverse() : [];
 
-    const modelId = chatConfig.openAIModel || defaultModel;
+    const modelId = appSetting.modelId || defaultModel;
     const target = allModels.find((v) => v.value === modelId);
     if (target) {
       const maxModelTokens = target.token;
@@ -230,9 +231,9 @@ export default function Page() {
     }
 
     try {
-      const model = currentChat.modelId ?? chatConfig.modelId;
-      const temperature = currentChat.temperature ?? chatConfig.temperature;
-      const top_p = currentChat.top_p ?? chatConfig.top_p;
+      const model = currentChat.modelId ?? appSetting.modelId;
+      const temperature = currentChat.temperature ?? appSetting.temperature;
+      const top_p = currentChat.top_p ?? appSetting.top_p;
 
       const { messages } = buildRequestMessages(messageList, question, currentChat.conversationId, systemMessage);
 
@@ -249,7 +250,7 @@ export default function Page() {
         method: 'POST',
         signal: abortController.signal,
         body: JSON.stringify({
-          apiKey: chatConfig.openAIKey,
+          apiKey: appSetting.openAIHost,
           baseURL: chatConfig.openAIHost,
           model,
           settings,

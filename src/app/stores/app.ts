@@ -8,12 +8,7 @@ export interface AppSetting {
   enterSend?: string;
   asrLanguage?: string;
 
-  //
   provider: keyof ModelSettingState;
-  modelId?: string;
-  baseURL?: string;
-  temperature?: string;
-  top_p?: string;
 
   /**
    * @deprecated
